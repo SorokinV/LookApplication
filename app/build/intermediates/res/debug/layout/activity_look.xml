@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LookActivity">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:capitalize="words"
+        android:clickable="true"
+        android:enabled="true"
+        android:id="@+id/showsensorslist"
+        android:longClickable="false"
+        android:nestedScrollingEnabled="false"
+        android:onClick="ClickShowSensorsList"
+        android:text="Show sensors list"
+        android:visibility="visible" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:capitalize="words"
+        android:clickable="true"
+        android:enabled="true"
+        android:id="@+id/showwifilist"
+        android:longClickable="false"
+        android:nestedScrollingEnabled="false"
+        android:onClick="ClickShowWiFiList"
+        android:text="Show Wi-Fi list"
+        android:visibility="visible" />
+
+</LinearLayout>
+<!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/layout/activity_look.xml -->
