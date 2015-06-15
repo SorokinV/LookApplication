@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.net.wifi.WifiManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.List;
@@ -22,6 +24,8 @@ public class LookActivity extends ActionBarActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_look);
+
+        VerifyClickButtons();
 
     }
 
@@ -56,6 +60,19 @@ public class LookActivity extends ActionBarActivity {
     public void ClickShowWiFiList (View view) {
         Intent intent = new Intent(this,ShowWiFi.class);
         startActivity(intent);
+
+    }
+
+    void VerifyClickButtons () {
+
+        //
+        // is WiFi enabled?
+        //
+        WifiManager mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        Button bWiFi = (Button) findViewById(R.id.showwifilist); bWiFi.setClickable(mWiFiManager.isWifiEnabled());
+        if (mWiFiManager.isWifiEnabled())
+                 bWiFi.setText(R.string.textshowwifilistOK);
+            else bWiFi.setText(R.string.textshowwifilistNOT);
 
     }
 

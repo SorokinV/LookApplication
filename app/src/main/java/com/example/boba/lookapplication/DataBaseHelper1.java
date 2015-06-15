@@ -17,7 +17,15 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
 
     // Database creation sql statement
     private static final String DATABASE_CREATE =
-            "create table MyEmployees ( _id integer primary key,name text not null);";
+            "create table WiFi ( " +
+                    "_id integer primary key,"+
+                    "SSID text not null,"+
+                    "BSSID text not null,"+
+                    "capabalities integer,"+
+                    "frequency float,"+
+                    "level float,"+
+                    "describeContents text,"+
+                    "datetime float);";
 
     public DataBaseHelper1(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

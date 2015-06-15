@@ -30,7 +30,7 @@
         android:longClickable="false"
         android:nestedScrollingEnabled="false"
         android:onClick="ClickShowWiFiList"
-        android:text="Show Wi-Fi list"
+        android:text="@string/textshowwifilistOK"
         android:visibility="visible" />
 
 </LinearLayout>

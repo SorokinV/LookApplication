@@ -5,4 +5,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_show_sensors">Show Sensors</string>
     <string name="title_activity_show_wi_fi">Show WiFi</string>
+
+    <string name="textshowwifilistOK">Show WiFi list</string>
+    <string name="textshowwifilistNOT">WiFi is not enabled</string>
+
 </resources>

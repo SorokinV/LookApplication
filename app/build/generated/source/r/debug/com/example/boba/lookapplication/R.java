@@ -1704,8 +1704,10 @@ containing a value of this type.
         public static final int app_name=0x7f060012;
         public static final int hello_world=0x7f060013;
         public static final int status_bar_notification_info_overflow=0x7f060014;
-        public static final int title_activity_show_sensors=0x7f060015;
-        public static final int title_activity_show_wi_fi=0x7f060016;
+        public static final int textshowwifilistNOT=0x7f060015;
+        public static final int textshowwifilistOK=0x7f060016;
+        public static final int title_activity_show_sensors=0x7f060017;
+        public static final int title_activity_show_wi_fi=0x7f060018;
     }
     public static final class style {
         public static final int AlertDialog_AppCompat=0x7f080073;
