@@ -91,7 +91,7 @@ public class ShowWiFi extends ActionBarActivity {
 
         catch (java.lang.SecurityException badly) {
 
-            String[] xString = {"Exception Exception Exception!!!",badly.getMessage()};
+            String[] xString = {"Exception Error!!!",badly.getMessage()};
             //String[] xString = {"getWiFiState :"+mWiFiManager.getWifiState()};
             //String[] xString = {"isWiFiEnabled :"+mWiFiManager.isWifiEnabled()};
             mString = xString;
