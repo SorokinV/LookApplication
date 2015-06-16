@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -60,6 +62,15 @@ public class LookActivity extends ActionBarActivity {
     public void ClickShowWiFiList (View view) {
         Intent intent = new Intent(this,ShowWiFi.class);
         startActivity(intent);
+
+    }
+
+    public void ClickStartLookService (View view) {
+        Intent intent = new Intent(this,LookServiceBobaTest.class);
+        //ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
+        //beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP,2000);
+        startService(intent);
+
 
     }
 

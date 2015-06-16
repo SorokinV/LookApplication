@@ -8,5 +8,6 @@
 
     <string name="textshowwifilistOK">Show WiFi list</string>
     <string name="textshowwifilistNOT">WiFi is not enabled</string>
+    <string name="textstartlookservice">Start look service</string>
 
 </resources>

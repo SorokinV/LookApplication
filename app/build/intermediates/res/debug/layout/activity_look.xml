@@ -33,5 +33,18 @@
         android:text="@string/textshowwifilistOK"
         android:visibility="visible" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:capitalize="words"
+        android:clickable="true"
+        android:enabled="true"
+        android:id="@+id/startlookservice"
+        android:longClickable="false"
+        android:nestedScrollingEnabled="false"
+        android:onClick="ClickStartLookService"
+        android:text="@string/textstartlookservice"
+        android:visibility="visible" />
+
 </LinearLayout>
 <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/layout/activity_look.xml -->
