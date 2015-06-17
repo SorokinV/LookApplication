@@ -54,35 +54,35 @@ ADDED from AndroidManifest.xml:19:17
 	android:name
 		ADDED from AndroidManifest.xml:19:25
 category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:21:17
+ADDED from AndroidManifest.xml:20:17
 	android:name
-		ADDED from AndroidManifest.xml:21:27
+		ADDED from AndroidManifest.xml:20:27
 activity#com.example.boba.lookapplication.ShowSensors
-ADDED from AndroidManifest.xml:24:9
+ADDED from AndroidManifest.xml:23:9
 	android:label
-		ADDED from AndroidManifest.xml:26:13
-	android:parentActivityName
-		ADDED from AndroidManifest.xml:27:13
-	android:name
 		ADDED from AndroidManifest.xml:25:13
-meta-data#android.support.PARENT_ACTIVITY
-ADDED from AndroidManifest.xml:28:13
-	android:name
-		ADDED from AndroidManifest.xml:29:17
-	android:value
-		ADDED from AndroidManifest.xml:30:17
-activity#com.example.boba.lookapplication.ShowWiFi
-ADDED from AndroidManifest.xml:32:9
-	android:label
-		ADDED from AndroidManifest.xml:34:13
 	android:parentActivityName
-		ADDED from AndroidManifest.xml:35:13
+		ADDED from AndroidManifest.xml:26:13
 	android:name
+		ADDED from AndroidManifest.xml:24:13
+meta-data#android.support.PARENT_ACTIVITY
+ADDED from AndroidManifest.xml:27:13
+	android:name
+		ADDED from AndroidManifest.xml:28:17
+	android:value
+		ADDED from AndroidManifest.xml:29:17
+activity#com.example.boba.lookapplication.ShowWiFi
+ADDED from AndroidManifest.xml:31:9
+	android:label
 		ADDED from AndroidManifest.xml:33:13
-service#com.example.boba.lookapplication.LookServiceBobaTest
-ADDED from AndroidManifest.xml:40:9
+	android:parentActivityName
+		ADDED from AndroidManifest.xml:34:13
 	android:name
-		ADDED from AndroidManifest.xml:40:18
+		ADDED from AndroidManifest.xml:32:13
+service#com.example.boba.lookapplication.LookServiceBobaTest
+ADDED from AndroidManifest.xml:39:9
+	android:name
+		ADDED from AndroidManifest.xml:39:18
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:22.2.0:20:5

@@ -209,6 +209,7 @@
     <string name="textshowwifilistNOT">WiFi is not enabled</string>
     <string name="textshowwifilistOK">Show WiFi list</string>
     <string name="textstartlookservice">Start look service</string>
+    <string name="textstoplookservice">Stop look service</string>
     <string name="title_activity_show_sensors">Show Sensors</string>
     <string name="title_activity_show_wi_fi">Show WiFi</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->

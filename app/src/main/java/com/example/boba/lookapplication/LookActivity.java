@@ -21,6 +21,8 @@ import java.util.List;
 
 public class LookActivity extends ActionBarActivity {
 
+    Intent intentService = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -28,6 +30,7 @@ public class LookActivity extends ActionBarActivity {
         setContentView(R.layout.activity_look);
 
         VerifyClickButtons();
+
 
     }
 
@@ -66,12 +69,29 @@ public class LookActivity extends ActionBarActivity {
     }
 
     public void ClickStartLookService (View view) {
-        Intent intent = new Intent(this,LookServiceBobaTest.class);
-        //ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
-        //beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP,2000);
-        startService(intent);
 
+        if (intentService!=null) {
+            stopService(intentService);
+            intentService=null;
+            try {wait(1000);} catch(Exception e) {};
+        };
 
+        intentService = new Intent(this,LookServiceBobaTest.class);
+
+        intentService.putExtra("beep",false);
+        intentService.putExtra("delayMS",getDelayService());
+        intentService.putExtra("timeMS",getTimeService());
+
+        startService(intentService);
+
+    }
+
+    public void ClickStopLookService (View view) {
+
+        if (intentService!=null) {
+            stopService(intentService);
+            intentService=null;
+        };
     }
 
     void VerifyClickButtons () {
@@ -86,5 +106,8 @@ public class LookActivity extends ActionBarActivity {
             else bWiFi.setText(R.string.textshowwifilistNOT);
 
     }
+
+    long getDelayService () {return(15*1000);};
+    long getTimeService () {return(2*60*60*1000);}; // {return(2*60*60*1000);};
 
 }
