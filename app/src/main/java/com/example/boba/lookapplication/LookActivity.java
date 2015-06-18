@@ -31,6 +31,9 @@ public class LookActivity extends ActionBarActivity {
 
         VerifyClickButtons();
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // If your minSdkVersion is 11 or higher, instead use:
+        // getActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
@@ -38,7 +41,8 @@ public class LookActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_look, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
+        // return true; // without menu
     }
 
     @Override
@@ -50,10 +54,14 @@ public class LookActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent();
+            intent.setClass(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+
     }
 
     public void ClickShowSensorsList (View view) {
@@ -73,8 +81,8 @@ public class LookActivity extends ActionBarActivity {
         if (intentService!=null) {
             stopService(intentService);
             intentService=null;
-            try {wait(1000);} catch(Exception e) {};
-        };
+            try {wait(1000);} catch(Exception e) {}
+        }
 
         intentService = new Intent(this,LookServiceBobaTest.class);
 
@@ -91,7 +99,7 @@ public class LookActivity extends ActionBarActivity {
         if (intentService!=null) {
             stopService(intentService);
             intentService=null;
-        };
+        }
     }
 
     void VerifyClickButtons () {
@@ -107,7 +115,7 @@ public class LookActivity extends ActionBarActivity {
 
     }
 
-    long getDelayService () {return(15*1000);};
-    long getTimeService () {return(2*60*60*1000);}; // {return(2*60*60*1000);};
+    long getDelayService () {return(15*1000);}
+    long getTimeService () {return(2*60*60*1000);} // {return(2*60*60*1000);};
 
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:dialogTitle="Введите размер задержки между опросами (от 3 до 60 сек)"
+        android:key="@string/pref_delayS"
+        android:summary="Устанавливает новый размер задержки между опросами (сек)"
+        android:title="Размер задержки между опросами (сек)" />
+
+    <EditTextPreference
+        android:defaultValue="60"
+        android:dialogTitle="Введите период опроса (от 2 до 180 минут )"
+        android:key="@string/pref_waitM"
+        android:summary="Устанавливает новый период опроса (мин)"
+        android:title="Период опроса (мин)" />
+
+
+</PreferenceScreen>
