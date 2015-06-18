@@ -85,6 +85,9 @@ public class LookServiceBobaTest extends IntentService {
         while (System.currentTimeMillis() < endTime) {
             if (stopped) break;
             Log.d(LOG_TAG, "service WORKING");
+            if (OKProtocol) {
+                wpn.writeRecord("a?");
+            };
 
             float procentWork = (endTime - System.currentTimeMillis()) / workTimeMS;
             String notificationText = String.valueOf((int) (100 * procentWork)) + " %";
