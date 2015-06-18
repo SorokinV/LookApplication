@@ -17,15 +17,19 @@ import java.util.List;
  */
 public class LookServiceBobaTest extends IntentService {
 
-    boolean OKBeep = true;
-    boolean stopped = false;
+    boolean OKBeep       = true;
+    boolean OKProtocol   = true;
+    boolean stopped      = false;
 
-    long delayWaitMS    = 5*1000;    // 05 sec
-    long workTimeMS     = 60*1000; // 60 sec
+    long delayWaitMS     = 5*1000;    // 05 sec
+    long workTimeMS      = 60*1000; // 60 sec
     final String LOG_TAG = "LookServiceBoba";
 
-    String workFileName = "wifi.csv";
+    String workFileName  = "wifi.csv";
     WriteInFile wif;
+
+    String workProtName  = "protocol.csv";
+    WriteInFile wpn;
 
     ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
 
@@ -48,6 +52,7 @@ public class LookServiceBobaTest extends IntentService {
 
         stopped = false;
 
+        if (OKProtocol) wpn = new WriteInFile(this,workProtName);
         wif = new WriteInFile(this,workFileName);
         Log.d(LOG_TAG, "service starting beep="+OKBeep+" size="+wif.fSize()+" "+getExternalFilesDir(null));
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
@@ -56,6 +61,7 @@ public class LookServiceBobaTest extends IntentService {
     @Override
     public void onDestroy() {
         stopped = true;
+        if (OKProtocol) wpn.close();
         wif.close();
         Toast.makeText(this, "service destroy", Toast.LENGTH_SHORT).show();
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP);
@@ -73,6 +79,7 @@ public class LookServiceBobaTest extends IntentService {
         // Normally we would do some work here, like download a file.
         // For our sample, we just sleep for 5 seconds.
 
+        String prot = "";
         long endTime = System.currentTimeMillis() + workTimeMS;
         Log.d(LOG_TAG, "service before WORKING");
         while (System.currentTimeMillis() < endTime) {
@@ -83,6 +90,11 @@ public class LookServiceBobaTest extends IntentService {
             String notificationText = String.valueOf((int) (100 * procentWork)) + " %";
 
             String[] listWiFi = bobaWiFiLook();
+
+            if (OKProtocol) {
+                if (listWiFi == null) prot = "r0"; else prot = "r" + listWiFi.length;
+                wpn.writeRecord(prot);
+            };
 
             if (listWiFi!=null) for (String iWiFi : listWiFi) wif.writeRecord(iWiFi);
 
@@ -116,11 +128,11 @@ public class LookServiceBobaTest extends IntentService {
 
                 int i = 0;
                 for ( ScanResult iList : deviceWiFis ) {
-                    mString[i++] = iList.SSID+"\t"+
-                            iList.BSSID+"\t"+
-                            iList.capabilities+"\t"+
-                            iList.frequency+"\t"+
+                    mString[i++] = iList.BSSID+"\t"+
                             iList.level+"\t"+
+                            iList.frequency+"\t"+
+                            iList.SSID+"\t"+
+                            iList.capabilities+"\t"+
                             iList.describeContents();
                 }}
 
