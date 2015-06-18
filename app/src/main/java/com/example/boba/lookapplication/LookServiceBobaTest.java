@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-/**
+/*
  * Created by boba2 on 16.06.2015.
  */
 public class LookServiceBobaTest extends IntentService {
@@ -21,7 +21,7 @@ public class LookServiceBobaTest extends IntentService {
     boolean stopped = false;
 
     long delayWaitMS    = 5*1000;    // 05 sec
-    long workTimeMS     = 1*30*1000; // 60 sec
+    long workTimeMS     = 60*1000; // 60 sec
     final String LOG_TAG = "LookServiceBoba";
 
     String workFileName = "wifi.csv";
@@ -35,7 +35,6 @@ public class LookServiceBobaTest extends IntentService {
      */
     public LookServiceBobaTest() {
         super("LookServiceBobaTest");
-        if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
     }
 
     @Override
@@ -43,12 +42,14 @@ public class LookServiceBobaTest extends IntentService {
 
         delayWaitMS = intent.getLongExtra("delayMS",delayWaitMS);
         workTimeMS = intent.getLongExtra("timeMS",workTimeMS);
-        OKBeep = intent.getBooleanExtra("beep",OKBeep);
+        OKBeep = intent.getBooleanExtra("beep", OKBeep);
+
+        if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
         stopped = false;
 
         wif = new WriteInFile(this,workFileName);
-        Log.d(LOG_TAG, "service starting size="+wif.fSize()+" "+getExternalFilesDir(null));
+        Log.d(LOG_TAG, "service starting beep="+OKBeep+" size="+wif.fSize()+" "+getExternalFilesDir(null));
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         return super.onStartCommand(intent,flags,startId);
     }

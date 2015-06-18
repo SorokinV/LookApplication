@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ import java.util.List;
 public class LookActivity extends ActionBarActivity {
 
     Intent intentService = null;
+
+    int    delayS = 5;
+    int    timeM  = 120;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +90,7 @@ public class LookActivity extends ActionBarActivity {
 
         intentService = new Intent(this,LookServiceBobaTest.class);
 
-        intentService.putExtra("beep",false);
+        intentService.putExtra("beep",true);
         intentService.putExtra("delayMS",getDelayService());
         intentService.putExtra("timeMS",getTimeService());
 
@@ -113,9 +117,12 @@ public class LookActivity extends ActionBarActivity {
                  bWiFi.setText(R.string.textshowwifilistOK);
             else bWiFi.setText(R.string.textshowwifilistNOT);
 
+        TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
+        bTextMessage.setText("service setings: M(S) :"+timeM+"("+delayS+")");
+
     }
 
-    long getDelayService () {return(15*1000);}
-    long getTimeService () {return(2*60*60*1000);} // {return(2*60*60*1000);};
+    long getDelayService () {return(delayS*1000);}
+    long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
 
 }
