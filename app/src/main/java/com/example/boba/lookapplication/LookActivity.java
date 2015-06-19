@@ -1,7 +1,9 @@
 package com.example.boba.lookapplication;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -17,25 +20,44 @@ import java.util.List;
 
 public class LookActivity extends ActionBarActivity {
 
-    Intent intentService = null;
+    Intent  intentService = null;
 
     String LOG_TAG = "Main--Main";
 
     int    delayS = 5;
-    int    timeM  = 120;
+    int    timeM  = 3;
 
-    @Override
+    ProgressBar progressBar;
+
+    private UpdateBroadcastReceiver updateBroadcastReceiver;
+
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_look);
 
+        // draw and initialize activity
+        progressBar = (ProgressBar) findViewById(R.id.progressbar);
         VerifyClickButtons();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // If your minSdkVersion is 11 or higher, instead use:
         // getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // registration BroadcastReceiver
+        updateBroadcastReceiver = new UpdateBroadcastReceiver();
+
+        IntentFilter intentFilterUpdate = new IntentFilter(
+                LookServiceBobaTest.ACTION_UPDATE);
+        intentFilterUpdate.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(updateBroadcastReceiver, intentFilterUpdate);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(updateBroadcastReceiver);
     }
 
     @Override
@@ -118,11 +140,21 @@ public class LookActivity extends ActionBarActivity {
 
         LookGeo lookGeo = new LookGeo(this);
         Log.d(LOG_TAG, "-----------------------GPS <x,y> = " + lookGeo.getLocationString());
-        bTextMessage.setText(bText+" <x,y>="+lookGeo.getLocationString());
+        bTextMessage.setText(bText + " <x,y>=" + lookGeo.getLocationString());
 
     }
 
     long getDelayService () {return(delayS*1000);}
     long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
+
+    public class UpdateBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int update = intent
+                    .getIntExtra(LookServiceBobaTest.EXTRA_KEY_UPDATE, 0);
+            progressBar.setProgress(update);
+        }
+    }
 
 }

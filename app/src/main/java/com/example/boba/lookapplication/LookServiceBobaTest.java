@@ -36,6 +36,9 @@ public class LookServiceBobaTest extends IntentService {
 
     LookGeo lookGeo = null;
 
+    public static final String ACTION_UPDATE = "com.example.boba.lookapplication.UPDATE";
+    public static final String EXTRA_KEY_UPDATE = "EXTRA_UPDATE";
+
     /**
      * A constructor is required, and must call the super IntentService(String)
      * constructor with a name for the worker thread.
@@ -92,17 +95,15 @@ public class LookServiceBobaTest extends IntentService {
         // For our sample, we just sleep for 5 seconds.
 
         String prot = "";
-        long endTime = System.currentTimeMillis() + workTimeMS;
         Log.d(LOG_TAG, "service before WORKING");
+
+        long endTime = System.currentTimeMillis() + workTimeMS;
+        float procentWork = (float)0.0;
+
         while (System.currentTimeMillis() < endTime) {
             if (stopped) break;
-            Log.d(LOG_TAG, "service WORKING");
-            if (OKProtocol) {
-                wpn.writeRecord("a?");
-            }
-
-            float procentWork = (endTime - System.currentTimeMillis()) / workTimeMS;
-            String notificationText = String.valueOf((int) (100 * procentWork)) + " %";
+            Log.d(LOG_TAG, "service WORKING "+procentWork+" % "+((int)(procentWork*100)));
+            if (OKProtocol) { wpn.writeRecord("a?"); }
 
             String[] listWiFi = bobaWiFiLook();
 
@@ -115,13 +116,17 @@ public class LookServiceBobaTest extends IntentService {
 
             // wif.writeRecord(notificationText);
 
-            synchronized (this) {
-                try {
-                    wait(delayWaitMS);
-                } catch (Exception e) {
-                }
-            }
+            synchronized (this) { try { wait(delayWaitMS); } catch (Exception e) {} }
+
+            procentWork = (float)(1.0-((0.0+endTime - System.currentTimeMillis()) / workTimeMS));
+            Intent intentUpdate = new Intent();
+            intentUpdate.setAction(ACTION_UPDATE);
+            intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
+            intentUpdate.putExtra(EXTRA_KEY_UPDATE, (int)(procentWork*100.0));
+            sendBroadcast(intentUpdate);
+
         }
+
     }
 
     String[] bobaWiFiLook () {
@@ -154,7 +159,7 @@ public class LookServiceBobaTest extends IntentService {
 
         }
 
-        catch (java.lang.SecurityException badly) {
+        catch (Exception e) {
             mString = null;
         }
 
