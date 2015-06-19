@@ -22,7 +22,7 @@ public class LookActivity extends ActionBarActivity {
     String LOG_TAG = "Main--Main";
 
     int    delayS = 5;
-    int    timeM  = 3;
+    int    timeM  = 120;
 
     ProgressBar progressBar;
 
@@ -105,6 +105,8 @@ public class LookActivity extends ActionBarActivity {
             intentService=null;
         }
 
+        sendServiceCommand(-1);
+
         intentService = new Intent(this,LookServiceBobaTest.class);
 
         intentService.putExtra("beep",true);
@@ -164,7 +166,8 @@ public class LookActivity extends ActionBarActivity {
             progressBar.setProgress(update);
             int state  = intent
                     .getIntExtra(LookServiceBobaTest.EXTRA_KEY_SERVICE, 0);
-            if (state>=0) progressBar.setVisibility(View.VISIBLE); else progressBar.setVisibility(View.INVISIBLE);
+            if (state>=0) progressBar.setVisibility(View.VISIBLE);
+            else {progressBar.setVisibility(View.INVISIBLE); intentService=null;}
         }
 
     }

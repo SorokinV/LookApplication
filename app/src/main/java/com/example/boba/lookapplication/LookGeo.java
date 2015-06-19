@@ -1,6 +1,8 @@
 package com.example.boba.lookapplication;
 
 import android.content.Context;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
@@ -22,7 +24,7 @@ public class LookGeo {
     String nameProvider = "gps";
 
     public LookGeo (Context ctx) {
-        if (OKProtocol) logs = new WriteInFile(ctx,logname,false); OKProtocol = (logs!=null);
+        if (OKProtocol) logs = new WriteInFile(ctx,logname,true /* = Append; false = noAppend */ ); OKProtocol = (logs!=null);
         if (OKGPS) {
             try {
                 locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
@@ -45,6 +47,18 @@ public class LookGeo {
                     }
                 }
 
+                LocationProvider gpsProvider = locationManager.getProvider(nameProvider);
+                GpsStatus gpsStatus = locationManager.getGpsStatus(null);
+                for ( GpsSatellite iSat : gpsStatus.getSatellites() ) {
+                    logs.writeRecord(" Sat: Prn:"+iSat.getPrn()+" "+
+                            " Az:"+iSat.getAzimuth()+
+                            " El:"+iSat.getElevation()+
+                            " Snr:"+iSat.getSnr()+
+                            " Alm:"+iSat.hasAlmanac()+
+                            " Eph:"+iSat.hasEphemeris()+
+                            " inFix:"+iSat.usedInFix());
+                }
+
             } catch (Exception e) {
                 OKGPS = false;
                 locationManager = null;
@@ -56,7 +70,7 @@ public class LookGeo {
         if (!OKGPS) return (null);
         Location location = null;
         try {
-            location = locationManager.getLastKnownLocation("gps");
+            location = locationManager.getLastKnownLocation(nameProvider);
         } catch (Exception e) {location=null; OKGPS=false;}
         return (location);
     }
