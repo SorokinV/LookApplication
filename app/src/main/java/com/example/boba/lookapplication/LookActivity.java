@@ -2,13 +2,6 @@ package com.example.boba.lookapplication;
 
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.location.GpsStatus;
-import android.location.Location;
-import android.location.LocationManager;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -16,9 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -125,33 +116,9 @@ public class LookActivity extends ActionBarActivity {
         TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
         String bText = "service setings: M(S) :"+timeM+"("+delayS+")";
 
-
-
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-        GpsStatus gpsStatus = locationManager.getGpsStatus(null);
-        Log.d(LOG_TAG, "-------------------------------GPSStatus = "+
-                gpsStatus.getMaxSatellites()+" "+
-                gpsStatus.getTimeToFirstFix());
-
-        for (String iProvider : locationManager.getProviders(true)) {
-            Log.d(LOG_TAG, "-----------------------GPS Provider = " + iProvider);
-        }
-
-        Location bLocation = locationManager.getLastKnownLocation("gps");
-        if (bLocation!=null) {
-            bText += bLocation.getLatitude() + "::" + bLocation.getLongitude();
-            Log.d(LOG_TAG, "-----------------------GPS <x,y> = " +
-                    bLocation.getLongitude()+"::"+
-                    bLocation.getLatitude());
-
-        }
-
-        /* bred from Google
-        Location bLocation = new LookGeo(this).getLocation();
-        if (bLocation!=null) bText += bLocation.getLatitude()+"::"+bLocation.getLongitude();
-        */
-        bTextMessage.setText(bText);
+        LookGeo lookGeo = new LookGeo(this);
+        Log.d(LOG_TAG, "-----------------------GPS <x,y> = " + lookGeo.getLocationString());
+        bTextMessage.setText(bText+" <x,y>="+lookGeo.getLocationString());
 
     }
 

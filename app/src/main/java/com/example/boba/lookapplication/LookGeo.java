@@ -2,78 +2,75 @@ package com.example.boba.lookapplication;
 
 import android.content.Context;
 import android.location.Location;
-import android.os.Bundle;
-import android.util.Log;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 
 /**
  * Created by boba2 on 18.06.2015.
  */
 
-public class LookGeo implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class LookGeo {
 
     String LOG_TAG = "LookGeo";
 
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation = null;
+    boolean OKGPS = true;
+    boolean OKProtocol = true;
+    LocationManager locationManager = null;
+    String logname = LOG_TAG+".csv";
+    WriteInFile logs;
+
+    String nameProvider = "gps";
 
     public LookGeo (Context ctx) {
-        buildGoogleApiClient(ctx);
-    }
+        if (OKProtocol) logs = new WriteInFile(ctx,logname,false); OKProtocol = (logs!=null);
+        if (OKGPS) {
+            try {
+                locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+                for (String iProvider : locationManager.getProviders(true)) {
+                    LocationProvider provider = locationManager.getProvider(iProvider);
+                    if (OKProtocol) {
+                        logs.writeRecord("GPS provider: "+
+                                        provider.getName()+"("+
+                                        "accuracy:"+provider.getAccuracy()+" "+
+                                        "power:"+provider.getPowerRequirement()+" "+
+                                        "money:"+provider.hasMonetaryCost()+" "+
+                                        // "criteria:"+provider.meetsCriteria()+" "+ // ?????????
+                                        "cell:"+provider.requiresCell()+" "+
+                                        "network:"+provider.requiresNetwork()+" "+
+                                        "sat:"+provider.requiresSatellite()+" "+
+                                        "alt:"+provider.supportsAltitude()+" "+
+                                        "bearing:"+provider.supportsBearing()+" "+
+                                        "speed:"+provider.supportsSpeed()+")"
+                        );
+                    }
+                }
 
-    protected synchronized void buildGoogleApiClient(Context ctx) {
-
-        /*
-        mGoogleApiClient = new GoogleApiClient.Builder(ctx,this,this)
-                .addApi(LocationServices.API)
-                .build();
-        */
-
-        mGoogleApiClient = new GoogleApiClient.Builder(ctx)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-//        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        Log.d(LOG_TAG, "--------------LastLocation null? = "+(mLastLocation==null) );
-        if (mLastLocation != null) {
-            //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-            //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+            } catch (Exception e) {
+                OKGPS = false;
+                locationManager = null;
+            }
         }
-    }
-
-    public void onConnectionSuspended (int cause) {
-        Log.d(LOG_TAG, "--------------Suspended " );
-
-    }
-
-    public void onConnectionFailed (ConnectionResult result) {
-        Log.d(LOG_TAG, "--------------Failed" );
-
     }
 
     public Location getLocation () {
-        int iCount = 0;
-        while (mLastLocation==null) {
-            synchronized (this) {
-                try {wait(1000);
-                } catch (Exception e) { }
-            }
-            if ((++iCount)>=30) break;
-            Log.d(LOG_TAG, "getLocation iCount = "+iCount );
-        }
-        Location xLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        Log.d(LOG_TAG, "getLocation null? = "+(xLocation==null) );
-        return(xLocation);
+        if (!OKGPS) return (null);
+        Location location = null;
+        try {
+            location = locationManager.getLastKnownLocation("gps");
+        } catch (Exception e) {location=null; OKGPS=false;}
+        return (location);
     }
+
+    public String getLocationString () {
+        String loc = ""; if (!OKGPS) return (loc);
+        try {
+            Location location = locationManager.getLastKnownLocation(nameProvider);
+            if (location == null) loc="";
+            loc = location.getLatitude()+" "+location.getLongitude();
+        } catch (Exception e) {loc=""; OKGPS=false;}
+        return (loc);
+    }
+
+    public boolean isGPS() {return(OKGPS);}
 
 }

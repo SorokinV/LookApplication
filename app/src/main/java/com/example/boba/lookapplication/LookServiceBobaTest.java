@@ -25,6 +25,7 @@ public class LookServiceBobaTest extends IntentService {
     long workTimeMS      = 60*1000; // 60 sec
     final String LOG_TAG = "LookServiceBoba";
 
+    String sep = "\t";
     String workFileName  = "wifi.csv";
     WriteInFile wif;
 
@@ -33,16 +34,23 @@ public class LookServiceBobaTest extends IntentService {
 
     ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
 
+    LookGeo lookGeo = null;
+
     /**
      * A constructor is required, and must call the super IntentService(String)
      * constructor with a name for the worker thread.
      */
     public LookServiceBobaTest() {
         super("LookServiceBobaTest");
+        setIntentRedelivery(true); // ????? is helpful :)
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        // get parameters
+
+        stopped = false;
 
         delayWaitMS = intent.getLongExtra("delayMS",delayWaitMS);
         workTimeMS = intent.getLongExtra("timeMS",workTimeMS);
@@ -50,22 +58,26 @@ public class LookServiceBobaTest extends IntentService {
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
-        stopped = false;
-
         if (OKProtocol) wpn = new WriteInFile(this,workProtName);
         wif = new WriteInFile(this,workFileName);
-        Log.d(LOG_TAG, "service starting beep="+OKBeep+" size="+wif.fSize()+" "+getExternalFilesDir(null));
+
+        if (OKProtocol) { wpn.writeRecord("service begin"); }
+        lookGeo = new LookGeo(this);
+
+        Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+
         return super.onStartCommand(intent,flags,startId);
     }
     @Override
     public void onDestroy() {
         stopped = true;
-        if (OKProtocol) wpn.close();
         wif.close();
         Toast.makeText(this, "service destroy", Toast.LENGTH_SHORT).show();
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP);
-        Log.d(LOG_TAG, "service destroy size="+wif.fSize()+" "+wif.fPath());
+        Log.d(LOG_TAG, "service destroy size=" + wif.fSize() + " " + wif.fPath());
+        if (OKProtocol) { wpn.writeRecord("service end"); }
+        if (OKProtocol) wpn.close();
         super.onDestroy();
     }
 
@@ -87,7 +99,7 @@ public class LookServiceBobaTest extends IntentService {
             Log.d(LOG_TAG, "service WORKING");
             if (OKProtocol) {
                 wpn.writeRecord("a?");
-            };
+            }
 
             float procentWork = (endTime - System.currentTimeMillis()) / workTimeMS;
             String notificationText = String.valueOf((int) (100 * procentWork)) + " %";
@@ -97,9 +109,9 @@ public class LookServiceBobaTest extends IntentService {
             if (OKProtocol) {
                 if (listWiFi == null) prot = "r0"; else prot = "r" + listWiFi.length;
                 wpn.writeRecord(prot);
-            };
+            }
 
-            if (listWiFi!=null) for (String iWiFi : listWiFi) wif.writeRecord(iWiFi);
+            if (listWiFi!=null) for (String iWiFi : listWiFi) wif.writeRecord(lookGeo.getLocationString()+sep+iWiFi);
 
             // wif.writeRecord(notificationText);
 
@@ -131,11 +143,11 @@ public class LookServiceBobaTest extends IntentService {
 
                 int i = 0;
                 for ( ScanResult iList : deviceWiFis ) {
-                    mString[i++] = iList.BSSID+"\t"+
-                            iList.level+"\t"+
-                            iList.frequency+"\t"+
-                            iList.SSID+"\t"+
-                            iList.capabilities+"\t"+
+                    mString[i++] = iList.BSSID+sep+
+                            iList.level+sep+
+                            iList.frequency+sep+
+                            iList.SSID+sep+
+                            iList.capabilities+sep+
                             iList.describeContents();
                 }}
 
