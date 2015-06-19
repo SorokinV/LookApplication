@@ -15,9 +15,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.List;
-
-
 public class LookActivity extends ActionBarActivity {
 
     Intent  intentService = null;
@@ -38,6 +35,8 @@ public class LookActivity extends ActionBarActivity {
 
         // draw and initialize activity
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        progressBar.setVisibility(View.INVISIBLE);
+
         VerifyClickButtons();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -118,10 +117,11 @@ public class LookActivity extends ActionBarActivity {
 
     public void ClickStopLookService (View view) {
 
+
         if (intentService!=null) {
             stopService(intentService);
             intentService=null;
-        }
+        } else sendServiceCommand(-1);
     }
 
     void VerifyClickButtons () {
@@ -147,6 +147,14 @@ public class LookActivity extends ActionBarActivity {
     long getDelayService () {return(delayS*1000);}
     long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
 
+    void sendServiceCommand (int command) {
+        Intent intentUpdate = new Intent();
+        intentUpdate.setAction(LookServiceBobaTest.ACTION_COMMAND);
+        intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
+        intentUpdate.putExtra(LookServiceBobaTest.EXTRA_KEY_SERVICE, command);
+        sendBroadcast(intentUpdate);
+    }
+
     public class UpdateBroadcastReceiver extends BroadcastReceiver {
 
         @Override
@@ -154,7 +162,11 @@ public class LookActivity extends ActionBarActivity {
             int update = intent
                     .getIntExtra(LookServiceBobaTest.EXTRA_KEY_UPDATE, 0);
             progressBar.setProgress(update);
+            int state  = intent
+                    .getIntExtra(LookServiceBobaTest.EXTRA_KEY_SERVICE, 0);
+            if (state>=0) progressBar.setVisibility(View.VISIBLE); else progressBar.setVisibility(View.INVISIBLE);
         }
+
     }
 
 }
