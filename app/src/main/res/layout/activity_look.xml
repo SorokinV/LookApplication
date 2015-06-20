@@ -43,7 +43,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -79,7 +80,7 @@
         android:layout_alignBaseline="@+id/wifis"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        />
+        android:textStyle="bold" />
 
     <Button
         android:layout_width="wrap_content"

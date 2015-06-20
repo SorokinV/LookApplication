@@ -109,4 +109,16 @@ public class ShowWiFi extends ActionBarActivity {
 
     }
 
+    public int WiFiCount () {
+        WifiManager mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        int count = 0;
+        List<ScanResult> deviceWiFis = null;
+        try {
+            deviceWiFis = mWiFiManager.getScanResults();
+            if (deviceWiFis!=null) count = deviceWiFis.size();
+        }
+        catch (Exception e) { count = 0; }
+        return(count);
+    }
+
 }

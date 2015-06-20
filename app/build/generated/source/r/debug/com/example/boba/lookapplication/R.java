@@ -2287,15 +2287,17 @@ containing a value of this type.
         public static final int status_bar_notification_info_overflow=0x7f08004d;
         public static final int store_picture_message=0x7f08004e;
         public static final int store_picture_title=0x7f08004f;
-        public static final int textshowwifilistNOT=0x7f080050;
-        public static final int textshowwifilistOK=0x7f080051;
-        public static final int textstartlookservice=0x7f080052;
-        public static final int textstoplookservice=0x7f080053;
-        public static final int title_activity_setting=0x7f080054;
-        public static final int title_activity_show_sensors=0x7f080055;
-        public static final int title_activity_show_wi_fi=0x7f080056;
+        public static final int textGEOparameter=0x7f080050;
+        public static final int textserviceparameter=0x7f080051;
+        public static final int textshowwifilistNOT=0x7f080052;
+        public static final int textshowwifilistOK=0x7f080053;
+        public static final int textstartlookservice=0x7f080054;
+        public static final int textstoplookservice=0x7f080055;
+        public static final int title_activity_setting=0x7f080056;
+        public static final int title_activity_show_sensors=0x7f080057;
+        public static final int title_activity_show_wi_fi=0x7f080058;
         public static final int wallet_buy_button_place_holder=0x7f080037;
-        public static final int wifistext=0x7f080057;
+        public static final int wifistext=0x7f080059;
     }
     public static final class style {
         public static final int AlertDialog_AppCompat=0x7f0a0073;

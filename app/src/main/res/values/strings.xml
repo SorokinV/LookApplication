@@ -12,6 +12,9 @@
     <string name="sensorstext">Sensors :</string>
     <string name="wifistext">WiFi :</string>
 
+    <string name="textserviceparameter">Service parameters : %1$d min(%2$d sec)</string>
+    <string name="textGEOparameter"> (lon,lat)= %1$s</string>
+
     <string name="textshowwifilistOK">Show WiFi list</string>
     <string name="textshowwifilistNOT">WiFi is not enabled</string>
     <string name="textstartlookservice">Start look service</string>

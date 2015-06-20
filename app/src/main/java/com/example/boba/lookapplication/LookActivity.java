@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -14,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.util.List;
 
 public class LookActivity extends ActionBarActivity {
 
@@ -37,8 +42,6 @@ public class LookActivity extends ActionBarActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         progressBar.setVisibility(View.INVISIBLE);
 
-        VerifyClickButtons();
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // If your minSdkVersion is 11 or higher, instead use:
         // getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -50,6 +53,9 @@ public class LookActivity extends ActionBarActivity {
                 LookServiceBobaTest.ACTION_UPDATE);
         intentFilterUpdate.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(updateBroadcastReceiver, intentFilterUpdate);
+
+        // VerifyClickButtons();
+        DrawMainScreen();
 
     }
 
@@ -146,8 +152,79 @@ public class LookActivity extends ActionBarActivity {
 
     }
 
+    void DrawMainScreen () {
+
+        //
+        // count device sensors
+        //
+        TextView tSensors =  (TextView) findViewById(R.id.sensorscount);
+        tSensors.setText(""+SensorsCount());
+
+        //
+        // Is WiFi enabled? If yes visible and count WiFi points
+        //
+        WifiManager mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        Button   bWiFiStart = (Button)   findViewById(R.id.startlookservice);
+        Button   bWiFiStop  = (Button)   findViewById(R.id.stoplookservice);
+        Button   bWiFi      = (Button)   findViewById(R.id.showwifilist);
+        TextView tWiFi      = (TextView) findViewById(R.id.wifiscount);
+        bWiFi     .setClickable(mWiFiManager.isWifiEnabled());
+        bWiFiStart.setClickable(mWiFiManager.isWifiEnabled());
+        if (mWiFiManager.isWifiEnabled()) {
+            bWiFi.setText(R.string.textshowwifilistOK);
+            tWiFi.setText(""+WiFiCount());
+        } else {
+            bWiFi.setText(R.string.textshowwifilistNOT);
+            tWiFi.setText(R.string.textshowwifilistNOT);
+        }
+
+
+        //
+        // Is look service work?
+        //
+
+        if (progressBar.getVisibility()==View.VISIBLE) {
+            bWiFiStop.setClickable(true);
+        }
+
+        //
+        // Refresh Geo data and service parameters
+        //
+
+        TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
+        String bText = getString(R.string.textserviceparameter,timeM,delayS);
+
+        LookGeo lookGeo = new LookGeo(this);
+        String  location= lookGeo.getLocationString();
+        if (location!="") bText += " " + getString(R.string.textGEOparameter,lookGeo.getLocationString());
+        bTextMessage.setText (bText);
+
+    }
+
+    int SensorsCount () {
+
+        SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        int Count = 0; if (deviceSensors!=null) Count = deviceSensors.size();
+        return(Count);
+
+    }
+
+    int WiFiCount () {
+        WifiManager mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        int count = 0;
+        List<ScanResult> deviceWiFis = null;
+        try {
+            deviceWiFis = mWiFiManager.getScanResults();
+            if (deviceWiFis!=null) count = deviceWiFis.size();
+        }
+        catch (Exception e) { count = 0; }
+        return(count);
+    }
+
     long getDelayService () {return(delayS*1000);}
-    long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
+//    long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
+    long getTimeService () {return(3*60*1000);} // {return(2*60*60*1000);};
 
     void sendServiceCommand (int command) {
         Intent intentUpdate = new Intent();
@@ -161,9 +238,11 @@ public class LookActivity extends ActionBarActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             int update = intent
                     .getIntExtra(LookServiceBobaTest.EXTRA_KEY_UPDATE, 0);
             progressBar.setProgress(update);
+
             int state  = intent
                     .getIntExtra(LookServiceBobaTest.EXTRA_KEY_SERVICE, 0);
             if (state>=0) progressBar.setVisibility(View.VISIBLE);

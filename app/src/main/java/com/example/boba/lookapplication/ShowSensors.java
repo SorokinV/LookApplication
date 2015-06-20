@@ -77,4 +77,13 @@ public class ShowSensors extends ActionBarActivity {
 
     }
 
+     public int SensorsCount () {
+
+        SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        int Count = 0; if (deviceSensors!=null) Count = deviceSensors.size();
+        return(Count);
+
+    }
+
 }
