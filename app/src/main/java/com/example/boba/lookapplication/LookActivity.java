@@ -104,6 +104,15 @@ public class LookActivity extends ActionBarActivity {
 
     }
 
+    public void ClickLookService (View view) {
+        if (progressBar.getVisibility() == View.VISIBLE) {
+            ClickStopLookService(view);
+        } else {
+            ClickStartLookService(view);
+        }
+        DrawMainScreen();
+    }
+
     public void ClickStartLookService (View view) {
 
         if (intentService!=null) {
@@ -132,26 +141,6 @@ public class LookActivity extends ActionBarActivity {
         } else sendServiceCommand(-1);
     }
 
-    void VerifyClickButtons () {
-
-        //
-        // is WiFi enabled?
-        //
-        WifiManager mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        Button bWiFi = (Button) findViewById(R.id.showwifilist); bWiFi.setClickable(mWiFiManager.isWifiEnabled());
-        if (mWiFiManager.isWifiEnabled())
-                 bWiFi.setText(R.string.textshowwifilistOK);
-            else bWiFi.setText(R.string.textshowwifilistNOT);
-
-        TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
-        String bText = "service setings: M(S) :"+timeM+"("+delayS+")";
-
-        LookGeo lookGeo = new LookGeo(this);
-        Log.d(LOG_TAG, "-----------------------GPS <x,y> = " + lookGeo.getLocationString());
-        bTextMessage.setText(bText + " <x,y>=" + lookGeo.getLocationString());
-
-    }
-
     void DrawMainScreen () {
 
         //
@@ -164,12 +153,9 @@ public class LookActivity extends ActionBarActivity {
         // Is WiFi enabled? If yes visible and count WiFi points
         //
         WifiManager mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        Button   bWiFiStart = (Button)   findViewById(R.id.startlookservice);
-        Button   bWiFiStop  = (Button)   findViewById(R.id.stoplookservice);
         Button   bWiFi      = (Button)   findViewById(R.id.showwifilist);
         TextView tWiFi      = (TextView) findViewById(R.id.wifiscount);
         bWiFi     .setClickable(mWiFiManager.isWifiEnabled());
-        bWiFiStart.setClickable(mWiFiManager.isWifiEnabled());
         if (mWiFiManager.isWifiEnabled()) {
             bWiFi.setText(R.string.textshowwifilistOK);
             tWiFi.setText(""+WiFiCount());
@@ -178,13 +164,27 @@ public class LookActivity extends ActionBarActivity {
             tWiFi.setText(R.string.textshowwifilistNOT);
         }
 
+        RefreshMainScreen();
+
+    }
+
+    void RefreshMainScreen () {
 
         //
         // Is look service work?
         //
 
+        Button   bLookService = (Button)   findViewById(R.id.lookservicebutton);
+
+        Button   bWiFi        = (Button)   findViewById(R.id.showwifilist);
+        TextView tWiFi        = (TextView) findViewById(R.id.wifiscount);
+
+        int restM = 0;
         if (progressBar.getVisibility()==View.VISIBLE) {
-            bWiFiStop.setClickable(true);
+            restM = (int)((1.0*progressBar.getMax()-progressBar.getProgress())*timeM/progressBar.getMax());
+            bLookService.setText(getString(R.string.textstoplookservice));
+        } else {
+            bLookService.setText(getString(R.string.textstartlookservice));
         }
 
         //
@@ -193,6 +193,8 @@ public class LookActivity extends ActionBarActivity {
 
         TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
         String bText = getString(R.string.textserviceparameter,timeM,delayS);
+
+        if (restM>0) bText += " " + getString(R.string.textrestminutes,restM);
 
         LookGeo lookGeo = new LookGeo(this);
         String  location= lookGeo.getLocationString();
@@ -223,8 +225,8 @@ public class LookActivity extends ActionBarActivity {
     }
 
     long getDelayService () {return(delayS*1000);}
-//    long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
-    long getTimeService () {return(3*60*1000);} // {return(2*60*60*1000);};
+    long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
+//    long getTimeService () {return(3*60*1000);} // {return(2*60*60*1000);};
 
     void sendServiceCommand (int command) {
         Intent intentUpdate = new Intent();
@@ -247,6 +249,8 @@ public class LookActivity extends ActionBarActivity {
                     .getIntExtra(LookServiceBobaTest.EXTRA_KEY_SERVICE, 0);
             if (state>=0) progressBar.setVisibility(View.VISIBLE);
             else {progressBar.setVisibility(View.INVISIBLE); intentService=null;}
+
+            RefreshMainScreen();
         }
 
     }
