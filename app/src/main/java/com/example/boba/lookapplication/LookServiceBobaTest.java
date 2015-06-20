@@ -145,18 +145,19 @@ public class LookServiceBobaTest extends IntentService {
                 if (listWiFi != null) for (String iWiFi : listWiFi)
                     wif.writeRecord(lookGeo.getLocationString() + sep + iWiFi);
 
-                // wif.writeRecord(notificationText);
-
-                synchronized (this) {
-                    try {
-                        wait(delayWaitMS);
-                    } catch (Exception e) {
+                int i = 0, step = 2;
+                while ((i<delayWaitMS)&&(!stopping)) { i += step;
+                    synchronized (this) {
+                        try {
+//                            wait(delayWaitMS);
+                            wait(step*1000);
+                        } catch (Exception e) {
+                        }
                     }
+                    procentWork = (float) (1.0 - ((0.0 + endTime - System.currentTimeMillis()) / workTimeMS));
+                    sendStateProgress(SERVICE_STATE_RUN, (int) (procentWork * 100));
                 }
 
-                procentWork = (float) (1.0 - ((0.0 + endTime - System.currentTimeMillis()) / workTimeMS));
-
-                sendStateProgress(SERVICE_STATE_RUN, (int) (procentWork * 100));
 
             }
         } finally {
