@@ -181,7 +181,8 @@ public class LookActivity extends ActionBarActivity {
 
         int restM = 0;
         if (progressBar.getVisibility()==View.VISIBLE) {
-            restM = (int)((1.0*progressBar.getMax()-progressBar.getProgress())*timeM/progressBar.getMax());
+            restM = 1+(int)((1.0*progressBar.getMax()-progressBar.getProgress())*timeM/progressBar.getMax());
+            if (restM>timeM) restM=timeM;
             bLookService.setText(getString(R.string.textstoplookservice,restM));
         } else {
             bLookService.setText(getString(R.string.textstartlookservice));
