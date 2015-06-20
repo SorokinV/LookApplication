@@ -19,12 +19,12 @@ public class LookGeo {
     boolean OKProtocol = false;
     LocationManager locationManager = null;
     String logname = LOG_TAG+".csv";
-    WriteInFile logs;
+    WriteFile logs;
 
     String nameProvider = "gps";
 
     public LookGeo (Context ctx) {
-        if (OKProtocol) logs = new WriteInFile(ctx,logname,false); OKProtocol = (logs!=null);
+        if (OKProtocol) logs = new WriteFile(ctx,logname,false); OKProtocol = (logs!=null);
         if (OKGPS) {
             try {
                 locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);

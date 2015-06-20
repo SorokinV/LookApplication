@@ -30,10 +30,10 @@ public class LookServiceBobaTest extends IntentService {
 
     String sep = "\t";
     String workFileName  = "wifi.csv";
-    WriteInFile wif;
+    WriteFile wif;
 
     String workProtName  = "protocol.csv";
-    WriteInFile wpn;
+    WriteFile wpn;
 
     ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
 
@@ -73,8 +73,8 @@ public class LookServiceBobaTest extends IntentService {
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
-        if (OKProtocol) wpn = new WriteInFile(this,workProtName);
-        wif = new WriteInFile(this,workFileName);
+        if (OKProtocol) wpn = new WriteFile(this,workProtName);
+        wif = new WriteFile(this,workFileName);
 
         if (OKProtocol) { wpn.writeRecord("service begin"); }
         lookGeo = new LookGeo(this);
