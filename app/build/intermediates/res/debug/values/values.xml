@@ -266,7 +266,7 @@
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="action_settings">Settings</string>
-    <string name="app_name">LookApplication</string>
+    <string name="app_name">Look Application (test)</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/7.5.0/res/values/auth_strings.xml -->
     <eat-comment/>
     <string name="auth_google_play_services_client_facebook_display_name">Facebook</string>
@@ -334,6 +334,9 @@
     <eat-comment/>
     <string name="pref_delayS">5</string>
     <string name="pref_waitM">60</string>
+    <string name="sensorstext">Sensors :</string>
+    <string name="show">Show</string>
+    <string name="showsensorsbutton">Show sensors list</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>
@@ -343,16 +346,23 @@
     <string name="store_picture_title">Save image</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="textGEOparameter"> (lon,lat)= %1$s</string>
+    <string name="textlookservicebutton">Look service</string>
+    <string name="textrestminutes">running (rest %1$d min)</string>
+    <string name="textserviceparameter">Service parameters : %1$d min(%2$d sec)</string>
     <string name="textshowwifilistNOT">WiFi is not enabled</string>
     <string name="textshowwifilistOK">Show WiFi list</string>
     <string name="textstartlookservice">Start look service</string>
-    <string name="textstoplookservice">Stop look service</string>
-    <string name="title_activity_setting">SettingActivity</string>
+    <string name="textstoplookservice">Stop look service (rest %1$s min)</string>
+    <string name="title_activity_setting">Setting</string>
     <string name="title_activity_show_sensors">Show Sensors</string>
     <string name="title_activity_show_wi_fi">Show WiFi</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/res/values/wallet_strings.xml -->
     <eat-comment/>
     <string name="wallet_buy_button_place_holder" translation_description="Text on a button that allows a user to make a payment with Google Wallet [CHAR LIMIT=30]">Buy with Google</string>
+    <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="wifistext">WiFi :</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="AlertDialog.AppCompat" parent="Base.AlertDialog.AppCompat"/>
