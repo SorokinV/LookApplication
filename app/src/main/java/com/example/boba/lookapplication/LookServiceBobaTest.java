@@ -107,6 +107,8 @@ public class LookServiceBobaTest extends IntentService {
         if (OKProtocol) { wpn.writeRecord("service end"); }
         if (OKProtocol) wpn.close();
 
+        sendStateProgress(SERVICE_STATE_STOP, 0);
+
         unregisterReceiver(commandBroadcastReceiver);
 
         super.onDestroy();
@@ -145,20 +147,18 @@ public class LookServiceBobaTest extends IntentService {
                 if (listWiFi != null) for (String iWiFi : listWiFi)
                     wif.writeRecord(lookGeo.getLocationString() + sep + iWiFi);
 
-                int i = 0, step = 2;
-                while ((i<delayWaitMS)&&(!stopping)) { i += step;
+                int i = 0, step = 2; // seconds
+                while ((i<delayWaitMS)&&(!stopping)) { i += step*1000; // i and delayWaitMS  in milliseconds
                     synchronized (this) {
                         try {
 //                            wait(delayWaitMS);
-                            wait(step*1000);
+                            wait(step*1000); // stopping in 1 sec, send current state and verify absent for parent's stop command
                         } catch (Exception e) {
                         }
                     }
                     procentWork = (float) (1.0 - ((0.0 + endTime - System.currentTimeMillis()) / workTimeMS));
                     sendStateProgress(SERVICE_STATE_RUN, (int) (procentWork * 100));
                 }
-
-
             }
         } finally {
             stopped = true;

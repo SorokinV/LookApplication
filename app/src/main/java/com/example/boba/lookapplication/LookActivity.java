@@ -27,7 +27,7 @@ public class LookActivity extends ActionBarActivity {
     String LOG_TAG = "Main--Main";
 
     int    delayS = 5;  // seconds
-    int    timeM  = 10; // minute
+    int    timeM  = 180; // minute
 
     ProgressBar progressBar;
 
