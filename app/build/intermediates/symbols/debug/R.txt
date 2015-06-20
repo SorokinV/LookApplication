@@ -830,10 +830,10 @@ int string pref_lookservice_key 0x7f08004e
 int string pref_lookservice_title 0x7f08004f
 int string pref_storage_key 0x7f080050
 int string pref_storage_title 0x7f080051
-int string pref_waitM 0x7f080052
-int string pref_waitM_dialogtitle 0x7f080053
-int string pref_waitM_summary 0x7f080054
-int string pref_waitM_title 0x7f080055
+int string pref_timeM 0x7f080052
+int string pref_timeM_dialogtitle 0x7f080053
+int string pref_timeM_summary 0x7f080054
+int string pref_timeM_title 0x7f080055
 int string sensorstext 0x7f080056
 int string show 0x7f080057
 int string showsensorsbutton 0x7f080058

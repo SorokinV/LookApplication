@@ -13,18 +13,18 @@
         />
 
     <EditTextPreference
-        android:defaultValue="5"
+        android:defaultValue="@string/pref_delayS"
         android:dialogTitle="@string/pref_delayS_dialogtitle"
-        android:key="@string/pref_delayS"
+        android:key="pref_delayS"
         android:summary="@string/pref_delayS_summary"
         android:title="@string/pref_delayS_title" />
 
     <EditTextPreference
-        android:defaultValue="60"
-        android:dialogTitle="@string/pref_waitM_dialogtitle"
-        android:key="@string/pref_waitM"
-        android:summary="@string/pref_waitM_summary"
-        android:title="@string/pref_waitM_title" />
+        android:defaultValue="@string/pref_timeM"
+        android:dialogTitle="@string/pref_timeM_dialogtitle"
+        android:key="pref_timeM"
+        android:summary="@string/pref_timeM_summary"
+        android:title="@string/pref_timeM_title" />
 
     </PreferenceCategory>
 

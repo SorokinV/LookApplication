@@ -2288,10 +2288,10 @@ containing a value of this type.
         public static final int pref_lookservice_title=0x7f08004f;
         public static final int pref_storage_key=0x7f080050;
         public static final int pref_storage_title=0x7f080051;
-        public static final int pref_waitM=0x7f080052;
-        public static final int pref_waitM_dialogtitle=0x7f080053;
-        public static final int pref_waitM_summary=0x7f080054;
-        public static final int pref_waitM_title=0x7f080055;
+        public static final int pref_timeM=0x7f080052;
+        public static final int pref_timeM_dialogtitle=0x7f080053;
+        public static final int pref_timeM_summary=0x7f080054;
+        public static final int pref_timeM_title=0x7f080055;
         public static final int sensorstext=0x7f080056;
         public static final int show=0x7f080057;
         public static final int showsensorsbutton=0x7f080058;

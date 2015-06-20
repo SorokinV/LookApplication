@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Look Application (test)</string>
+    <string name="app_name">Look Application</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -38,9 +38,9 @@
     <string name="pref_delayS_title">Delay time</string>
     <string name="pref_delayS_summary">Delay time between query (second)</string>
 
-    <string name="pref_waitM">60</string>
-    <string name="pref_waitM_dialogtitle">Insert working time (from 2 to 240 min)</string>
-    <string name="pref_waitM_title">Working time</string>
-    <string name="pref_waitM_summary">Working service time (minutes)</string>
+    <string name="pref_timeM">60</string>
+    <string name="pref_timeM_dialogtitle">Insert working time (from 2 to 240 min)</string>
+    <string name="pref_timeM_title">Working time</string>
+    <string name="pref_timeM_summary">Working service time (minutes)</string>
 
 </resources>
