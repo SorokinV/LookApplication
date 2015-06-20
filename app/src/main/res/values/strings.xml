@@ -19,7 +19,7 @@
     <string name="textshowwifilistOK">Show WiFi list</string>
     <string name="textshowwifilistNOT">WiFi is not enabled</string>
     <string name="textstartlookservice">Start look service</string>
-    <string name="textstoplookservice">Stop look service</string>
+    <string name="textstoplookservice">Stop look service (rest %1$s min)</string>
     <string name="textlookservicebutton">Look service</string>
 
     <string name="title_activity_setting">Setting</string>

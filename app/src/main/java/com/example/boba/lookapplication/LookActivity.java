@@ -26,8 +26,8 @@ public class LookActivity extends ActionBarActivity {
 
     String LOG_TAG = "Main--Main";
 
-    int    delayS = 5;
-    int    timeM  = 120;
+    int    delayS = 5;  // seconds
+    int    timeM  = 10; // minute
 
     ProgressBar progressBar;
 
@@ -182,7 +182,7 @@ public class LookActivity extends ActionBarActivity {
         int restM = 0;
         if (progressBar.getVisibility()==View.VISIBLE) {
             restM = (int)((1.0*progressBar.getMax()-progressBar.getProgress())*timeM/progressBar.getMax());
-            bLookService.setText(getString(R.string.textstoplookservice));
+            bLookService.setText(getString(R.string.textstoplookservice,restM));
         } else {
             bLookService.setText(getString(R.string.textstartlookservice));
         }
@@ -193,8 +193,6 @@ public class LookActivity extends ActionBarActivity {
 
         TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
         String bText = getString(R.string.textserviceparameter,timeM,delayS);
-
-        if (restM>0) bText += " " + getString(R.string.textrestminutes,restM);
 
         LookGeo lookGeo = new LookGeo(this);
         String  location= lookGeo.getLocationString();
