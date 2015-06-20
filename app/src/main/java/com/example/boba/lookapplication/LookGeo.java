@@ -62,6 +62,7 @@ public class LookGeo {
             } catch (Exception e) {
                 OKGPS = false;
                 locationManager = null;
+                logs.close();
             }
         }
     }

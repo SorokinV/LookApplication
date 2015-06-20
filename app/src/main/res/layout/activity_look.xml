@@ -7,6 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".LookActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sensors"
+        android:text="@string/sensorstext"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="30dp"
+
+        android:textStyle="bold|italic" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sensorscount"
+        android:text="-1"
+        android:layout_alignBaseline="@+id/sensors"
+        android:layout_toRightOf="@+id/sensors"
+        android:layout_toEndOf="@+id/sensors" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,9 +35,35 @@
         android:longClickable="false"
         android:nestedScrollingEnabled="false"
         android:onClick="ClickShowSensorsList"
-        android:text="Show sensors list"
-        android:visibility="visible" />
+        android:text="@string/showsensorsbutton"
+        android:visibility="visible"
+        android:layout_alignParentTop="true"
+        android:layout_alignBaseline="@+id/sensors"
+        android:layout_alignRight="@+id/showwifilist"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wifis"
+        android:text="@string/wifistext"
+        android:layout_below="@+id/showsensorslist"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="30dp"
+        android:textStyle="bold|italic" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wifiscount"
+        android:text="-2"
+        android:layout_alignBaseline="@+id/wifis"
+        android:layout_below="@+id/showsensorslist"
+        android:layout_toRightOf="@+id/wifis"
+        android:layout_toEndOf="@+id/wifis" />
+    />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,12 +76,14 @@
         android:onClick="ClickShowWiFiList"
         android:text="@string/textshowwifilistOK"
         android:visibility="visible"
-        android:layout_below="@id/showsensorslist"/>
+        android:layout_alignBaseline="@+id/wifis"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:capitalize="words"
         android:clickable="true"
         android:enabled="true"
         android:id="@+id/startlookservice"
@@ -46,7 +92,15 @@
         android:onClick="ClickStartLookService"
         android:text="@string/textstartlookservice"
         android:visibility="visible"
-        android:layout_below="@id/showwifilist"/>
+        android:layout_below="@+id/showwifilist"
+        android:layout_toRightOf="@+id/wifis"
+        android:layout_toEndOf="@+id/wifis"
+        android:layout_marginTop="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:textStyle="bold" />
 
     <Button
         android:layout_width="wrap_content"
@@ -60,13 +114,18 @@
         android:onClick="ClickStopLookService"
         android:text="@string/textstoplookservice"
         android:visibility="visible"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/simpletextmessage"
-        android:layout_above="@id/stoplookservice"/>
+        android:layout_above="@+id/stoplookservice"/>
 
     <ProgressBar
         android:id="@+id/progressbar"
@@ -75,6 +134,6 @@
         android:layout_height="wrap_content"
         android:max="100"
         android:progress="0"
-        android:layout_above="@id/simpletextmessage"/>
+        android:layout_above="@+id/simpletextmessage"/>
 
 </RelativeLayout>
