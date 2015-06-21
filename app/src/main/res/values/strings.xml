@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Look Application</string>
+    <string name="ticker_text">LS running</string>
+    <string name="notification_title">LS running (title)</string>
+    <string name="notification_message">LS running (message)</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
