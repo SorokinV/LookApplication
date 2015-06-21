@@ -14,7 +14,7 @@
 
     <string name="textserviceparameter">Service parameters : %1$d min(%2$d sec)</string>
     <string name="textrestminutes">running (rest %1$d min)</string>
-    <string name="textGEOparameter"> (lon,lat)= %1$s</string>
+    <string name="textGEOparameter"> (lo,la)= %1$s</string>
 
     <string name="textshowwifilistOK">Show WiFi</string>
     <string name="textshowwifilistNOT">WiFi is stopped</string>
