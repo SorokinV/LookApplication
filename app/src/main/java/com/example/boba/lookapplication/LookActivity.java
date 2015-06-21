@@ -216,11 +216,14 @@ public class LookActivity extends ActionBarActivity {
 
     void RefreshParameters () {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        Toast.makeText(this, "pref_delayS"+sharedPref.getString("pref_delayS", "XXXX"), Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "pref_delayS"+sharedPref.getString("pref_timeM", "XXXX"), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "pref_delayS="+sharedPref.getString("pref_delayS", "XXXX"), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "pref_timeM="+sharedPref.getString("pref_timeM", "XXXX"), Toast.LENGTH_SHORT).show();
 
-        delayS  = Integer.getInteger(sharedPref.getString("pref_delayS",""),delayS);
-        timeM   = Integer.getInteger(sharedPref.getString("pref_timeM",""),timeM);
+        delayS  = Integer.parseInt(sharedPref.getString("pref_delayS",""+delayS));
+        timeM   = Integer.parseInt(sharedPref.getString("pref_timeM",""+timeM));
+
+//        Toast.makeText(this, "delayS="+delayS, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "timeM"+timeM, Toast.LENGTH_SHORT).show();
 
         OKBeep  = sharedPref.getBoolean("pref_beep", OKBeep);
     }
@@ -247,7 +250,7 @@ public class LookActivity extends ActionBarActivity {
     }
 
     long getDelayService () {return(delayS*1000);}
-    long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
+    long getTimeService  () {return(timeM*60*1000);} // {return(2*60*60*1000);};
 //    long getTimeService () {return(3*60*1000);} // {return(2*60*60*1000);};
 
     void sendServiceCommand (int command) {
