@@ -34,23 +34,31 @@ public class LookServiceMiddle extends Service {
 
         long    delayWaitMS = intent.getLongExtra("delayMS",5);
         long    workTimeMS  = intent.getLongExtra("timeMS",35);
-        boolean OKBeep      = intent.getBooleanExtra("beep",true );
+        boolean OKBeep      = intent.getBooleanExtra("beep", true);
 
+        Log.d(LOG_TAG, "Start Foreground extra "+delayWaitMS+" "+workTimeMS+" "+OKBeep);
         Notification notification = new Notification(R.drawable.ic_launcher,
                 getText(R.string.ticker_text),
                 System.currentTimeMillis());
+
         Intent notificationIntent = new Intent(this, LookServiceBobaTest.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
         notification.setLatestEventInfo(this,
                 getText(R.string.notification_title),
                 getText(R.string.notification_message),
                 pendingIntent);
 
-        notificationIntent.putExtra("beep",    OKBeep);
-        notificationIntent.putExtra("delayMS", delayWaitMS);
-        notificationIntent.putExtra("timeMS",  workTimeMS);
+        Log.d(LOG_TAG, "Start Foreground Intent before puExtra");
 
-        startForeground(ONGOING_NOTIFICATION_ID, notification);
+        notificationIntent.putExtra("beep", OKBeep);
+        notificationIntent.putExtra("delayMS", delayWaitMS);
+        notificationIntent.putExtra("timeMS", workTimeMS);
+
+        startForeground(0 /*ONGOING_NOTIFICATION_ID*/, notification);
+        //startForeground(ONGOING_NOTIFICATION_ID, notification);
+        Log.d(LOG_TAG, "Start Foreground Intent after startForeground before return");
         return START_STICKY;
     }
 

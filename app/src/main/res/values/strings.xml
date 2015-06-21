@@ -36,6 +36,9 @@
     <string name="pref_beep">Service beep</string>
     <string name="pref_beep_summary">Start/Stop activity service beep</string>
 
+    <string name="pref_foreground">Run foreground</string>
+    <string name="pref_foreground_summary">Run foreground</string>
+
     <string name="pref_delayS">5</string>
     <string name="pref_delayS_dialogtitle">Insert delay time between query (from 3 to 60 sec)</string>
     <string name="pref_delayS_title">Delay time</string>

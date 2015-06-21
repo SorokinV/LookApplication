@@ -171,12 +171,16 @@ service#com.example.boba.lookapplication.LookServiceBobaTest
 ADDED from AndroidManifest.xml:42:9
 	android:name
 		ADDED from AndroidManifest.xml:42:18
-activity#com.example.boba.lookapplication.SettingsActivity
-ADDED from AndroidManifest.xml:44:9
-	android:label
-		ADDED from AndroidManifest.xml:46:13
+service#com.example.boba.lookapplication.LookServiceMiddle
+ADDED from AndroidManifest.xml:43:9
 	android:name
-		ADDED from AndroidManifest.xml:45:13
+		ADDED from AndroidManifest.xml:43:18
+activity#com.example.boba.lookapplication.SettingsActivity
+ADDED from AndroidManifest.xml:46:9
+	android:label
+		ADDED from AndroidManifest.xml:48:13
+	android:name
+		ADDED from AndroidManifest.xml:47:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:22.2.0:20:5

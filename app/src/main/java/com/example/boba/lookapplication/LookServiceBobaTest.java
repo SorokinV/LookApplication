@@ -1,6 +1,8 @@
 package com.example.boba.lookapplication;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,7 +22,10 @@ import java.util.List;
  */
 public class LookServiceBobaTest extends IntentService {
 
+    final int FOREGROUND_ID = 123;
+
     boolean OKBeep       = true;
+    boolean OKForeground = true;
     boolean OKProtocol   = true;
     boolean stopping     = false;
     boolean stopped      = false;
@@ -56,7 +62,7 @@ public class LookServiceBobaTest extends IntentService {
      */
     public LookServiceBobaTest() {
         super("LookServiceBobaTest");
-        setIntentRedelivery(true); // ????? is helpful :)
+//        setIntentRedelivery(true); // ????? is helpful :)
     }
 
     @Override
@@ -67,9 +73,10 @@ public class LookServiceBobaTest extends IntentService {
         stopped = false;
         stopping= false;
 
-        delayWaitMS = intent.getLongExtra("delayMS",delayWaitMS);
-        workTimeMS = intent.getLongExtra("timeMS",workTimeMS);
-        OKBeep = intent.getBooleanExtra("beep", OKBeep);
+        delayWaitMS  = intent.getLongExtra("delayMS",delayWaitMS);
+        workTimeMS   = intent.getLongExtra("timeMS",workTimeMS);
+        OKBeep       = intent.getBooleanExtra("beep", OKBeep);
+        OKForeground = intent.getBooleanExtra("foreground", OKForeground);
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
@@ -124,6 +131,22 @@ public class LookServiceBobaTest extends IntentService {
         // Normally we would do some work here, like download a file.
         // For our sample, we just sleep for 5 seconds.
 
+
+        if (OKForeground) {
+
+            Notification notification = new Notification(R.drawable.ic_launcher,
+                    getText(R.string.ticker_text),
+                    System.currentTimeMillis());
+            Intent notificationIntent = new Intent(this, LookServiceBobaTest.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
+            notification.setLatestEventInfo(this,
+                    getText(R.string.notification_title),
+                    getText(R.string.notification_message),
+                    pendingIntent);
+
+            startForeground(FOREGROUND_ID, notification);
+        }
+
         try {
             String prot = "";
             Log.d(LOG_TAG, "service before WORKING");
@@ -163,6 +186,7 @@ public class LookServiceBobaTest extends IntentService {
         } finally {
             stopped = true;
             sendStateProgress(SERVICE_STATE_STOP, 0);
+            if (OKForeground) stopForeground(true);
         }
 
     }
