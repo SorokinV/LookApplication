@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
-        android:defaultValue="5"
-        android:dialogTitle="Введите размер задержки между опросами (от 3 до 60 сек)"
-        android:key="@string/pref_delayS"
-        android:summary="Устанавливает новый размер задержки между опросами (сек)"
-        android:title="Размер задержки между опросами (сек)" />
+    <PreferenceCategory
+        android:title="@string/pref_lookservice_title"
+        android:key="@string/pref_lookservice_key">
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_beep"
+        android:title="@string/pref_beep"
+        android:summary="@string/pref_beep_summary"
+        />
 
     <EditTextPreference
-        android:defaultValue="60"
-        android:dialogTitle="Введите период опроса (от 2 до 180 минут )"
-        android:key="@string/pref_waitM"
-        android:summary="Устанавливает новый период опроса (мин)"
-        android:title="Период опроса (мин)" />
+        android:defaultValue="@string/pref_delayS"
+        android:dialogTitle="@string/pref_delayS_dialogtitle"
+        android:key="pref_delayS"
+        android:summary="@string/pref_delayS_summary"
+        android:title="@string/pref_delayS_title" />
 
+    <EditTextPreference
+        android:defaultValue="@string/pref_timeM"
+        android:dialogTitle="@string/pref_timeM_dialogtitle"
+        android:key="pref_timeM"
+        android:summary="@string/pref_timeM_summary"
+        android:title="@string/pref_timeM_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_storage_title"
+        android:key="@string/pref_storage_key">
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -4,10 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -26,8 +29,9 @@ public class LookActivity extends ActionBarActivity {
 
     String LOG_TAG = "Main--Main";
 
-    int    delayS = 5;  // seconds
-    int    timeM  = 180; // minute
+    int     delayS = 6;  // seconds
+    int     timeM  = 180; // minute
+    boolean OKBeep = true;
 
     ProgressBar progressBar;
 
@@ -54,7 +58,8 @@ public class LookActivity extends ActionBarActivity {
         intentFilterUpdate.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(updateBroadcastReceiver, intentFilterUpdate);
 
-        // VerifyClickButtons();
+        RefreshParameters();
+
         DrawMainScreen();
 
     }
@@ -122,9 +127,11 @@ public class LookActivity extends ActionBarActivity {
 
         sendServiceCommand(-1);
 
+        RefreshParameters();
+
         intentService = new Intent(this,LookServiceBobaTest.class);
 
-        intentService.putExtra("beep",true);
+        intentService.putExtra("beep",OKBeep);
         intentService.putExtra("delayMS",getDelayService());
         intentService.putExtra("timeMS",getTimeService());
 
@@ -139,6 +146,9 @@ public class LookActivity extends ActionBarActivity {
             stopService(intentService);
             intentService=null;
         } else sendServiceCommand(-1);
+
+        RefreshParameters();
+
     }
 
     void DrawMainScreen () {
@@ -170,6 +180,8 @@ public class LookActivity extends ActionBarActivity {
 
     void RefreshMainScreen () {
 
+        //RefreshParameters();
+
         //
         // Is look service work?
         //
@@ -198,8 +210,22 @@ public class LookActivity extends ActionBarActivity {
         LookGeo lookGeo = new LookGeo(this);
         String  location= lookGeo.getLocationString();
         if (location!="") bText += " " + getString(R.string.textGEOparameter,lookGeo.getLocationString());
-        bTextMessage.setText (bText);
+        bTextMessage.setText(bText);
 
+    }
+
+    void RefreshParameters () {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+//        Toast.makeText(this, "pref_delayS="+sharedPref.getString("pref_delayS", "XXXX"), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "pref_timeM="+sharedPref.getString("pref_timeM", "XXXX"), Toast.LENGTH_SHORT).show();
+
+        delayS  = Integer.parseInt(sharedPref.getString("pref_delayS",""+delayS));
+        timeM   = Integer.parseInt(sharedPref.getString("pref_timeM",""+timeM));
+
+//        Toast.makeText(this, "delayS="+delayS, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "timeM"+timeM, Toast.LENGTH_SHORT).show();
+
+        OKBeep  = sharedPref.getBoolean("pref_beep", OKBeep);
     }
 
     int SensorsCount () {
@@ -224,7 +250,7 @@ public class LookActivity extends ActionBarActivity {
     }
 
     long getDelayService () {return(delayS*1000);}
-    long getTimeService () {return(timeM*60*1000);} // {return(2*60*60*1000);};
+    long getTimeService  () {return(timeM*60*1000);} // {return(2*60*60*1000);};
 //    long getTimeService () {return(3*60*1000);} // {return(2*60*60*1000);};
 
     void sendServiceCommand (int command) {

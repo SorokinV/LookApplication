@@ -266,7 +266,7 @@
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="action_settings">Settings</string>
-    <string name="app_name">Look Application (test)</string>
+    <string name="app_name">Look Application</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/7.5.0/res/values/auth_strings.xml -->
     <eat-comment/>
     <string name="auth_google_play_services_client_facebook_display_name">Facebook</string>
@@ -332,8 +332,20 @@
     <string name="mr_user_route_category_name">Devices</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="pref_beep">Service beep</string>
+    <string name="pref_beep_summary">Start/Stop activity service beep</string>
     <string name="pref_delayS">5</string>
-    <string name="pref_waitM">60</string>
+    <string name="pref_delayS_dialogtitle">Insert delay time between query (from 3 to 60 sec)</string>
+    <string name="pref_delayS_summary">Delay time between query (second)</string>
+    <string name="pref_delayS_title">Delay time</string>
+    <string name="pref_lookservice_key">Service key</string>
+    <string name="pref_lookservice_title">Service options</string>
+    <string name="pref_storage_key">Storage key</string>
+    <string name="pref_storage_title">Storage</string>
+    <string name="pref_timeM">60</string>
+    <string name="pref_timeM_dialogtitle">Insert working time (from 2 to 240 min)</string>
+    <string name="pref_timeM_summary">Working service time (minutes)</string>
+    <string name="pref_timeM_title">Working time</string>
     <string name="sensorstext">Sensors :</string>
     <string name="show">Show</string>
     <string name="showsensorsbutton">Show sensors list</string>
