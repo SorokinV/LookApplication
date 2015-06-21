@@ -362,8 +362,8 @@
     <string name="textlookservicebutton">Look service</string>
     <string name="textrestminutes">running (rest %1$d min)</string>
     <string name="textserviceparameter">Service parameters : %1$d min(%2$d sec)</string>
-    <string name="textshowwifilistNOT">WiFi is not enabled</string>
-    <string name="textshowwifilistOK">Show WiFi list</string>
+    <string name="textshowwifilistNOT">WiFi is stopped</string>
+    <string name="textshowwifilistOK">Show WiFi</string>
     <string name="textstartlookservice">Start look service</string>
     <string name="textstoplookservice">Stop look service (rest %1$s min)</string>
     <string name="title_activity_setting">Setting</string>
