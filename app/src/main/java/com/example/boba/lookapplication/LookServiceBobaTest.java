@@ -27,8 +27,10 @@ public class LookServiceBobaTest extends IntentService {
     boolean OKBeep       = true;
     boolean OKForeground = true;
     boolean OKProtocol   = true;
+
     boolean stopping     = false;
     boolean stopped      = false;
+    boolean sendstatus   = false;
 
     long delayWaitMS     = 5*1000;    // 05 sec
     long workTimeMS      = 60*1000; // 60 sec
@@ -128,9 +130,8 @@ public class LookServiceBobaTest extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Normally we would do some work here, like download a file.
-        // For our sample, we just sleep for 5 seconds.
 
+        sendstatus = true;
 
         if (OKForeground) {
 
@@ -234,12 +235,14 @@ public class LookServiceBobaTest extends IntentService {
     }
 
     void sendStateProgress (int state, int progress) {
-        Intent intentUpdate = new Intent();
-        intentUpdate.setAction(ACTION_UPDATE);
-        intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
-        intentUpdate.putExtra(EXTRA_KEY_SERVICE, state);
-        intentUpdate.putExtra(EXTRA_KEY_UPDATE, progress);
-        sendBroadcast(intentUpdate);
+        if (sendstatus) {
+            Intent intentUpdate = new Intent();
+            intentUpdate.setAction(ACTION_UPDATE);
+            intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
+            intentUpdate.putExtra(EXTRA_KEY_SERVICE, state);
+            intentUpdate.putExtra(EXTRA_KEY_UPDATE, progress);
+            sendBroadcast(intentUpdate);
+        }
     }
 
     public class CommandBroadcastReceiver extends BroadcastReceiver {
@@ -247,7 +250,14 @@ public class LookServiceBobaTest extends IntentService {
         @Override
         public void onReceive(Context context, Intent intent) {
             int command = intent.getIntExtra(LookServiceBobaTest.EXTRA_KEY_SERVICE, 0);
-            stopping = (command<0);
+            switch (command) {
+                case 0 : {sendstatus = true;  break;}
+                case 1 : {sendstatus = false; break;}
+                case -1: {stopping   = true;  break;}
+            }
+
+            Log.d(LOG_TAG,"commands state(send,stop):"+command+" "+sendstatus+" "+stopping);
+
         }
     }
 

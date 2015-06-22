@@ -65,6 +65,7 @@ public class LookActivity extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
+        sendServiceCommand(1); // nosend
         super.onDestroy();
         unregisterReceiver(updateBroadcastReceiver);
     }
@@ -185,6 +186,8 @@ public class LookActivity extends ActionBarActivity {
         //
         // Is look service work?
         //
+
+        sendServiceCommand(0);
 
         Button   bLookService = (Button)   findViewById(R.id.lookservicebutton);
 
