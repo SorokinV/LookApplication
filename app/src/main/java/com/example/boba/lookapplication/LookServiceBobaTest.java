@@ -173,16 +173,18 @@ public class LookServiceBobaTest extends IntentService {
                     wif.writeRecord(lookGeo.getLocationString() + sep + iWiFi);
 
                 long i = 0, step = 1; // seconds
-                while ((i<delayWaitMS)&&(!stopping)) { i += step*1000; // i and delayWaitMS  in milliseconds
+                while ((i<delayWaitMS)&&(!stopping)) { i += step*1000L; // i and delayWaitMS  in milliseconds
+                    /*
                     synchronized (this) {
                         try {
 //                            wait(delayWaitMS);
                             //wait(step*1000);       // stopping in 1 sec, send current state and verify absent for parent's stop command
                             //Thread.sleep(step*1000L); // stopping in 1 sec, send current state and verify absent for parent's stop command
-                            SystemClock.sleep(step*1000L);
                         } catch (Exception e) {
                         }
                     }
+                    */
+                    SystemClock.sleep(step*1000L);
                     procentWork = (float) (1.0 - ((0.0 + endTime - System.currentTimeMillis()) / workTimeMS));
                     sendStateProgress(SERVICE_STATE_RUN, (int) (procentWork * 100));
                 }
