@@ -11,6 +11,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.SystemClock;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -82,7 +83,7 @@ public class LookServiceBobaTest extends IntentService {
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
-        if (OKProtocol) wpn = new WriteFile(this,workProtName);
+        if (OKProtocol) wpn = new WriteFile(this,workProtName,true,true);
         wif = new WriteFile(this,workFileName);
 
         if (OKProtocol) { wpn.writeRecord("service begin"); }
@@ -171,18 +172,24 @@ public class LookServiceBobaTest extends IntentService {
                 if (listWiFi != null) for (String iWiFi : listWiFi)
                     wif.writeRecord(lookGeo.getLocationString() + sep + iWiFi);
 
-                int i = 0, step = 2; // seconds
+                long i = 0, step = 1; // seconds
                 while ((i<delayWaitMS)&&(!stopping)) { i += step*1000; // i and delayWaitMS  in milliseconds
                     synchronized (this) {
                         try {
 //                            wait(delayWaitMS);
-                            wait(step*1000); // stopping in 1 sec, send current state and verify absent for parent's stop command
+                            //wait(step*1000);       // stopping in 1 sec, send current state and verify absent for parent's stop command
+                            //Thread.sleep(step*1000L); // stopping in 1 sec, send current state and verify absent for parent's stop command
+                            SystemClock.sleep(step*1000L);
                         } catch (Exception e) {
                         }
                     }
                     procentWork = (float) (1.0 - ((0.0 + endTime - System.currentTimeMillis()) / workTimeMS));
                     sendStateProgress(SERVICE_STATE_RUN, (int) (procentWork * 100));
                 }
+                if (OKProtocol) {
+                    wpn.writeRecord("end sleep");
+                }
+
             }
         } finally {
             stopped = true;
