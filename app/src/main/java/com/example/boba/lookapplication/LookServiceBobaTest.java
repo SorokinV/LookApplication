@@ -11,6 +11,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
@@ -56,6 +57,7 @@ public class LookServiceBobaTest extends IntentService {
     public static final int SERVICE_STATE_RUN   =  1;
     public static final int SERVICE_STATE_STOP  = -1;
 
+    private PowerManager.WakeLock wakeLock;
     private CommandBroadcastReceiver commandBroadcastReceiver;
 
     /**
@@ -91,6 +93,12 @@ public class LookServiceBobaTest extends IntentService {
         Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
 
+        // registration WaveLock
+
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"BobaWakelockTag");
+        wakeLock.acquire();
+
         // registration BroadcastReceiver
         commandBroadcastReceiver = new CommandBroadcastReceiver();
 
@@ -118,6 +126,7 @@ public class LookServiceBobaTest extends IntentService {
 
         sendStateProgress(SERVICE_STATE_STOP, 0);
 
+        wakeLock.release();
         unregisterReceiver(commandBroadcastReceiver);
 
         super.onDestroy();

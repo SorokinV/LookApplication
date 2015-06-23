@@ -336,6 +336,8 @@
     <string name="notification_title">LS running (title)</string>
     <string name="pref_beep">Service beep</string>
     <string name="pref_beep_summary">Start/Stop activity service beep</string>
+    <string name="pref_communication_key">Communication key</string>
+    <string name="pref_communication_title">Communication</string>
     <string name="pref_delayS">5</string>
     <string name="pref_delayS_dialogtitle">Insert delay time between query (from 3 to 60 sec)</string>
     <string name="pref_delayS_summary">Delay time between query (second)</string>
@@ -362,7 +364,7 @@
     <string name="store_picture_title">Save image</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
-    <string name="textGEOparameter"> (lon,lat)= %1$s</string>
+    <string name="textGEOparameter"> (lo,la)= %1$s</string>
     <string name="textlookservicebutton">Look service</string>
     <string name="textrestminutes">running (rest %1$d min)</string>
     <string name="textserviceparameter">Service parameters : %1$d min(%2$d sec)</string>
