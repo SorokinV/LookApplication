@@ -219,14 +219,16 @@ public class LookActivity extends ActionBarActivity {
 
     void RefreshParameters () {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-//        Toast.makeText(this, "pref_delayS="+sharedPref.getString("pref_delayS", "XXXX"), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, "pref_timeM="+sharedPref.getString("pref_timeM", "XXXX"), Toast.LENGTH_SHORT).show();
 
         delayS  = Integer.parseInt(sharedPref.getString("pref_delayS",""+delayS));
         timeM   = Integer.parseInt(sharedPref.getString("pref_timeM",""+timeM));
 
-//        Toast.makeText(this, "delayS="+delayS, Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, "timeM"+timeM, Toast.LENGTH_SHORT).show();
+        if (timeM< 2)           timeM  = 2;
+        if (timeM> (60*10))     timeM  = 60*10;
+        if (delayS< 3)          delayS = 3;
+        if (delayS> 300)        delayS = 300;
+
+        if (delayS>=(timeM*60)) delayS = ((timeM*60)/2);
 
         OKBeep        = sharedPref.getBoolean("pref_beep", OKBeep);
         OKForeground  = sharedPref.getBoolean("pref_foreground", OKForeground);

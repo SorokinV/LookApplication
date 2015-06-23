@@ -66,7 +66,6 @@ public class LookServiceBobaTest extends IntentService {
      */
     public LookServiceBobaTest() {
         super("LookServiceBobaTest");
-//        setIntentRedelivery(true); // ????? is helpful :)
     }
 
     @Override
@@ -87,13 +86,13 @@ public class LookServiceBobaTest extends IntentService {
         if (OKProtocol) wpn = new WriteFile(this,workProtName,true,true);
         wif = new WriteFile(this,workFileName);
 
-        if (OKProtocol) { wpn.writeRecord("service begin"); }
+        if (OKProtocol) { wpn.writeRecord("service begin time(M)="+(workTimeMS/1000/60)+" delay(S)="+(delayWaitMS/1000)); }
         lookGeo = new LookGeo(this);
 
-        Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));
+        //Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
 
-        // registration WaveLock
+        // registration WaveLock for work in power off state
 
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"BobaWakelockTag");
@@ -115,14 +114,13 @@ public class LookServiceBobaTest extends IntentService {
         int waitstopMS = 100;
         stopping = true;
 
-        while (!stopped) { synchronized (this) { try { wait(waitstopMS); } catch (Exception e) {} } }
+        while (!stopped) SystemClock.sleep(waitstopMS);
 
         wif.close();
-        Toast.makeText(this, "service destroy", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "service destroy (file size)="+wif.fSize(), Toast.LENGTH_SHORT).show();
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP);
-        Log.d(LOG_TAG, "service destroy size=" + wif.fSize() + " " + wif.fPath());
-        if (OKProtocol) { wpn.writeRecord("service end"); }
-        if (OKProtocol) wpn.close();
+        // Log.d(LOG_TAG, "service destroy size=" + wif.fSize() + " " + wif.fPath());
+        if (OKProtocol) { wpn.writeRecord("service end");  wpn.close(); }
 
         sendStateProgress(SERVICE_STATE_STOP, 0);
 
@@ -136,11 +134,14 @@ public class LookServiceBobaTest extends IntentService {
      * The IntentService calls this method from the default worker thread with
      * the intent that started the service. When this method returns, IntentService
      * stops the service, as appropriate.
+     *
+     * work in WakeLock state (special)
+     *
      */
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        sendstatus = true;
+        sendstatus = true; // send message parent's activity
 
         if (OKForeground) {
 
@@ -158,8 +159,7 @@ public class LookServiceBobaTest extends IntentService {
         }
 
         try {
-            String prot = "";
-            Log.d(LOG_TAG, "service before WORKING");
+            // Log.d(LOG_TAG, "service before WORKING");
             sendStateProgress(SERVICE_STATE_START, 0);
 
             long endTime = System.currentTimeMillis() + workTimeMS;
@@ -169,16 +169,14 @@ public class LookServiceBobaTest extends IntentService {
                 if (stopping) break;
                 Log.d(LOG_TAG, "service WORK " + ((int) (procentWork * 100)) + "%");
 
-                String[] listWiFi = bobaWiFiLook();
+                long p0 = System.currentTimeMillis();
 
-                if (OKProtocol) {
-                    if (listWiFi == null) prot = "r0";
-                    else prot = "r" + listWiFi.length;
-                    wpn.writeRecord(prot);
-                }
+                String[] listWiFi = bobaWiFiLook();
 
                 if (listWiFi != null) for (String iWiFi : listWiFi)
                     wif.writeRecord(lookGeo.getLocationString() + sep + iWiFi);
+
+                long p1 = System.currentTimeMillis();
 
                 long i = 0, step = 1; // seconds
                 while ((i<delayWaitMS)&&(!stopping)) { i += step*1000L; // i and delayWaitMS  in milliseconds
@@ -196,8 +194,13 @@ public class LookServiceBobaTest extends IntentService {
                     procentWork = (float) (1.0 - ((0.0 + endTime - System.currentTimeMillis()) / workTimeMS));
                     sendStateProgress(SERVICE_STATE_RUN, (int) (procentWork * 100));
                 }
+
+                long p2 = System.currentTimeMillis();
                 if (OKProtocol) {
-                    wpn.writeRecord("end sleep");
+                    String prot = "find=";
+                    if (listWiFi == null) prot += "0"; else prot += listWiFi.length;
+                    prot += " work (ms) time="+(p2-p0)+" find="+(p1-p0)+" delay="+(p2-p1);
+                    wpn.writeRecord(prot);
                 }
 
             }

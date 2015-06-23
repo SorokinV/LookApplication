@@ -43,12 +43,12 @@
     <string name="pref_foreground_summary">Run foreground</string>
 
     <string name="pref_delayS">5</string>
-    <string name="pref_delayS_dialogtitle">Insert delay time between query (from 3 to 60 sec)</string>
+    <string name="pref_delayS_dialogtitle">Insert delay time between query (from 3 to 300 sec)</string>
     <string name="pref_delayS_title">Delay time</string>
     <string name="pref_delayS_summary">Delay time between query (second)</string>
 
     <string name="pref_timeM">60</string>
-    <string name="pref_timeM_dialogtitle">Insert working time (from 2 to 240 min)</string>
+    <string name="pref_timeM_dialogtitle">Insert working time (from 2 to 600 min)</string>
     <string name="pref_timeM_title">Working time</string>
     <string name="pref_timeM_summary">Working service time (minutes)</string>
 
