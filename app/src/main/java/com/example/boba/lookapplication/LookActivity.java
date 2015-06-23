@@ -29,8 +29,10 @@ public class LookActivity extends ActionBarActivity {
 
     int     delayS = 6;  // seconds
     int     timeM  = 180; // minute
-    boolean OKBeep       = true;
-    boolean OKForeground = true;
+    boolean OKBeep           = true;
+    boolean OKForeground     = true;
+    boolean OKProtocol       = false; // inner working protocol
+    boolean OKProtocolAppend = false; // append or recreate inner working protocol
 
     ProgressBar progressBar;
 
@@ -135,6 +137,8 @@ public class LookActivity extends ActionBarActivity {
         intentService.putExtra("foreground",OKForeground);
         intentService.putExtra("delayMS",getDelayService());
         intentService.putExtra("timeMS",getTimeService());
+        intentService.putExtra("protocol",OKProtocol);
+        intentService.putExtra("protocolappend",OKProtocolAppend);
 
         startService(intentService);
 
@@ -230,8 +234,10 @@ public class LookActivity extends ActionBarActivity {
 
         if (delayS>=(timeM*60)) delayS = ((timeM*60)/2);
 
-        OKBeep        = sharedPref.getBoolean("pref_beep", OKBeep);
-        OKForeground  = sharedPref.getBoolean("pref_foreground", OKForeground);
+        OKBeep             = sharedPref.getBoolean("pref_beep", OKBeep);
+        OKForeground       = sharedPref.getBoolean("pref_foreground", OKForeground);
+        OKProtocol         = sharedPref.getBoolean("pref_protocol", OKProtocol);
+        OKProtocolAppend   = sharedPref.getBoolean("pref_protocol_append", OKProtocolAppend);
     }
 
     int SensorsCount () {

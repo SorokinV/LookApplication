@@ -25,17 +25,18 @@ public class LookServiceBobaTest extends IntentService {
 
     final int FOREGROUND_ID = 123;
 
-    boolean OKBeep       = true;
-    boolean OKForeground = true;
-    boolean OKProtocol   = true;
+    boolean OKBeep           = true;
+    boolean OKForeground     = true;
+    boolean OKProtocol       = true;
+    boolean OKProtocolAppend = true;
 
-    boolean stopping     = false;
-    boolean stopped      = false;
-    boolean sendstatus   = false;
+    boolean stopping         = false;
+    boolean stopped          = false;
+    boolean sendstatus       = false;
 
-    long delayWaitMS     = 5*1000;    // 05 sec
-    long workTimeMS      = 60*1000; // 60 sec
-    final String LOG_TAG = "LookServiceBoba";
+    long delayWaitMS         = 5*1000;    // 05 sec
+    long workTimeMS          = 60*1000; // 60 sec
+    final String LOG_TAG     = "LookServiceBoba";
 
     String sep = "\t";
     String workFileName  = "wifi.csv";
@@ -76,14 +77,16 @@ public class LookServiceBobaTest extends IntentService {
         stopped = false;
         stopping= false;
 
-        delayWaitMS  = intent.getLongExtra("delayMS",delayWaitMS);
-        workTimeMS   = intent.getLongExtra("timeMS",workTimeMS);
-        OKBeep       = intent.getBooleanExtra("beep", OKBeep);
-        OKForeground = intent.getBooleanExtra("foreground", OKForeground);
+        delayWaitMS      = intent.getLongExtra("delayMS",delayWaitMS);
+        workTimeMS       = intent.getLongExtra("timeMS",workTimeMS);
+        OKBeep           = intent.getBooleanExtra("beep", OKBeep);
+        OKForeground     = intent.getBooleanExtra("foreground", OKForeground);
+        OKProtocol       = intent.getBooleanExtra("protocol", OKProtocol);
+        OKProtocolAppend = intent.getBooleanExtra("protocolappend", OKProtocolAppend);
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
-        if (OKProtocol) wpn = new WriteFile(this,workProtName,true,true);
+        if (OKProtocol) wpn = new WriteFile(this,workProtName,OKProtocolAppend,true);
         wif = new WriteFile(this,workFileName);
 
         if (OKProtocol) { wpn.writeRecord("service begin time(M)="+(workTimeMS/1000/60)+" delay(S)="+(delayWaitMS/1000)); }
@@ -276,7 +279,7 @@ public class LookServiceBobaTest extends IntentService {
                 case -1: {stopping   = true;  break;}
             }
 
-            Log.d(LOG_TAG,"commands state(send,stop):"+command+" "+sendstatus+" "+stopping);
+            //Log.d(LOG_TAG,"commands state(send,stop):"+command+" "+sendstatus+" "+stopping);
 
         }
     }

@@ -42,6 +42,19 @@
     <PreferenceCategory
         android:title="@string/pref_storage_title"
         android:key="@string/pref_storage_key">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_protocol"
+            android:title="@string/pref_protocol_title"
+            android:summary="@string/pref_protocol_summary"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_protocol_append"
+            android:dependency="pref_protocol"
+            android:title="@string/pref_protocol_append_title"
+            android:summary="@string/pref_protocol_append_summary"/>
+
+
     </PreferenceCategory>
 
 </PreferenceScreen>

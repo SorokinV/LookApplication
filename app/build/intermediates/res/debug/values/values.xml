@@ -346,6 +346,10 @@
     <string name="pref_foreground_summary">Run foreground</string>
     <string name="pref_lookservice_key">Service key</string>
     <string name="pref_lookservice_title">Service options</string>
+    <string name="pref_protocol_append_summary">Enable protocol append</string>
+    <string name="pref_protocol_append_title">Enable protocol append</string>
+    <string name="pref_protocol_summary">Enable protocol</string>
+    <string name="pref_protocol_title">Enable protocol</string>
     <string name="pref_storage_key">Storage key</string>
     <string name="pref_storage_title">Storage</string>
     <string name="pref_timeM">60</string>
