@@ -62,6 +62,7 @@
         </activity>
 
         <service android:name="com.example.boba.lookapplication.LookServiceBobaTest" />
+        <service android:name="com.example.boba.lookapplication.LookServiceMiddle" />
 
         <activity
             android:name="com.example.boba.lookapplication.SettingsActivity"

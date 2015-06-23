@@ -332,12 +332,16 @@
     <string name="mr_user_route_category_name">Devices</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="notification_message">LS running (message)</string>
+    <string name="notification_title">LS running (title)</string>
     <string name="pref_beep">Service beep</string>
     <string name="pref_beep_summary">Start/Stop activity service beep</string>
     <string name="pref_delayS">5</string>
     <string name="pref_delayS_dialogtitle">Insert delay time between query (from 3 to 60 sec)</string>
     <string name="pref_delayS_summary">Delay time between query (second)</string>
     <string name="pref_delayS_title">Delay time</string>
+    <string name="pref_foreground">Run foreground</string>
+    <string name="pref_foreground_summary">Run foreground</string>
     <string name="pref_lookservice_key">Service key</string>
     <string name="pref_lookservice_title">Service options</string>
     <string name="pref_storage_key">Storage key</string>
@@ -366,6 +370,7 @@
     <string name="textshowwifilistOK">Show WiFi</string>
     <string name="textstartlookservice">Start look service</string>
     <string name="textstoplookservice">Stop look service (rest %1$s min)</string>
+    <string name="ticker_text">LS running</string>
     <string name="title_activity_setting">Setting</string>
     <string name="title_activity_show_sensors">Show Sensors</string>
     <string name="title_activity_show_wi_fi">Show WiFi</string>

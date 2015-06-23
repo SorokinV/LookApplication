@@ -5,14 +5,20 @@
         android:title="@string/pref_lookservice_title"
         android:key="@string/pref_lookservice_key">
 
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_beep"
-        android:title="@string/pref_beep"
-        android:summary="@string/pref_beep_summary"
-        />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_beep"
+            android:title="@string/pref_beep"
+            android:summary="@string/pref_beep_summary"/>
 
-    <EditTextPreference
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_foreground"
+            android:title="@string/pref_foreground"
+            android:summary="@string/pref_foreground_summary"
+            />
+
+        <EditTextPreference
         android:defaultValue="@string/pref_delayS"
         android:dialogTitle="@string/pref_delayS_dialogtitle"
         android:key="pref_delayS"

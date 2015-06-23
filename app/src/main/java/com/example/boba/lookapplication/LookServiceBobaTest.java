@@ -1,6 +1,8 @@
 package com.example.boba.lookapplication;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,10 +22,15 @@ import java.util.List;
  */
 public class LookServiceBobaTest extends IntentService {
 
+    final int FOREGROUND_ID = 123;
+
     boolean OKBeep       = true;
+    boolean OKForeground = true;
     boolean OKProtocol   = true;
+
     boolean stopping     = false;
     boolean stopped      = false;
+    boolean sendstatus   = false;
 
     long delayWaitMS     = 5*1000;    // 05 sec
     long workTimeMS      = 60*1000; // 60 sec
@@ -56,7 +64,7 @@ public class LookServiceBobaTest extends IntentService {
      */
     public LookServiceBobaTest() {
         super("LookServiceBobaTest");
-        setIntentRedelivery(true); // ????? is helpful :)
+//        setIntentRedelivery(true); // ????? is helpful :)
     }
 
     @Override
@@ -67,13 +75,14 @@ public class LookServiceBobaTest extends IntentService {
         stopped = false;
         stopping= false;
 
-        delayWaitMS = intent.getLongExtra("delayMS",delayWaitMS);
-        workTimeMS = intent.getLongExtra("timeMS",workTimeMS);
-        OKBeep = intent.getBooleanExtra("beep", OKBeep);
+        delayWaitMS  = intent.getLongExtra("delayMS",delayWaitMS);
+        workTimeMS   = intent.getLongExtra("timeMS",workTimeMS);
+        OKBeep       = intent.getBooleanExtra("beep", OKBeep);
+        OKForeground = intent.getBooleanExtra("foreground", OKForeground);
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
-        if (OKProtocol) wpn = new WriteFile(this,workProtName);
+        if (OKProtocol) wpn = new WriteFile(this,workProtName,true,true);
         wif = new WriteFile(this,workFileName);
 
         if (OKProtocol) { wpn.writeRecord("service begin"); }
@@ -121,8 +130,23 @@ public class LookServiceBobaTest extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Normally we would do some work here, like download a file.
-        // For our sample, we just sleep for 5 seconds.
+
+        sendstatus = true;
+
+        if (OKForeground) {
+
+            Notification notification = new Notification(R.drawable.ic_launcher,
+                    getText(R.string.ticker_text),
+                    System.currentTimeMillis());
+            Intent notificationIntent = new Intent(this, LookServiceBobaTest.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
+            notification.setLatestEventInfo(this,
+                    getText(R.string.notification_title),
+                    getText(R.string.notification_message),
+                    pendingIntent);
+
+            startForeground(FOREGROUND_ID, notification);
+        }
 
         try {
             String prot = "";
@@ -147,22 +171,31 @@ public class LookServiceBobaTest extends IntentService {
                 if (listWiFi != null) for (String iWiFi : listWiFi)
                     wif.writeRecord(lookGeo.getLocationString() + sep + iWiFi);
 
-                int i = 0, step = 2; // seconds
-                while ((i<delayWaitMS)&&(!stopping)) { i += step*1000; // i and delayWaitMS  in milliseconds
+                long i = 0, step = 1; // seconds
+                while ((i<delayWaitMS)&&(!stopping)) { i += step*1000L; // i and delayWaitMS  in milliseconds
+                    /*
                     synchronized (this) {
                         try {
 //                            wait(delayWaitMS);
-                            wait(step*1000); // stopping in 1 sec, send current state and verify absent for parent's stop command
+                            //wait(step*1000);       // stopping in 1 sec, send current state and verify absent for parent's stop command
+                            //Thread.sleep(step*1000L); // stopping in 1 sec, send current state and verify absent for parent's stop command
                         } catch (Exception e) {
                         }
                     }
+                    */
+                    SystemClock.sleep(step*1000L);
                     procentWork = (float) (1.0 - ((0.0 + endTime - System.currentTimeMillis()) / workTimeMS));
                     sendStateProgress(SERVICE_STATE_RUN, (int) (procentWork * 100));
                 }
+                if (OKProtocol) {
+                    wpn.writeRecord("end sleep");
+                }
+
             }
         } finally {
             stopped = true;
             sendStateProgress(SERVICE_STATE_STOP, 0);
+            if (OKForeground) stopForeground(true);
         }
 
     }
@@ -210,12 +243,14 @@ public class LookServiceBobaTest extends IntentService {
     }
 
     void sendStateProgress (int state, int progress) {
-        Intent intentUpdate = new Intent();
-        intentUpdate.setAction(ACTION_UPDATE);
-        intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
-        intentUpdate.putExtra(EXTRA_KEY_SERVICE, state);
-        intentUpdate.putExtra(EXTRA_KEY_UPDATE, progress);
-        sendBroadcast(intentUpdate);
+        if (sendstatus) {
+            Intent intentUpdate = new Intent();
+            intentUpdate.setAction(ACTION_UPDATE);
+            intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
+            intentUpdate.putExtra(EXTRA_KEY_SERVICE, state);
+            intentUpdate.putExtra(EXTRA_KEY_UPDATE, progress);
+            sendBroadcast(intentUpdate);
+        }
     }
 
     public class CommandBroadcastReceiver extends BroadcastReceiver {
@@ -223,7 +258,14 @@ public class LookServiceBobaTest extends IntentService {
         @Override
         public void onReceive(Context context, Intent intent) {
             int command = intent.getIntExtra(LookServiceBobaTest.EXTRA_KEY_SERVICE, 0);
-            stopping = (command<0);
+            switch (command) {
+                case 0 : {sendstatus = true;  break;}
+                case 1 : {sendstatus = false; break;}
+                case -1: {stopping   = true;  break;}
+            }
+
+            Log.d(LOG_TAG,"commands state(send,stop):"+command+" "+sendstatus+" "+stopping);
+
         }
     }
 

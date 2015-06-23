@@ -12,14 +12,12 @@ import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -31,7 +29,8 @@ public class LookActivity extends ActionBarActivity {
 
     int     delayS = 6;  // seconds
     int     timeM  = 180; // minute
-    boolean OKBeep = true;
+    boolean OKBeep       = true;
+    boolean OKForeground = true;
 
     ProgressBar progressBar;
 
@@ -66,6 +65,7 @@ public class LookActivity extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
+        sendServiceCommand(1); // nosend
         super.onDestroy();
         unregisterReceiver(updateBroadcastReceiver);
     }
@@ -110,7 +110,7 @@ public class LookActivity extends ActionBarActivity {
     }
 
     public void ClickLookService (View view) {
-        if (progressBar.getVisibility() == View.VISIBLE) {
+        if ((progressBar.getVisibility() == View.VISIBLE)||(intentService!=null)) {
             ClickStopLookService(view);
         } else {
             ClickStartLookService(view);
@@ -132,6 +132,7 @@ public class LookActivity extends ActionBarActivity {
         intentService = new Intent(this,LookServiceBobaTest.class);
 
         intentService.putExtra("beep",OKBeep);
+        intentService.putExtra("foreground",OKForeground);
         intentService.putExtra("delayMS",getDelayService());
         intentService.putExtra("timeMS",getTimeService());
 
@@ -186,6 +187,8 @@ public class LookActivity extends ActionBarActivity {
         // Is look service work?
         //
 
+        sendServiceCommand(0);
+
         Button   bLookService = (Button)   findViewById(R.id.lookservicebutton);
 
         Button   bWiFi        = (Button)   findViewById(R.id.showwifilist);
@@ -225,7 +228,8 @@ public class LookActivity extends ActionBarActivity {
 //        Toast.makeText(this, "delayS="+delayS, Toast.LENGTH_SHORT).show();
 //        Toast.makeText(this, "timeM"+timeM, Toast.LENGTH_SHORT).show();
 
-        OKBeep  = sharedPref.getBoolean("pref_beep", OKBeep);
+        OKBeep        = sharedPref.getBoolean("pref_beep", OKBeep);
+        OKForeground  = sharedPref.getBoolean("pref_foreground", OKForeground);
     }
 
     int SensorsCount () {
@@ -250,8 +254,7 @@ public class LookActivity extends ActionBarActivity {
     }
 
     long getDelayService () {return(delayS*1000);}
-    long getTimeService  () {return(timeM*60*1000);} // {return(2*60*60*1000);};
-//    long getTimeService () {return(3*60*1000);} // {return(2*60*60*1000);};
+    long getTimeService  () {return(timeM*60*1000);}
 
     void sendServiceCommand (int command) {
         Intent intentUpdate = new Intent();
