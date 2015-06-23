@@ -68,6 +68,9 @@
         <activity
             android:name="com.example.boba.lookapplication.SettingsActivity"
             android:label="@string/title_activity_setting" >
+            <intent-filter>
+                <action android:name="com.example.boba.lookapplication.ACTION_USER_PREFERENCE" />
+            </intent-filter>
         </activity>
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity

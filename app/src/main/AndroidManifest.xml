@@ -47,7 +47,9 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_setting" >
-        </activity>
+            <intent-filter>
+                <action android:name="com.example.boba.lookapplication.ACTION_USER_PREFERENCE" />
+            </intent-filter>        </activity>
     </application>
 
 </manifest>
