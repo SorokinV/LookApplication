@@ -51,6 +51,8 @@
 
     <string name="pref_wifi_title">WiFi setting</string>
     <string name="pref_wifi_summary">WiFi setting summary</string>
+    <string name="pref_wifi_request_scanning_title">WiFi Scanning</string>
+    <string name="pref_wifi_request_scanning_summary">WiFi Scanning summary</string>
     <string name="pref_location_title">Location (GPS, GLONASS ...)</string>
     <string name="pref_location_summary">Location summary</string>
 

@@ -60,6 +60,9 @@ public class LookServiceBobaTest extends IntentService {
 
     private PowerManager.WakeLock wakeLock;
     private CommandBroadcastReceiver commandBroadcastReceiver;
+    WifiManager mWiFiManager;
+    WifiManager.WifiLock mWiFiLock;
+
 
     /**
      * A constructor is required, and must call the super IntentService(String)
@@ -101,6 +104,17 @@ public class LookServiceBobaTest extends IntentService {
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"BobaWakelockTag");
         wakeLock.acquire();
 
+        // definition WiFiManager & WiFiLock
+
+        mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        mWiFiManager.isWifiEnabled();
+        // mWiFiManager.isScanAlwaysAvailable();
+        mWiFiLock = mWiFiManager.createWifiLock("BobaWiFiLock");
+        mWiFiLock.acquire();
+        if (OKProtocol) { wpn.writeRecord("service WiFi: "+
+                " enabled="+ mWiFiManager.isWifiEnabled()+
+                " state="+mWiFiManager.getWifiState()); }
+
         // registration BroadcastReceiver
         commandBroadcastReceiver = new CommandBroadcastReceiver();
 
@@ -128,6 +142,7 @@ public class LookServiceBobaTest extends IntentService {
         sendStateProgress(SERVICE_STATE_STOP, 0);
 
         wakeLock.release();
+        mWiFiLock.release();
         unregisterReceiver(commandBroadcastReceiver);
 
         super.onDestroy();
@@ -217,16 +232,12 @@ public class LookServiceBobaTest extends IntentService {
 
     String[] bobaWiFiLook () {
 
-        // SensorManager mSensorManager;
-
-        WifiManager mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-
         String[] mString = null;
         List<ScanResult> deviceWiFis = null;
 
         try {
 
-            deviceWiFis = mWiFiManager.getScanResults();
+            deviceWiFis = mWiFiManager.getScanResults(); //mWiFiManager.startScan();
 
             if (deviceWiFis!=null) {
 

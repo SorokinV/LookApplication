@@ -44,6 +44,13 @@
             <intent android:action="android.settings.WIFI_SETTINGS" />
         </PreferenceScreen>
 
+        <!--PreferenceScreen
+            android:summary="@string/pref_wifi_request_scanning_summary"
+            android:title="@string/pref_wifi_request_scanning_title" >
+            <intent android:action="android.net.wifi.action.REQUEST_SCAN_ALWAYS_AVAILABLE" />
+        </PreferenceScreen>
+        -->
+
         <PreferenceScreen
             android:summary="@string/pref_location_summary"
             android:title="@string/pref_location_title" >
