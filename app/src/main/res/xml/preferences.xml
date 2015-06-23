@@ -35,6 +35,11 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/pref_communication_title"
+        android:key="@string/pref_communication_key">
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/pref_storage_title"
         android:key="@string/pref_storage_key">
     </PreferenceCategory>
