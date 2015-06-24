@@ -215,7 +215,7 @@ public class LookServiceBobaTest extends IntentService {
 
                 long p2 = System.currentTimeMillis();
                 if (OKProtocol) {
-                    String prot = "find=";
+                    String prot = "points=";
                     if (listWiFi == null) prot += "0"; else prot += listWiFi.length;
                     prot += " work (ms) time="+(p2-p0)+" find="+(p1-p0)+" delay="+(p2-p1);
                     wpn.writeRecord(prot);
