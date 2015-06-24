@@ -62,6 +62,7 @@ public class LookServiceBobaTest extends IntentService {
     private CommandBroadcastReceiver commandBroadcastReceiver;
     WifiManager mWiFiManager;
     WifiManager.WifiLock mWiFiLock;
+    WifiManager.MulticastLock mWiFiMultiLock;
 
 
     /**
@@ -104,13 +105,15 @@ public class LookServiceBobaTest extends IntentService {
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"BobaWakelockTag");
         wakeLock.acquire();
 
-        // definition WiFiManager & WiFiLock
+        // definition WiFiManager & WiFiLock & Multilock (experimental)
 
         mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         mWiFiManager.isWifiEnabled();
         // mWiFiManager.isScanAlwaysAvailable();
         mWiFiLock = mWiFiManager.createWifiLock("BobaWiFiLock");
         mWiFiLock.acquire();
+        mWiFiMultiLock = mWiFiManager.createMulticastLock("BobaWiFiMultiLock");
+        mWiFiMultiLock.acquire();
         if (OKProtocol) { wpn.writeRecord("service WiFi: "+
                 " enabled="+ mWiFiManager.isWifiEnabled()+
                 " state="+mWiFiManager.getWifiState()); }
@@ -143,6 +146,7 @@ public class LookServiceBobaTest extends IntentService {
 
         wakeLock.release();
         mWiFiLock.release();
+        mWiFiMultiLock.release();
         unregisterReceiver(commandBroadcastReceiver);
 
         super.onDestroy();
