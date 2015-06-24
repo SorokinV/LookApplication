@@ -41,8 +41,7 @@
         </activity>
 
         <service android:name=".LookServiceBobaTest" />
-        <service android:name=".LookServiceMiddle" />
-
+ 
 
         <activity
             android:name=".SettingsActivity"
