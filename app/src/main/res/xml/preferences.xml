@@ -11,13 +11,6 @@
             android:title="@string/pref_beep"
             android:summary="@string/pref_beep_summary"/>
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_foreground"
-            android:title="@string/pref_foreground"
-            android:summary="@string/pref_foreground_summary"
-            />
-
         <EditTextPreference
         android:defaultValue="@string/pref_delayS"
         android:dialogTitle="@string/pref_delayS_dialogtitle"
@@ -51,6 +44,12 @@
         </PreferenceScreen>
         -->
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_location_use"
+            android:title="@string/pref_location_use_title"
+            android:summary="@string/pref_location_use_summary"/>
+
         <PreferenceScreen
             android:summary="@string/pref_location_summary"
             android:title="@string/pref_location_title" >
@@ -62,6 +61,12 @@
     <PreferenceCategory
         android:title="@string/pref_storage_title"
         android:key="@string/pref_storage_key">
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_special_title"
+        android:key="@string/pref_special_key">
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_protocol"
@@ -73,7 +78,12 @@
             android:dependency="pref_protocol"
             android:title="@string/pref_protocol_append_title"
             android:summary="@string/pref_protocol_append_summary"/>
-
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_foreground"
+            android:title="@string/pref_foreground"
+            android:summary="@string/pref_foreground_summary"
+            />
 
     </PreferenceCategory>
 

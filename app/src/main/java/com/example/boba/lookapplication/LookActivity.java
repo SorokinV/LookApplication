@@ -33,6 +33,7 @@ public class LookActivity extends ActionBarActivity {
     boolean OKForeground     = true;
     boolean OKProtocol       = false; // inner working protocol
     boolean OKProtocolAppend = false; // append or recreate inner working protocol
+    boolean OKLocationUse    = false; // append or recreate inner working protocol
 
     ProgressBar progressBar;
 
@@ -139,6 +140,7 @@ public class LookActivity extends ActionBarActivity {
         intentService.putExtra("timeMS",getTimeService());
         intentService.putExtra("protocol",OKProtocol);
         intentService.putExtra("protocolappend",OKProtocolAppend);
+        intentService.putExtra("location",OKLocationUse);
 
         startService(intentService);
 
@@ -214,9 +216,13 @@ public class LookActivity extends ActionBarActivity {
         TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
         String bText = getString(R.string.textserviceparameter,timeM,delayS);
 
-        LookGeo lookGeo = new LookGeo(this);
-        String  location= lookGeo.getLocationString();
-        if (location!="") bText += " " + getString(R.string.textGEOparameter,lookGeo.getLocationString());
+        if (OKLocationUse) {
+            LookGeo lookGeo = new LookGeo(this);
+            String location = lookGeo.getLocationString();
+            if (location != "")
+                bText += " " + getString(R.string.textGEOparameter, lookGeo.getLocationString());
+        }
+
         bTextMessage.setText(bText);
 
     }
@@ -238,6 +244,7 @@ public class LookActivity extends ActionBarActivity {
         OKForeground       = sharedPref.getBoolean("pref_foreground", OKForeground);
         OKProtocol         = sharedPref.getBoolean("pref_protocol", OKProtocol);
         OKProtocolAppend   = sharedPref.getBoolean("pref_protocol_append", OKProtocolAppend);
+        OKLocationUse      = sharedPref.getBoolean("pref_location_use_append", OKLocationUse);
     }
 
     int SensorsCount () {

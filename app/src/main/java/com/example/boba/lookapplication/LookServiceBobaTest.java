@@ -29,6 +29,7 @@ public class LookServiceBobaTest extends IntentService {
     boolean OKForeground     = true;
     boolean OKProtocol       = true;
     boolean OKProtocolAppend = true;
+    boolean OKLocationUse    = true;
 
     boolean stopping         = false;
     boolean stopped          = false;
@@ -83,10 +84,11 @@ public class LookServiceBobaTest extends IntentService {
 
         delayWaitMS      = intent.getLongExtra("delayMS",delayWaitMS);
         workTimeMS       = intent.getLongExtra("timeMS",workTimeMS);
-        OKBeep           = intent.getBooleanExtra("beep", OKBeep);
+        OKBeep = intent.getBooleanExtra("beep", OKBeep);
         OKForeground     = intent.getBooleanExtra("foreground", OKForeground);
         OKProtocol       = intent.getBooleanExtra("protocol", OKProtocol);
         OKProtocolAppend = intent.getBooleanExtra("protocolappend", OKProtocolAppend);
+        OKLocationUse    = intent.getBooleanExtra("location", OKLocationUse);
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
@@ -94,7 +96,7 @@ public class LookServiceBobaTest extends IntentService {
         wif = new WriteFile(this,workFileName);
 
         if (OKProtocol) { wpn.writeRecord("service begin time(M)="+(workTimeMS/1000/60)+" delay(S)="+(delayWaitMS/1000)); }
-        lookGeo = new LookGeo(this);
+        if (OKLocationUse) lookGeo = new LookGeo(this);
 
         //Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
@@ -195,8 +197,8 @@ public class LookServiceBobaTest extends IntentService {
 
                 String[] listWiFi = bobaWiFiLook();
 
-                if (listWiFi != null) for (String iWiFi : listWiFi)
-                    wif.writeRecord(lookGeo.getLocationString() + sep + iWiFi);
+                String location = ""; if (OKLocationUse) location = lookGeo.getLocationString();
+                if (listWiFi != null) for (String iWiFi : listWiFi) wif.writeRecord(location + sep + iWiFi);
 
                 long p1 = System.currentTimeMillis();
 

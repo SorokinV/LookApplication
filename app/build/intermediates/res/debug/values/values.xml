@@ -346,12 +346,16 @@
     <string name="pref_foreground_summary">Run foreground</string>
     <string name="pref_location_summary">Location summary</string>
     <string name="pref_location_title">Location (GPS, GLONASS ...)</string>
+    <string name="pref_location_use_summary">Using location (GPS, GLONASS ...)</string>
+    <string name="pref_location_use_title">Using location</string>
     <string name="pref_lookservice_key">Service key</string>
     <string name="pref_lookservice_title">Service options</string>
     <string name="pref_protocol_append_summary">Enable protocol append</string>
     <string name="pref_protocol_append_title">Enable protocol append</string>
     <string name="pref_protocol_summary">Enable protocol</string>
     <string name="pref_protocol_title">Enable protocol</string>
+    <string name="pref_special_key">Special key</string>
+    <string name="pref_special_title">Special</string>
     <string name="pref_storage_key">Storage key</string>
     <string name="pref_storage_title">Storage</string>
     <string name="pref_timeM">60</string>
