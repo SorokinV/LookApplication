@@ -27,7 +27,6 @@ public class DB1{
         database = dbHelper.getWritableDatabase();
     }
 
-
     public long createRecords(String id, String name){
         ContentValues values = new ContentValues();
         values.put(EMP_ID, id);
