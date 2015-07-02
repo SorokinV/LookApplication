@@ -244,7 +244,7 @@ public class LookActivity extends ActionBarActivity {
         OKForeground       = sharedPref.getBoolean("pref_foreground", OKForeground);
         OKProtocol         = sharedPref.getBoolean("pref_protocol", OKProtocol);
         OKProtocolAppend   = sharedPref.getBoolean("pref_protocol_append", OKProtocolAppend);
-        OKLocationUse      = sharedPref.getBoolean("pref_location_use_append", OKLocationUse);
+        OKLocationUse      = sharedPref.getBoolean("pref_location_use", OKLocationUse);
     }
 
     int SensorsCount () {
