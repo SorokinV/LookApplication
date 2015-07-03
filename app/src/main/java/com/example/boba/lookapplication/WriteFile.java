@@ -17,32 +17,25 @@ import java.util.Date;
  */
 public class WriteFile {
 
-    private File ffos = null;
+    private File        ffos = null;
     private OutputStream fos = null;
-    private String sep = "\t";
-    private String LOG_TAG = "WriteInFile";
+    private String sep       = "\t";
+    private String LOG_TAG   = "WriteInFile";
 
-    int     exceptions    = 0;
-    int     writes        = 0;
-    boolean statException = false;
+    boolean statException    = false;
+    int     exceptions       = 0;
+    int     writes           = 0;
+    String  lastException    = "";
 
     @SuppressLint("SimpleDateFormat")
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 
     public WriteFile (Context ctx, String filename) {
-        try {
-            ffos = new File(ctx.getExternalFilesDir(null),filename);
-            fos = new FileOutputStream(ffos,true /* append */);
-        } catch (Exception e) {Log.d(LOG_TAG, "Exception: open" + " " + e.getMessage());}
-        Log.d(LOG_TAG, "service starting size="+" " + ctx.getExternalFilesDir(null));
+        new WriteFile(ctx,filename,true);
     }
 
     public WriteFile (Context ctx, String filename, boolean OKAppend) {
-        try {
-            ffos = new File(ctx.getExternalFilesDir(null),filename);
-            fos = new FileOutputStream(ffos,OKAppend /* append */);
-        } catch (Exception e) {Log.d(LOG_TAG, "Exception: open" + " " + e.getMessage());}
-        Log.d(LOG_TAG, "service starting size="+" " + ctx.getExternalFilesDir(null));
+        new WriteFile(ctx,filename,OKAppend,statException);
     }
 
     public WriteFile (Context ctx, String filename, boolean OKAppend, boolean exception) {
@@ -50,18 +43,26 @@ public class WriteFile {
             statException = exception;
             ffos = new File(ctx.getExternalFilesDir(null),filename);
             fos = new FileOutputStream(ffos,OKAppend /* append */);
-        } catch (Exception e) {Log.d(LOG_TAG, "Exception: open" + " " + e.getMessage());}
+        } catch (Exception e) {
+            exceptions++;
+            Log.e(LOG_TAG, "Exception: open" + " " + e.getMessage());
+            lastException = e.getMessage();
+        }
         Log.d(LOG_TAG, "service starting size="+" " + ctx.getExternalFilesDir(null));
     }
 
     public boolean writeRecord (String text) {
 
-        writes++;
         String datetimeNow = sdf.format(new Date());
         String btext = datetimeNow + sep + text + "\n";
         try {
             fos.write(btext.getBytes());
-        } catch (Exception e) {exceptions++; Log.d(LOG_TAG, "Exception: write"+" " + e.getMessage());}
+            writes++;
+        } catch (Exception e) {
+            exceptions++;
+            lastException = e.getMessage();
+            Log.e(LOG_TAG, "Exception: write"+" " + e.getMessage());
+        }
         return(true);
     }
 
@@ -69,7 +70,11 @@ public class WriteFile {
         try {
             if (statException) writeRecord("writes="+writes+" exception="+exceptions);
             fos.close();
-        } catch (Exception e) {Log.d(LOG_TAG, "Exception: close"+" " + e.getMessage());}
+        } catch (Exception e) {
+            exceptions++;
+            Log.e(LOG_TAG, "Exception: close" + " " + e.getMessage());
+            lastException = e.getMessage();
+        }
     }
 
     public long fSize (String filename) {
@@ -97,5 +102,8 @@ public class WriteFile {
     public String  fPath ()     { return(ffos.getPath());  }
     public String  getSeparator ()           { return(sep);}
     public void    setSeparator (String nsep) {sep=nsep;   }
+    public int     getExceptions() {return(exceptions);}
+    public int     getWrites    () {return(writes);}
+    public String  getException () {return(lastException);}
 
 }
