@@ -9,7 +9,7 @@ import org.junit.runners.Suite;
  */
 // Runs all unit tests.
 @RunWith(Suite.class)
-@Suite.SuiteClasses({WriteFileTest.class, TestSQLLiteDB.class})
+@Suite.SuiteClasses({TestWriteFile.class, TestSQLLiteDB.class})
 class UnitTestSuite {
 }
 
