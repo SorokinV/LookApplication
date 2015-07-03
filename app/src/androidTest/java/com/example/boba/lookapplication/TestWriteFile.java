@@ -47,6 +47,11 @@ public class TestWriteFile extends AndroidTestCase {
     @Test
     public void test_null_context() {
         Assert.assertNotNull("context is null?", ctx);
+        File extDir = ctx.getExternalFilesDir(null);
+        Assert.assertTrue("External Dirs not exists(-)", extDir.exists());
+        Assert.assertTrue("External Dirs not Dir (-)",   extDir.isDirectory());
+        Assert.assertTrue("External Dirs not read  (-)", extDir.canRead());
+        Assert.assertTrue("External Dirs not write (-)", extDir.canWrite());
     }
 
     @Test
