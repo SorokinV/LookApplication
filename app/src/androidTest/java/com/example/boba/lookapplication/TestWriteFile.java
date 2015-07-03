@@ -6,11 +6,16 @@ import android.database.Cursor;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.AndroidTestCase;
 import android.test.ApplicationTestCase;
+import android.test.InstrumentationTestCase;
+import android.test.IsolatedContext;
+import android.test.mock.MockContext;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.File;
 
 /**
  * Created by boba2 on 26.06.2015.
@@ -18,33 +23,60 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 
-public class TestWriteFile extends AndroidTestCase {
+public class TestWriteFile extends InstrumentationTestCase {
     public static final String TEST_STRING = "This is a string";
     public static final long TEST_LONG = 12345678L;
-    private DB1 mDB1;
 
-    //public TestSQLLiteDB() { super(Application.class); }
+    Context ctx ;
 
-    Context ctx;
+    public TestWriteFile() { super(); }
 
     @Before
-    public void createSQLDBObject() { ctx = getContext();}
+    public void beforeTest() { ctx = new IsolatedContext(null,null);}
 
     @Test
-    public void DB1_CreateOpenWriteRead() {
-
-        Context ctx  = getContext();
-        Assert.assertNotNull(ctx);
-        //Assert.assertFalse(ctx == null);
-
-
-        /*
-        WriteFile writeFile = new WriteFile(ctx,"bobatest.csv",true,true);
-
-        Assert.assertEquals(true, writeFile.writeRecord("asdf"));
-
-        writeFile.close();
-        */
-
+    public void test0() {
+        Assert.assertNotNull("this is null?",this);
     }
+
+    @Test
+    public void test_null_context() {
+        Assert.assertNotNull("context is null?",ctx);
+    }
+
+    @Test
+    public void test_null_getContext() {
+        Context ctx1 = new IsolatedContext(null,null);
+        Context ctx = new MockContext();
+        Assert.assertNotNull("Context is null?", ctx);
+    }
+
+    @Test
+    public void test_open_create() {
+        Context ctx = new IContext();
+        Assert.assertNotNull("Context is null?", ctx);
+        WriteFile writeFile = new WriteFile(ctx,"bobatest.csv",false,false);
+        Assert.assertEquals(0,writeFile.fSize());
+        writeFile.writeRecord("1234567890");
+//        Assert.assertEquals((10+23),writeFile.fSize());
+        writeFile.writeRecord("1234567890");
+//        Assert.assertEquals((10+23),writeFile.fSize());
+    }
+
+
+    private class MContext extends MockContext {
+        @Override
+        public File getExternalFilesDir(String name) {
+            return (getFilesDir());
+        }
+    }
+
+    private class IContext extends IsolatedContext {
+        public IContext () {super(null,null);}
+        @Override
+        public File getExternalFilesDir(String name) {
+            return (getFilesDir());
+        }
+    }
+
 }
