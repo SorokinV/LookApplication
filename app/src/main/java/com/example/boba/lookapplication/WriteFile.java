@@ -31,18 +31,22 @@ public class WriteFile {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 
     public WriteFile (Context ctx, String filename) {
-        new WriteFile(ctx,filename,true);
+        writeFile(ctx, filename, true, statException);
     }
 
     public WriteFile (Context ctx, String filename, boolean OKAppend) {
-        new WriteFile(ctx,filename,OKAppend,statException);
+        writeFile(ctx, filename, OKAppend, statException);
     }
 
     public WriteFile (Context ctx, String filename, boolean OKAppend, boolean exception) {
+        writeFile(ctx,filename,OKAppend,exception);
+    }
+
+    void writeFile (Context ctx, String filename, boolean OKAppend, boolean exception) {
         try {
             statException = exception;
             ffos = new File(ctx.getExternalFilesDir(null),filename);
-            fos = new FileOutputStream(ffos,OKAppend /* append */);
+            fos =  new FileOutputStream(ffos,OKAppend /* append */);
         } catch (Exception e) {
             exceptions++;
             Log.e(LOG_TAG, "Exception: open" + " " + e.getMessage());
@@ -50,6 +54,8 @@ public class WriteFile {
         }
         Log.d(LOG_TAG, "service starting size="+" " + ctx.getExternalFilesDir(null));
     }
+
+
 
     public boolean writeRecord (String text) {
 
@@ -61,14 +67,15 @@ public class WriteFile {
         } catch (Exception e) {
             exceptions++;
             lastException = e.getMessage();
-            Log.e(LOG_TAG, "Exception: write"+" " + e.getMessage());
+            Log.e(LOG_TAG, "Exception: error write"+" " + e.getMessage() + e);
         }
         return(true);
     }
 
     public void close () {
         try {
-            if (statException) writeRecord("writes="+writes+" exception="+exceptions);
+            if (statException) writeRecord("writes="+(writes+1)+" exception="+exceptions);
+            fos.flush();
             fos.close();
         } catch (Exception e) {
             exceptions++;
@@ -97,13 +104,14 @@ public class WriteFile {
     }
 
     public long    fSize ()     { return(ffos.length());   }
-    public boolean fExist ()    { return(ffos.exists());   }
-    public boolean fWritable () { return(ffos.canWrite()); }
-    public String  fPath ()     { return(ffos.getPath());  }
+    public boolean fExist () { return(ffos.exists());   }
+    public boolean fWritable() { return(ffos.canWrite()); }
+    public String  fPath () { return(ffos.getPath());  }
     public String  getSeparator ()           { return(sep);}
     public void    setSeparator (String nsep) {sep=nsep;   }
     public int     getExceptions() {return(exceptions);}
     public int     getWrites    () {return(writes);}
     public String  getException () {return(lastException);}
+    public OutputStream getOStream () {return(fos);}
 
 }
