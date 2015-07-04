@@ -1,10 +1,10 @@
 package com.example.boba.lookapplication;
 
-import android.app.Application;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.ApplicationTestCase;
+import android.test.AndroidTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,34 +16,52 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 
-public class TestSQLLiteDB extends ApplicationTestCase {
+public class TestSQLLiteDB extends AndroidTestCase {
     public static final String TEST_STRING = "This is a string";
     public static final long TEST_LONG = 12345678L;
     private DB1 mDB1;
 
-    public TestSQLLiteDB() { super(Application.class); }
+    public TestSQLLiteDB() { super(); }
 
     @Before
     public void createSQLDBObject() {
-        Context ctx  = getContext();
-        mDB1 = new DB1(ctx);
+        Context ctx = InstrumentationRegistry.getTargetContext();
+        mDB1        = new DB1(ctx);
     }
 
     @Test
     public void DB1_CreateOpenWriteRead() {
 
-        mDB1.selectRecords();
+        mDB1.deleteRecords();
 
-        // Write the data.
-        mDB1.createRecords("1", "2");
+        Cursor cursor;
 
-        // Read the data.
-        Cursor cursor = mDB1.selectRecords();
+        cursor = mDB1.selectRecords();
+        assertEquals("DB is not null (-)", 0, cursor.getCount());
+        cursor.close();
 
-        // Verify that the received data is correct.
-        assertEquals(cursor.getCount(), 1);
-        //assertThat(cursor.getCount(), is(1));
-        //assertThat(cursor.getString(0), is(TEST_STRING));
-        //assertThat(cursor.getLong(1), is(TEST_LONG));
+        long result;
+
+        result = mDB1.createRecords(1, 101, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
+        assertFalse("DB is not insert record", (result==-1));
+
+        cursor = mDB1.selectRecords();
+        assertEquals("DB is not (-)", 1, cursor.getCount());
+        cursor.close();
+
+        mDB1.createRecords(2, 102, "BSSID102", "SSID102", (float) 1102.0, (float) 82.0, "dContents102", 1103);
+        assertFalse("DB is not insert record", (result == -1));
+        mDB1.createRecords(3, 103, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
+        assertFalse("DB is not insert record", (result == -1));
+        mDB1.createRecords(4, 104, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
+        assertFalse("DB is not insert record", (result == -1));
+        mDB1.createRecords(5, 105, "BSSID105", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001,(float)0.156,(float)-12.90);
+        assertFalse("DB is not insert record", (result == -1));
+        cursor = mDB1.selectRecords();
+        assertEquals("DB is not (-)",  4, cursor.getCount());
+        assertEquals("Columns is not (-)", 10, cursor.getColumnCount());
+        cursor.close();
+
     }
+
 }
