@@ -16,6 +16,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -35,6 +36,9 @@ public class LookServiceBobaTest extends IntentService {
     boolean stopping         = false;
     boolean stopped          = false;
     boolean sendstatus       = false;
+
+    long    dtBegin;
+    long    dtEnd;
 
     long delayWaitMS         = 5*1000;    // 05 sec
     long workTimeMS          = 60*1000; // 60 sec
@@ -151,8 +155,12 @@ public class LookServiceBobaTest extends IntentService {
         wif.close();
 
         Toast.makeText(this, "service destroy (file size)="+wif.fSize(), Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "DB (count,BSSID,looks)="+database.countAllRecords()+" "+database.countAllBSSID()+" "+database.countAllLooks(),
-                Toast.LENGTH_LONG).show();
+        if (OKDBUse) {
+            Toast.makeText(this, "DB (count,BSSID,looks)=" + database.countAllRecords() + " " + database.countAllBSSID() + " " + database.countAllLooks(),
+                    Toast.LENGTH_LONG).show();
+            database.createRecords(dtBegin,dtEnd);
+            database.close();
+        }
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP);
         // Log.d(LOG_TAG, "service destroy size=" + wif.fSize() + " " + wif.fPath());
         if (OKProtocol) { wpn.writeRecord("service end");  wpn.close(); }
@@ -196,6 +204,8 @@ public class LookServiceBobaTest extends IntentService {
         }
 
         try {
+
+            dtBegin = new Date().getTime();
             // Log.d(LOG_TAG, "service before WORKING");
             sendStateProgress(SERVICE_STATE_START, 0);
 
@@ -249,6 +259,7 @@ public class LookServiceBobaTest extends IntentService {
             stopped = true;
             sendStateProgress(SERVICE_STATE_STOP, 0);
             if (OKForeground) stopForeground(true);
+            dtEnd = new Date().getTime();
         }
 
     }
@@ -266,7 +277,7 @@ public class LookServiceBobaTest extends IntentService {
 
                 mString = new String[deviceWiFis.size()];
 
-                long dt = System.currentTimeMillis();
+                long dt = new Date().getTime();
                 int i = 0;
                 for ( ScanResult iList : deviceWiFis ) {
                     mString[i++] = iList.BSSID+sep+
@@ -276,13 +287,12 @@ public class LookServiceBobaTest extends IntentService {
                             iList.capabilities+sep+
                             iList.describeContents();
 
-
                     if (OKLocationUse) {
                         double latitude  = gpsTracker.getLatitude();
                         double longitude = gpsTracker.getLongitude();
                         database.createRecords(dt, iList.BSSID, iList.SSID,
                                 iList.frequency, iList.level, iList.capabilities, iList.describeContents(),
-                                latitude,longitude);
+                                latitude, longitude);
                     } else {
                         database.createRecords(dt, iList.BSSID, iList.SSID,
                                 iList.frequency, iList.level, iList.capabilities, iList.describeContents());

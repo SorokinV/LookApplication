@@ -16,17 +16,22 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_WiFi_CREATE = "create table WiFi ( " +
-                    "datetime     integer  not null,"+
-                    "SSID         text     not null,"+
-                    "BSSID        text     not null,"+
-                    "frequency    float    not null,"   +
-                    "dB           float    not null,"   +
-                    "Latitude     float,"   +
-                    "Longitude    float,"  +
-                    "capabalities text," +
-                    "dContents    integer," +
-                    "PRIMARY KEY (datetime ASC, BSSID ASC, SSID ASC));";
+    private static final String DATABASE_Protocol_CREATE  = "create table Protocol ( " +
+                    "dtBegin      integer  not null,"+
+                    "dtEnd        integer,"+
+                    "PRIMARY KEY (dtBegin ASC));";
+
+    private static final String DATABASE_WiFi_CREATE      = "create table WiFi ( " +
+            "datetime     integer  not null,"+
+            "SSID         text     not null,"+
+            "BSSID        text     not null,"+
+            "frequency    float    not null,"   +
+            "dB           float    not null,"   +
+            "Latitude     float,"   +
+            "Longitude    float,"  +
+            "capabalities text," +
+            "dContents    integer," +
+            "PRIMARY KEY (datetime ASC, BSSID ASC, SSID ASC));";
 
     public DataBaseHelper1(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -39,6 +44,7 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
     // Method is called during creation of the database
     @Override
     public void onCreate(SQLiteDatabase database) {
+        database.execSQL(DATABASE_Protocol_CREATE);
         database.execSQL(DATABASE_WiFi_CREATE);
     }
 

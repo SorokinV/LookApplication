@@ -18,7 +18,11 @@ public class DB1{
 
     public final static String NameDB = "LookApplication.db";
 
-    public final static String WiFi_TABLE="WiFi"; // name of table for WiFi
+    public final static String PRTC_TABLE ="Protocol";            // name of common table
+    public final static String PRTC_DateTimeBegin="dtBegin";      // name of begin date&time field
+    public final static String PRTC_DateTimeEnd  ="dtEnd";        // name of begin date&time field
+
+    public final static String WiFi_TABLE ="WiFi"; // name of table for WiFi
 
     public final static String WiFi_BSSID="BSSID";                // name of BSSID field
     public final static String WiFi_SSID ="SSID";                 // name of SSID field
@@ -72,6 +76,13 @@ public class DB1{
         return database.insert(WiFi_TABLE, null, values);
     }
 
+    public long createRecords(long dtBegin, long dtEnd) {
+        ContentValues values = new ContentValues();
+        values.put(PRTC_DateTimeBegin, dtBegin);
+        values.put(PRTC_DateTimeEnd, dtBegin);
+        return database.insert(PRTC_TABLE, null, values);
+    }
+
     public Cursor selectRecords() {
         String[] cols = new String[] {WiFi_DateTime,WiFi_BSSID,WiFi_SSID,WiFi_dB,WiFi_Frequency,WiFi_dContents,WiFi_capabalities,WiFi_Latitude,WiFi_Longitude};
         Cursor mCursor = database.query(true, WiFi_TABLE,cols,null
@@ -92,9 +103,12 @@ public class DB1{
         return(mCursor.getInt(0));
     }
 
-    public int countAllRecords() { return(countWiFi(" count(*) AS count")); }
-    public int countAllBSSID()   { return(countWiFi("count( DISTINCT " + WiFi_BSSID    + ") AS count")); }
-    public int countAllLooks()   { return(countWiFi("count( DISTINCT " + WiFi_DateTime + ") AS count")); }
+    public int countAllRecords()   { return(countWiFi(" count(*) AS count")); }
+    public int countAllBSSID()     { return(countWiFi("count( DISTINCT " + WiFi_BSSID + ") AS count")); }
+    public int countAllLooks()     { return(countWiFi("count( DISTINCT " + WiFi_DateTime + ") AS count")); }
 
-    public int deleteRecords() { return(database.delete(WiFi_TABLE,null,null)); }
+    public int deleteRecords()     { return(deleteWiFiRecords()); }
+    public int deleteWiFiRecords() { return(database.delete(WiFi_TABLE, null, null)); }
+    public void clearDataBase() {deleteRecords();}
+    public void close() {database.close();}
 }
