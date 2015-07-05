@@ -146,6 +146,14 @@ public class GPSTracker extends Service implements LocationListener {
         return longitude;
     }
 
+    public String getLocationString () {
+        String loc = "";
+        try {
+            loc = location.getLatitude()+" "+location.getLongitude();
+        } catch (Exception e) {loc="";}
+        return (loc);
+    }
+
     /**
      * Function to check GPS/wifi enabled
      * @return boolean

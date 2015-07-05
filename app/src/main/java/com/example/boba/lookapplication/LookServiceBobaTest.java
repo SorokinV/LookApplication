@@ -205,7 +205,8 @@ public class LookServiceBobaTest extends IntentService {
 
                 String location = "";
                 if (OKLocationUse) {
-                    location = lookGeo.getLocationString();
+                    // location = lookGeo.getLocationString();
+                    location = gpsTracker.getLocationString();
                 }
                 if (listWiFi != null) for (String iWiFi : listWiFi) wif.writeRecord(location + sep + iWiFi);
 
