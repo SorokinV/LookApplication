@@ -30,6 +30,7 @@ public class LookServiceBobaTest extends IntentService {
     boolean OKProtocol       = true;
     boolean OKProtocolAppend = true;
     boolean OKLocationUse    = true;
+    boolean OKDBUse          = true;
 
     boolean stopping         = false;
     boolean stopped          = false;
@@ -45,6 +46,8 @@ public class LookServiceBobaTest extends IntentService {
 
     String workProtName  = "protocol.csv";
     WriteFile wpn;
+
+    DB1       database;
 
     ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
 
@@ -95,6 +98,7 @@ public class LookServiceBobaTest extends IntentService {
 
         if (OKProtocol) wpn = new WriteFile(this,workProtName,OKProtocolAppend,true);
         wif = new WriteFile(this,workFileName);
+        if (OKDBUse) database = new DB1(this);
 
         if (OKProtocol) { wpn.writeRecord("service begin time(M)="+(workTimeMS/1000/60)+" delay(S)="+(delayWaitMS/1000)); }
         if (OKLocationUse) {
@@ -145,7 +149,10 @@ public class LookServiceBobaTest extends IntentService {
         if (OKLocationUse) { gpsTracker.stopUsingGPS(); }
 
         wif.close();
+
         Toast.makeText(this, "service destroy (file size)="+wif.fSize(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "DB (count,BSSID,looks)="+database.countAllRecords()+" "+database.countAllBSSID()+" "+database.countAllLooks(),
+                Toast.LENGTH_LONG).show();
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP);
         // Log.d(LOG_TAG, "service destroy size=" + wif.fSize() + " " + wif.fPath());
         if (OKProtocol) { wpn.writeRecord("service end");  wpn.close(); }
@@ -259,6 +266,7 @@ public class LookServiceBobaTest extends IntentService {
 
                 mString = new String[deviceWiFis.size()];
 
+                long dt = System.currentTimeMillis();
                 int i = 0;
                 for ( ScanResult iList : deviceWiFis ) {
                     mString[i++] = iList.BSSID+sep+
@@ -267,7 +275,20 @@ public class LookServiceBobaTest extends IntentService {
                             iList.SSID+sep+
                             iList.capabilities+sep+
                             iList.describeContents();
-                }}
+
+
+                    if (OKLocationUse) {
+                        double latitude  = gpsTracker.getLatitude();
+                        double longitude = gpsTracker.getLongitude();
+                        database.createRecords(dt, iList.BSSID, iList.SSID,
+                                iList.frequency, iList.level, iList.capabilities, iList.describeContents(),
+                                latitude,longitude);
+                    } else {
+                        database.createRecords(dt, iList.BSSID, iList.SSID,
+                                iList.frequency, iList.level, iList.capabilities, iList.describeContents());
+                    }
+                }
+            }
 
 
         }

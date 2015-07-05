@@ -11,24 +11,29 @@ import android.util.Log;
 
 public class DataBaseHelper1 extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "DBName";
+    private static final String DATABASE_NAME = "LookBoba";
 
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
     private static final String DATABASE_WiFi_CREATE = "create table WiFi ( " +
-                    "datetime     integer  primary key,"+
-                    "SSID         text     primary key,"+
-                    "BSSID        text     primary key,"+
-                    "frequency    float,"   +
-                    "dB           float,"   +
+                    "datetime     integer  not null,"+
+                    "SSID         text     not null,"+
+                    "BSSID        text     not null,"+
+                    "frequency    float    not null,"   +
+                    "dB           float    not null,"   +
                     "Latitude     float,"   +
                     "Longitude    float,"  +
-                    "capabalities integer," +
-                    "dContents    text);";
+                    "capabalities text," +
+                    "dContents    integer," +
+                    "PRIMARY KEY (datetime ASC, BSSID ASC, SSID ASC));";
 
     public DataBaseHelper1(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public DataBaseHelper1(Context context, String databaseFile) {
+        super(context, databaseFile, null, DATABASE_VERSION);
     }
 
     // Method is called during creation of the database

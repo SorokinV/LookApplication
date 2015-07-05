@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.io.File;
+
 /**
  * Created by boba2 on 16.06.2015.
  */
@@ -14,9 +16,10 @@ public class DB1{
 
     private SQLiteDatabase database;
 
+    public final static String NameDB = "LookApplication.db";
+
     public final static String WiFi_TABLE="WiFi"; // name of table for WiFi
 
-    public final static String WiFi_ID="_id";                     // id value
     public final static String WiFi_BSSID="BSSID";                // name of BSSID field
     public final static String WiFi_SSID ="SSID";                 // name of SSID field
     public final static String WiFi_DateTime="datetime";          // name of datetime field
@@ -31,14 +34,16 @@ public class DB1{
      * @param context
      */
     public DB1(Context context){
-        dbHelper = new DataBaseHelper1(context);
+        File   file = new File(context.getExternalFilesDir(null),NameDB);
+        dbHelper = new DataBaseHelper1(context,file.getPath());
         database = dbHelper.getWritableDatabase();
     }
 
     public long createRecords(long dt, String BSSID, String SSID,
                               float freq, float dB,
-                              String dContents, int capabalities,
-                              float latitude, float longitude){
+                              String capabalities,
+                              int dContents,
+                              double latitude, double longitude){
         ContentValues values = new ContentValues();
         values.put(WiFi_DateTime, dt);
         values.put(WiFi_BSSID, BSSID);
@@ -54,7 +59,8 @@ public class DB1{
 
     public long createRecords(long dt, String BSSID, String SSID,
                               float freq, float dB,
-                              String dContents, int capabalities){
+                              String capabalities,
+                              int dContents){
         ContentValues values = new ContentValues();
         values.put(WiFi_DateTime, dt);
         values.put(WiFi_BSSID, BSSID);
@@ -67,7 +73,7 @@ public class DB1{
     }
 
     public Cursor selectRecords() {
-        String[] cols = new String[] {WiFi_BSSID, WiFi_dB};
+        String[] cols = new String[] {WiFi_DateTime,WiFi_BSSID,WiFi_SSID,WiFi_dB,WiFi_Frequency,WiFi_dContents,WiFi_capabalities,WiFi_Latitude,WiFi_Longitude};
         Cursor mCursor = database.query(true, WiFi_TABLE,cols,null
                 , null, null, null, null, null);
         if (mCursor != null) {
@@ -75,6 +81,20 @@ public class DB1{
         }
         return mCursor; // iterate to get each value.
     }
+
+    public int countWiFi (String countSelection) {
+        String[] cols = new String[] {countSelection};
+        Cursor mCursor = database.query(true, WiFi_TABLE,cols,null
+                , null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return(mCursor.getInt(0));
+    }
+
+    public int countAllRecords() { return(countWiFi(" count(*) AS count")); }
+    public int countAllBSSID()   { return(countWiFi("count( DISTINCT " + WiFi_BSSID    + ") AS count")); }
+    public int countAllLooks()   { return(countWiFi("count( DISTINCT " + WiFi_DateTime + ") AS count")); }
 
     public int deleteRecords() { return(database.delete(WiFi_TABLE,null,null)); }
 }
