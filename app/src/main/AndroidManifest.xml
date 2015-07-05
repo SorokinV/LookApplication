@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -43,13 +43,17 @@
 
         <service android:name=".LookServiceBobaTest" />
 
-
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_setting" >
             <intent-filter>
                 <action android:name="com.example.boba.lookapplication.ACTION_USER_PREFERENCE" />
-            </intent-filter>        </activity>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ShowDB"
+            android:label="@string/title_activity_show_db" >
+        </activity>
     </application>
 
 </manifest>

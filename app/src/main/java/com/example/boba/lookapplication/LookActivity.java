@@ -103,13 +103,16 @@ public class LookActivity extends ActionBarActivity {
     public void ClickShowSensorsList (View view) {
         Intent intent = new Intent(this,ShowSensors.class);
         startActivity(intent);
-
     }
 
     public void ClickShowWiFiList (View view) {
         Intent intent = new Intent(this,ShowWiFi.class);
         startActivity(intent);
+    }
 
+    public void ClickShowDB (View view) {
+        Intent intent = new Intent(this,ShowDB.class);
+        startActivity(intent);
     }
 
     public void ClickLookService (View view) {
