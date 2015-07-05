@@ -98,8 +98,8 @@ public class LookServiceBobaTest extends IntentService {
 
         if (OKProtocol) { wpn.writeRecord("service begin time(M)="+(workTimeMS/1000/60)+" delay(S)="+(delayWaitMS/1000)); }
         if (OKLocationUse) {
-            lookGeo = new LookGeo(this);
-            gpsTracker = new GPSTracker(this);
+            // lookGeo = new LookGeo(this);
+            gpsTracker = new GPSTracker(this,delayWaitMS);
         }
 
         //Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));

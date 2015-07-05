@@ -39,16 +39,22 @@ public class GPSTracker extends Service implements LocationListener {
     double longitude; // longitude
 
     // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10; // 10 meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // update to 0 # 2015-07-05 // 10; // 10 meters
 
     // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
+    private static       long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // update to parameter # 2015-07-05 // 1 minute
 
     // Declaring a Location Manager
     protected LocationManager locationManager;
 
     public GPSTracker(Context context) {
         this.mContext = context;
+        getLocation();
+    }
+
+    public GPSTracker(Context context, long min_time_bw_updates) {
+        this.mContext = context;
+        MIN_TIME_BW_UPDATES = min_time_bw_updates;
         getLocation();
     }
 
