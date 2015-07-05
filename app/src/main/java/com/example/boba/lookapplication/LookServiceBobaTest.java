@@ -48,7 +48,8 @@ public class LookServiceBobaTest extends IntentService {
 
     ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
 
-    LookGeo lookGeo = null;
+    LookGeo    lookGeo    = null;
+    GPSTracker gpsTracker = null;
 
     public static final String ACTION_COMMAND    = "com.example.boba.lookapplication.COMMAND";
     public static final String ACTION_UPDATE     = "com.example.boba.lookapplication.UPDATE";
@@ -96,7 +97,10 @@ public class LookServiceBobaTest extends IntentService {
         wif = new WriteFile(this,workFileName);
 
         if (OKProtocol) { wpn.writeRecord("service begin time(M)="+(workTimeMS/1000/60)+" delay(S)="+(delayWaitMS/1000)); }
-        if (OKLocationUse) lookGeo = new LookGeo(this);
+        if (OKLocationUse) {
+            lookGeo = new LookGeo(this);
+            gpsTracker = new GPSTracker(this);
+        }
 
         //Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
@@ -137,6 +141,8 @@ public class LookServiceBobaTest extends IntentService {
         stopping = true;
 
         while (!stopped) SystemClock.sleep(waitstopMS);
+
+        if (OKLocationUse) { gpsTracker.stopUsingGPS(); }
 
         wif.close();
         Toast.makeText(this, "service destroy (file size)="+wif.fSize(), Toast.LENGTH_SHORT).show();
@@ -197,7 +203,10 @@ public class LookServiceBobaTest extends IntentService {
 
                 String[] listWiFi = bobaWiFiLook();
 
-                String location = ""; if (OKLocationUse) location = lookGeo.getLocationString();
+                String location = "";
+                if (OKLocationUse) {
+                    location = lookGeo.getLocationString();
+                }
                 if (listWiFi != null) for (String iWiFi : listWiFi) wif.writeRecord(location + sep + iWiFi);
 
                 long p1 = System.currentTimeMillis();
