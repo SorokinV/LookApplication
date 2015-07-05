@@ -17,14 +17,13 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
 
     // Database creation sql statement
     private static final String DATABASE_WiFi_CREATE = "create table WiFi ( " +
-                    "_id          integer  primary key,"+
-                    "datetime     integer  not null,"+
-                    "SSID         text     not null,"+
-                    "BSSID        text     not null,"+
+                    "datetime     integer  primary key,"+
+                    "SSID         text     primary key,"+
+                    "BSSID        text     primary key,"+
                     "frequency    float,"   +
                     "dB           float,"   +
-                    "Latitude     float,"   +   // Широта
-                    "Longitude    float,"  +   // Долгота
+                    "Latitude     float,"   +
+                    "Longitude    float,"  +
                     "capabalities integer," +
                     "dContents    text);";
 

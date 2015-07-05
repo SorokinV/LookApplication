@@ -35,12 +35,11 @@ public class DB1{
         database = dbHelper.getWritableDatabase();
     }
 
-    public long createRecords(int id, long dt, String BSSID, String SSID,
+    public long createRecords(long dt, String BSSID, String SSID,
                               float freq, float dB,
                               String dContents, int capabalities,
                               float latitude, float longitude){
         ContentValues values = new ContentValues();
-        values.put(WiFi_ID, id);
         values.put(WiFi_DateTime, dt);
         values.put(WiFi_BSSID, BSSID);
         values.put(WiFi_SSID, SSID);
@@ -53,11 +52,10 @@ public class DB1{
         return database.insert(WiFi_TABLE, null, values);
     }
 
-    public long createRecords(int id, long dt, String BSSID, String SSID,
+    public long createRecords(long dt, String BSSID, String SSID,
                               float freq, float dB,
                               String dContents, int capabalities){
         ContentValues values = new ContentValues();
-        values.put(WiFi_ID, id);
         values.put(WiFi_DateTime, dt);
         values.put(WiFi_BSSID, BSSID);
         values.put(WiFi_SSID, SSID);

@@ -42,20 +42,20 @@ public class TestSQLLiteDB extends AndroidTestCase {
 
         long result;
 
-        result = mDB1.createRecords(1, 101, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
+        result = mDB1.createRecords(101, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
         assertFalse("DB is not insert record", (result==-1));
 
         cursor = mDB1.selectRecords();
         assertEquals("DB is not (-)", 1, cursor.getCount());
         cursor.close();
 
-        mDB1.createRecords(2, 102, "BSSID102", "SSID102", (float) 1102.0, (float) 82.0, "dContents102", 1103);
+        mDB1.createRecords(102, "BSSID102", "SSID102", (float) 1102.0, (float) 82.0, "dContents102", 1103);
         assertFalse("DB is not insert record", (result == -1));
-        mDB1.createRecords(3, 103, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
+        mDB1.createRecords(103, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
         assertFalse("DB is not insert record", (result == -1));
-        mDB1.createRecords(4, 104, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
+        mDB1.createRecords(104, "BSSID", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001);
         assertFalse("DB is not insert record", (result == -1));
-        mDB1.createRecords(5, 105, "BSSID105", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001,(float)0.156,(float)-12.90);
+        mDB1.createRecords(105, "BSSID105", "SSID", (float) 1000.0, (float) 80.0, "dContents", 1001,(float)0.156,(float)-12.90);
         assertFalse("DB is not insert record", (result == -1));
         cursor = mDB1.selectRecords();
         assertEquals("DB is not (-)",  4, cursor.getCount());
