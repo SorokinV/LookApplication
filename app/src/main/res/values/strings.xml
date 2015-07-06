@@ -25,8 +25,10 @@
     <string name="textstoplookservice">Stop look service (rest %1$s min)</string>
     <string name="textlookservicebutton">Look service</string>
 
+    <string name="textshowDB">Show DB state</string>
     <string name="count_DB_records">Records count :</string>
     <string name="count_BSSID_records">BSSID count :</string>
+    <string name="textEraseDB">Erase DB records</string>
 
     <string name="title_activity_setting">Setting</string>
 

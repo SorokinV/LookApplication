@@ -82,6 +82,35 @@
         android:layout_alignParentRight="true"
         android:textStyle="bold" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dbcounttext"
+        android:text="@string/textshowDB"
+        android:layout_marginTop="90dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/showwifilist"
+        android:layout_toRightOf="@+id/dbcount"
+        android:layout_toEndOf="@+id/dbcount" />
+    />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:capitalize="words"
+        android:clickable="true"
+        android:enabled="true"
+        android:id="@+id/dbcount"
+        android:longClickable="false"
+        android:nestedScrollingEnabled="false"
+        android:onClick="ClickShowDB"
+        android:text="@string/textshowDB"
+        android:visibility="visible"
+        android:textStyle="bold"
+        android:layout_alignBaseline="@+id/dbcounttext"
+        android:layout_below="@+id/showwifilist"
+        android:layout_alignRight="@+id/showwifilist"
+        android:layout_alignEnd="@+id/showwifilist" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

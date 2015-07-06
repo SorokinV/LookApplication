@@ -310,6 +310,10 @@
     <string name="common_open_on_phone">Open on phone</string>
     <string name="common_signin_button_text">Sign in</string>
     <string name="common_signin_button_text_long">Sign in with Google</string>
+    <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="count_BSSID_records">BSSID count :</string>
+    <string name="count_DB_records">Records count :</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.5.0/res/values/admob_strings.xml -->
     <eat-comment/>
     <string name="create_calendar_message">Allow Ad to create a calendar event?</string>
@@ -378,16 +382,19 @@
     <string name="store_picture_title">Save image</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="textEraseDB">Erase DB records</string>
     <string name="textGEOparameter"> (lo,la)= %1$s</string>
     <string name="textlookservicebutton">Look service</string>
     <string name="textrestminutes">running (rest %1$d min)</string>
     <string name="textserviceparameter">Service parameters : %1$d min(%2$d sec)</string>
+    <string name="textshowDB">Show DB state</string>
     <string name="textshowwifilistNOT">WiFi is stopped</string>
     <string name="textshowwifilistOK">Show WiFi</string>
     <string name="textstartlookservice">Start look service</string>
     <string name="textstoplookservice">Stop look service (rest %1$s min)</string>
     <string name="ticker_text">LS running</string>
     <string name="title_activity_setting">Setting</string>
+    <string name="title_activity_show_db">ShowDB</string>
     <string name="title_activity_show_sensors">Show Sensors</string>
     <string name="title_activity_show_wi_fi">Show WiFi</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/res/values/wallet_strings.xml -->
