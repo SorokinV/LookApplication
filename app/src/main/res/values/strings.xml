@@ -71,6 +71,11 @@
     <string name="pref_protocol_append_title">Enable protocol append</string>
     <string name="pref_protocol_append_summary">Enable protocol append</string>
 
+    <string name="pref_erase_title">Enable erase DB?</string>
+    <string name="pref_erase_summary">Enable erase DB</string>
+    <string name="pref_erase_second_confirm_title">Confirm enable erase DB</string>
+    <string name="pref_erase_second_confirm_summary">Confirm enable erase DB (second confirm)</string>
+
     <string name="pref_special_title">Special</string>
     <string name="pref_special_key">Special key</string>
     <string name="title_activity_show_db">ShowDB</string>

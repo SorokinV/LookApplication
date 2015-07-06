@@ -79,6 +79,17 @@
             android:title="@string/pref_protocol_append_title"
             android:summary="@string/pref_protocol_append_summary"/>
         <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_erase"
+            android:title="@string/pref_erase_title"
+            android:summary="@string/pref_erase_summary"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_erase_db"
+            android:dependency="pref_erase"
+            android:title="@string/pref_erase_second_confirm_title"
+            android:summary="@string/pref_erase_second_confirm_summary"/>
+        <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_foreground"
             android:title="@string/pref_foreground"

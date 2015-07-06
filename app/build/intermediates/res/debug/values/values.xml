@@ -346,6 +346,10 @@
     <string name="pref_delayS_dialogtitle">Insert delay time between query (from 3 to 300 sec)</string>
     <string name="pref_delayS_summary">Delay time between query (second)</string>
     <string name="pref_delayS_title">Delay time</string>
+    <string name="pref_erase_second_confirm_summary">Confirm enable erase DB (second confirm)</string>
+    <string name="pref_erase_second_confirm_title">Confirm enable erase DB</string>
+    <string name="pref_erase_summary">Enable erase DB</string>
+    <string name="pref_erase_title">Enable erase DB?</string>
     <string name="pref_foreground">Run foreground</string>
     <string name="pref_foreground_summary">Run foreground</string>
     <string name="pref_location_summary">Location summary</string>

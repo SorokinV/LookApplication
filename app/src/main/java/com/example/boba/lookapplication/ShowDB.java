@@ -24,7 +24,6 @@ public class ShowDB extends ActionBarActivity {
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         OKEraseDB  = sharedPref.getBoolean("pref_erase_db", OKEraseDB);
-
         database = new DB1(this);
         DrawScreen();
 
