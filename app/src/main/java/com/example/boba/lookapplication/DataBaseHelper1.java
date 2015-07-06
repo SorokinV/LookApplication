@@ -33,6 +33,12 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
             "dContents    integer," +
             "PRIMARY KEY (datetime ASC, BSSID ASC, SSID ASC));";
 
+    private static final String DATABASE_VIEW_BSSID_last      = "create view BSSID_Last AS " +
+            "select DISTINCT BSSID from WiFi where datetime> (select max(dtEnd) from Protocol)";
+
+    private static final String DATABASE_VIEW_BSSID_PreLast   = "create view BSSID_PreLast AS " +
+            "select DISTINCT BSSID from WiFi where datetime>=(select max(dtBegin) from Protocol)";
+
     public DataBaseHelper1(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -46,6 +52,8 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_Protocol_CREATE);
         database.execSQL(DATABASE_WiFi_CREATE);
+        database.execSQL(DATABASE_VIEW_BSSID_last);
+        database.execSQL(DATABASE_VIEW_BSSID_PreLast);
     }
 
     // Method is called during an upgrade of the database,

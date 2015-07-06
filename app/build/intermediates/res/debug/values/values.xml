@@ -312,6 +312,8 @@
     <string name="common_signin_button_text_long">Sign in with Google</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="count_BSSID_Last">BSSID count (current) :</string>
+    <string name="count_BSSID_PreLast">BSSID count (prelast) :</string>
     <string name="count_BSSID_records">BSSID count :</string>
     <string name="count_DB_records">Records count :</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.5.0/res/values/admob_strings.xml -->

@@ -38,6 +38,40 @@
         android:layout_below="@+id/countRecords"
         />
 
+    <TextView android:text="@string/count_BSSID_PreLast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignBaseline="@+id/count_BSSID_PreLast"
+        android:layout_below="@+id/count_BSSID_records"
+
+        />
+
+    <TextView android:text="0"
+        android:id="@+id/count_BSSID_PreLast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/count_BSSID_records"
+        />
+
+    <TextView android:text="@string/count_BSSID_Last"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignBaseline="@+id/count_BSSID_Last"
+        android:layout_below="@+id/count_BSSID_PreLast"
+
+        />
+
+    <TextView android:text="0"
+        android:id="@+id/count_BSSID_Last"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/count_BSSID_PreLast"
+        />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

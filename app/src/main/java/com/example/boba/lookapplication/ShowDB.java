@@ -31,12 +31,18 @@ public class ShowDB extends ActionBarActivity {
 
     void DrawScreen () {
 
-        TextView countRecords = (TextView) findViewById(R.id.countRecords);
-        TextView countBSSID   = (TextView) findViewById(R.id.count_BSSID_records);
+        TextView countRecords        = (TextView) findViewById(R.id.countRecords);
+        TextView countBSSID          = (TextView) findViewById(R.id.count_BSSID_records);
+        TextView countBSSIDPreLast   = (TextView) findViewById(R.id.count_BSSID_PreLast);
+        TextView countBSSIDLast      = (TextView) findViewById(R.id.count_BSSID_Last);
         Button   eraseDB      = (Button)   findViewById(R.id.dbErase);
 
         countRecords.setText("" + database.countAllRecords());
         countBSSID.setText("" + database.countAllBSSID());
+        countBSSIDPreLast.setText("" + database.countBSSIDPreLast());
+        countBSSIDLast.setText("" + database.countBSSIDLast());
+
+        // dangerous !!!!!
         eraseDB.setClickable(OKEraseDB);
         eraseDB.setEnabled(OKEraseDB);
 

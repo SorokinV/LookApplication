@@ -22,6 +22,10 @@ public class DB1{
     public final static String PRTC_DateTimeBegin="dtBegin";      // name of begin date&time field
     public final static String PRTC_DateTimeEnd  ="dtEnd";        // name of begin date&time field
 
+    public final static String TABLE_BSSID_Last    ="BSSID_Last";       // name of view
+    public final static String TABLE_BSSID_PreLast ="BSSID_PreLast";    // name of view
+
+
     public final static String WiFi_TABLE ="WiFi"; // name of table for WiFi
 
     public final static String WiFi_BSSID="BSSID";                // name of BSSID field
@@ -35,7 +39,7 @@ public class DB1{
     public final static String WiFi_Longitude="Longitude";        // name of longitude field
     /**
      *
-     * @param context
+     * 
      */
     public DB1(Context context){
         File   file = new File(context.getExternalFilesDir(null),NameDB);
@@ -79,7 +83,7 @@ public class DB1{
     public long createRecords(long dtBegin, long dtEnd) {
         ContentValues values = new ContentValues();
         values.put(PRTC_DateTimeBegin, dtBegin);
-        values.put(PRTC_DateTimeEnd, dtBegin);
+        values.put(PRTC_DateTimeEnd, dtEnd);
         return database.insert(PRTC_TABLE, null, values);
     }
 
@@ -93,19 +97,27 @@ public class DB1{
         return mCursor; // iterate to get each value.
     }
 
-    public int countWiFi (String countSelection) {
+    public int countTable (String nameTable, String countSelection) {
         String[] cols = new String[] {countSelection};
-        Cursor mCursor = database.query(true, WiFi_TABLE,cols,null
+        Cursor mCursor = database.query(true, nameTable,cols,null
                 , null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
-        return(mCursor.getInt(0));
+        int count = 0; try {count = mCursor.getInt(0);} finally {mCursor.close();}
+        return(count);
+    }
+
+    public int countWiFi (String countSelection) {
+        return(countTable(WiFi_TABLE, countSelection));
     }
 
     public int countAllRecords()   { return(countWiFi(" count(*) AS count")); }
     public int countAllBSSID()     { return(countWiFi("count( DISTINCT " + WiFi_BSSID + ") AS count")); }
     public int countAllLooks()     { return(countWiFi("count( DISTINCT " + WiFi_DateTime + ") AS count")); }
+
+    public int countBSSIDLast()    { return(countTable(TABLE_BSSID_Last,    "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
+    public int countBSSIDPreLast() { return(countTable(TABLE_BSSID_PreLast, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
 
     public int deleteRecords()     { return(deleteWiFiRecords()); }
     public int deleteWiFiRecords() { return(database.delete(WiFi_TABLE, null, null)); }
