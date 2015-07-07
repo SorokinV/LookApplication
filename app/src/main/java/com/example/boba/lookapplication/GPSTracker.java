@@ -5,11 +5,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -21,9 +23,15 @@ import android.util.Log;
  *
  */
 
-public class GPSTracker extends Service implements LocationListener {
+public class GPSTracker extends Service implements LocationListener, GpsStatus.NmeaListener {
 
     private final Context mContext;
+
+    // object for unsleep power state
+    private PowerManager.WakeLock wakeLock = null;
+
+    WriteFile nmea = null;
+
 
     // flag for GPS status
     boolean isGPSEnabled = false;
@@ -48,14 +56,52 @@ public class GPSTracker extends Service implements LocationListener {
     protected LocationManager locationManager;
 
     public GPSTracker(Context context) {
+        super();
         this.mContext = context;
+        WakeLockOn();
         getLocation();
+        setNmeaOn();
+
     }
 
     public GPSTracker(Context context, long min_time_bw_updates) {
+        super();
         this.mContext = context;
         MIN_TIME_BW_UPDATES = min_time_bw_updates;
+        WakeLockOn();
         getLocation();
+        setNmeaOn();
+    }
+
+    public boolean WakeLockOn () {
+
+        // work in sleep state
+
+        if (wakeLock==null) {
+            PowerManager powerManager = (PowerManager) mContext.getSystemService(POWER_SERVICE);
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BobaWakelockTagGPS");
+            wakeLock.acquire();
+        }
+
+        return(true);
+
+    }
+
+    public void setNmeaOn () {
+        if (locationManager.addNmeaListener(this)) nmea = new WriteFile(mContext,"nmea.csv");
+    }
+
+    public void setNmeaOff () {
+        if (nmea!=null) {
+            locationManager.removeNmeaListener(this);
+            nmea.close();
+        }
+        nmea = null;
+    }
+
+    @Override
+    public void onNmeaReceived (long timestamp, String nmeaText) {
+        if (nmea!=null) nmea.writeRecord(""+timestamp+nmea.getSeparator()+nmeaText);
     }
 
     public Location getLocation() {
@@ -127,6 +173,8 @@ public class GPSTracker extends Service implements LocationListener {
         if(locationManager != null){
             locationManager.removeUpdates(GPSTracker.this);
         }
+        if (wakeLock!=null) wakeLock.release();
+        setNmeaOff();
     }
 
     /**

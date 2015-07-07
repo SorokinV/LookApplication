@@ -64,6 +64,7 @@
         </activity>
 
         <service android:name="com.example.boba.lookapplication.LookServiceBobaTest" />
+        <service android:name="com.example.boba.lookapplication.GPSTracker" />
 
         <activity
             android:name="com.example.boba.lookapplication.SettingsActivity"

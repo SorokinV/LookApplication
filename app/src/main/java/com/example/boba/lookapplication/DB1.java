@@ -39,7 +39,7 @@ public class DB1{
     public final static String WiFi_Longitude="Longitude";        // name of longitude field
     /**
      *
-     * 
+     *
      */
     public DB1(Context context){
         File   file = new File(context.getExternalFilesDir(null),NameDB);
@@ -115,8 +115,10 @@ public class DB1{
     public int countAllRecords()   { return(countWiFi(" count(*) AS count")); }
     public int countAllBSSID()     { return(countWiFi("count( DISTINCT " + WiFi_BSSID + ") AS count")); }
     public int countAllLooks()     { return(countWiFi("count( DISTINCT " + WiFi_DateTime + ") AS count")); }
+    public int countLati()         { return(countWiFi("count( DISTINCT " + WiFi_Latitude + ") AS count")); }
+    public int countLogi()         { return(countWiFi("count( DISTINCT " + WiFi_Longitude + ") AS count")); }
 
-    public int countBSSIDLast()    { return(countTable(TABLE_BSSID_Last,    "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
+    public int countBSSIDLast()    { return(countTable(TABLE_BSSID_Last, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
     public int countBSSIDPreLast() { return(countTable(TABLE_BSSID_PreLast, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
 
     public int deleteRecords()     { return(deleteWiFiRecords()); }

@@ -42,6 +42,7 @@
         </activity>
 
         <service android:name=".LookServiceBobaTest" />
+        <service android:name=".GPSTracker" />
 
         <activity
             android:name=".SettingsActivity"
