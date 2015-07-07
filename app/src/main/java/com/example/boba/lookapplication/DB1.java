@@ -213,11 +213,15 @@ public class DB1{
 
         if (count>0) {
             do {
-                long timeBeginWiFi = countTable(WiFi_TABLE, "min(" + WiFi_DateTime + ") AS minTime", when);
-                long timeBeginPRTC = countTable(PRTC_TABLE, "min(" + PRTC_DateTimeBegin + ") AS minTime",
-                        " " + PRTC_DateTimeBegin + ">" + timeBeginWiFi);
-                long timeEndWiFi = countTable(WiFi_TABLE, "max(" + WiFi_DateTime + ") AS maxTime",
-                        " " + WiFi_DateTime + "<" + timeBeginPRTC);
+                long timeBeginWiFi = countTable(WiFi_TABLE,
+                        "min(" + WiFi_DateTime + ") AS minTime",         // select
+                        when);
+                long timeBeginPRTC = countTable(PRTC_TABLE,
+                        "min(" + PRTC_DateTimeBegin + ") AS minTime",    // select
+                        " " + PRTC_DateTimeBegin + ">" + timeBeginWiFi); // when
+                long timeEndWiFi = countTable(WiFi_TABLE,
+                        "max(" + WiFi_DateTime + ") AS maxTime",         // select
+                        " " + WiFi_DateTime + "<" + timeBeginPRTC);      // when
                 long result = createRecords(timeBeginWiFi, timeEndWiFi);
                 count = countTable(WiFi_TABLE,"count(*) AS records",when);
             } while (count>0);
