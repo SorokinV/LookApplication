@@ -52,7 +52,7 @@ public class WriteFile {
             Log.e(LOG_TAG, "Exception: open" + " " + e.getMessage());
             lastException = e.getMessage();
         }
-        Log.d(LOG_TAG, "service starting size="+" " + ctx.getExternalFilesDir(null));
+        Log.d(LOG_TAG, "service starting size=" + " " + ctx.getExternalFilesDir(null));
     }
 
 
@@ -61,6 +61,20 @@ public class WriteFile {
 
         String datetimeNow = sdf.format(new Date());
         String btext = datetimeNow + sep + text + "\n";
+        try {
+            fos.write(btext.getBytes());
+            writes++;
+        } catch (Exception e) {
+            exceptions++;
+            lastException = e.getMessage();
+            Log.e(LOG_TAG, "Exception: error write"+" " + e.getMessage() + e);
+        }
+        return(true);
+    }
+
+    public boolean writeRecordWithoutPrefix (String text) {
+
+        String btext = text + "\n";
         try {
             fos.write(btext.getBytes());
             writes++;

@@ -38,7 +38,7 @@ public class ShowDB extends ActionBarActivity {
         Button   eraseDB      = (Button)   findViewById(R.id.dbErase);
 
         countRecords.setText("" + database.countAllRecords());
-        countBSSID.setText("" + database.countAllBSSID()+" (ll="+database.countLati()+","+database.countLogi()+")");
+        countBSSID.setText("" + database.countAllBSSID());
         countBSSIDPreLast.setText("" + database.countBSSIDPreLast());
         countBSSIDLast.setText("" + database.countBSSIDLast());
 

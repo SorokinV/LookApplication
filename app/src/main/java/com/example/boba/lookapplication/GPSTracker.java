@@ -30,7 +30,11 @@ public class GPSTracker extends Service implements LocationListener, GpsStatus.N
     // object for unsleep power state
     private PowerManager.WakeLock wakeLock = null;
 
+    // nmea protocol
     WriteFile nmea = null;
+    boolean OKNMEA         = true;
+    boolean OKNMEAprotocol = false;
+    boolean OKNMEAappend   = false;
 
 
     // flag for GPS status
@@ -88,14 +92,17 @@ public class GPSTracker extends Service implements LocationListener, GpsStatus.N
     }
 
     public void setNmeaOn () {
-        if (locationManager.addNmeaListener(this)) nmea = new WriteFile(mContext,"nmea.csv");
+        if (isGPSEnabled) {
+            OKNMEA = locationManager.addNmeaListener(this);
+            if ((OKNMEA)&&(OKNMEAprotocol)) {
+                nmea = new WriteFile(mContext, "nmea.csv",OKNMEAappend);
+            }
+        }
     }
 
     public void setNmeaOff () {
-        if (nmea!=null) {
-            locationManager.removeNmeaListener(this);
-            nmea.close();
-        }
+        if (OKNMEA) locationManager.removeNmeaListener(this);
+        if (nmea!=null) nmea.close();
         nmea = null;
     }
 

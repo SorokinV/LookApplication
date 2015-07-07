@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * Created by boba2 on 16.06.2015.
@@ -15,6 +16,8 @@ public class DB1{
     private DataBaseHelper1 dbHelper;
 
     private SQLiteDatabase database;
+
+    private Context mContext;
 
     public final static String NameDB = "LookApplication.db";
 
@@ -108,6 +111,17 @@ public class DB1{
         return(count);
     }
 
+    public int countTable (String nameTable, String countSelection, String when) {
+        String[] cols = new String[] {countSelection};
+        Cursor mCursor = database.query(true, nameTable,cols,when
+                , null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        int count = 0; try {count = mCursor.getInt(0);} finally {mCursor.close();}
+        return(count);
+    }
+
     public int countWiFi (String countSelection) {
         return(countTable(WiFi_TABLE, countSelection));
     }
@@ -120,6 +134,97 @@ public class DB1{
 
     public int countBSSIDLast()    { return(countTable(TABLE_BSSID_Last, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
     public int countBSSIDPreLast() { return(countTable(TABLE_BSSID_PreLast, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
+
+    public boolean exportWiFiData (String filename, long beginDate, long endDate) {
+        boolean   result = false;
+        String[]  cols   = new String[] {WiFi_DateTime,WiFi_SSID,WiFi_BSSID,
+                WiFi_dB,WiFi_Frequency,WiFi_Latitude,WiFi_Longitude,WiFi_capabalities,WiFi_dContents};
+        String    when   = "datetime between "+beginDate+" and "+endDate;
+        Cursor mCursor = database.query(true, WiFi_TABLE,cols,when,null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+            WriteFile ef = new WriteFile(mContext,filename);
+            String sep = ef.getSeparator();
+            String text;
+            int count = 0;
+            do { count++;
+                text = ""; for (int i=0;i<mCursor.getColumnCount();i++) text += sep+mCursor.getString(i);
+                ef.writeRecordWithoutPrefix(text);
+            } while (mCursor.moveToNext());
+            mCursor.close();
+            ef.close();
+            result = true;
+        }
+        return (result);
+    }
+
+    public boolean exportWiFiData (String filename) {
+        long timeBegin = countWiFi("min(" + WiFi_DateTime + ") AS minDateTime");
+        long timeEnd   = countWiFi("max(" + WiFi_DateTime + ") AS maxDateTime");
+        return (exportWiFiData(filename, timeBegin, timeEnd));
+    }
+
+    public boolean exportWiFiDataDay (String filename, long timeDay) {
+        Date date = new Date(timeDay); date.setHours(0);date.setMinutes(0);date.setSeconds(0);
+        long timeBegin = date.getTime();
+        long timeEnd   = timeBegin+24*60*60*1000-999;
+        return (exportWiFiData(filename, timeBegin, timeEnd));
+    }
+
+    public boolean exportWiFiDataLast (String filename) {
+        long timeBegin = countTable(PRTC_TABLE, "max(" + PRTC_DateTimeBegin + ") AS maxTimeBegin");
+        long timeEnd   = new Date().getTime();
+        return (exportWiFiData(filename, timeBegin, timeEnd));
+    }
+
+    public boolean exportWiFiDataLastDay (String filename) {
+        long timeBegin = new Date().getTime();
+        return (exportWiFiDataDay(filename, timeBegin));
+    }
+
+    public boolean repairDB (){
+
+        // verify first look and repair from abend
+        {
+            long timeBeginWiFi = countWiFi("min(" + WiFi_DateTime + ") AS minTime");
+            long timeBeginPRTC = countTable(PRTC_TABLE, "min(" + PRTC_DateTimeBegin + ") AS minTimeBegin");
+            if (timeBeginWiFi<timeBeginPRTC) {
+                String when = "" + WiFi_DateTime + " between 0 and " + (timeBeginPRTC-1);
+                long timeEndWiFi = countTable(WiFi_TABLE,"max(" + WiFi_DateTime + ") AS maxTime",when);
+                long result = createRecords(timeBeginWiFi,timeEndWiFi);
+            }
+        }
+
+        // verify last look and repair from abend
+        {
+            long timeEndWiFi = countWiFi("max(" + WiFi_DateTime + ") AS maxTime");
+            long timeEndPRTC = countTable(PRTC_TABLE, "max(" + PRTC_DateTimeEnd + ") AS maxTimeEnd");
+            if (timeEndPRTC<timeEndWiFi) {
+                String when = "" + WiFi_DateTime + " between " + (timeEndPRTC+1) + " and " + timeEndWiFi;
+                long timeBeginWiFi = countTable(WiFi_TABLE,"min(" + WiFi_DateTime + ") AS minTime",when);
+                long result = createRecords(timeBeginWiFi, timeEndWiFi);
+            }
+        }
+
+        // verify and repair abends between first and last looks
+        String when = " not exists ( select "+PRTC_DateTimeBegin+
+                " where " + WiFi_DateTime + " between " + PRTC_DateTimeBegin + " and " + PRTC_DateTimeEnd + ") ";
+        long   count = countTable(WiFi_TABLE,"count(*) AS records",when);
+
+        if (count>0) {
+            do {
+                long timeBeginWiFi = countTable(WiFi_TABLE, "min(" + WiFi_DateTime + ") AS minTime", when);
+                long timeBeginPRTC = countTable(PRTC_TABLE, "min(" + PRTC_DateTimeBegin + ") AS minTime",
+                        " " + PRTC_DateTimeBegin + ">" + timeBeginWiFi);
+                long timeEndWiFi = countTable(WiFi_TABLE, "max(" + WiFi_DateTime + ") AS maxTime",
+                        " " + WiFi_DateTime + "<" + timeBeginPRTC);
+                long result = createRecords(timeBeginWiFi, timeEndWiFi);
+                count = countTable(WiFi_TABLE,"count(*) AS records",when);
+            } while (count>0);
+        }
+
+        return(true);
+    }
 
     public int deleteRecords()     { return(deleteWiFiRecords()); }
     public int deleteWiFiRecords() { return(database.delete(WiFi_TABLE, null, null)); }
