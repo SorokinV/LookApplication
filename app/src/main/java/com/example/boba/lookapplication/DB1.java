@@ -50,6 +50,12 @@ public class DB1{
         database = dbHelper.getWritableDatabase();
     }
 
+    public DB1(Context context, String nameDB){
+        File   file = new File(context.getExternalFilesDir(null),nameDB);
+        dbHelper = new DataBaseHelper1(context,file.getPath());
+        database = dbHelper.getWritableDatabase();
+    }
+
     public long createRecords(long dt, String BSSID, String SSID,
                               float freq, float dB,
                               String capabalities,
@@ -209,7 +215,7 @@ public class DB1{
         // verify and repair abends between first and last looks
         String when = " not exists ( select "+PRTC_DateTimeBegin+
                 " where " + WiFi_DateTime + " between " + PRTC_DateTimeBegin + " and " + PRTC_DateTimeEnd + ") ";
-        long   count = countTable(WiFi_TABLE,"count(*) AS records",when);
+        long   count = countTable(WiFi_TABLE, "count(*) AS records", when);
 
         if (count>0) {
             do {
@@ -230,8 +236,11 @@ public class DB1{
         return(true);
     }
 
-    public int deleteRecords()     { return(deleteWiFiRecords()); }
+    public int deleteRecords()     { deleteWiFiRecords(); deleteProtocols(); return(0);}
     public int deleteWiFiRecords() { return(database.delete(WiFi_TABLE, null, null)); }
+    public int deleteProtocols()   { return(database.delete(PRTC_TABLE, null, null)); }
     public void clearDataBase() {deleteRecords();}
     public void close() {database.close();}
+
+    public String getPath() {return(database.getPath());}
 }

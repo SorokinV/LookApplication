@@ -120,12 +120,13 @@ public class WriteFile {
     public long    fSize ()     { return(ffos.length());   }
     public boolean fExist () { return(ffos.exists());   }
     public boolean fWritable() { return(ffos.canWrite()); }
-    public String  fPath () { return(ffos.getPath());  }
+    public String  getPath ()      { return(ffos.getPath()); }
     public String  getSeparator ()           { return(sep);}
     public void    setSeparator (String nsep) {sep=nsep;   }
     public int     getExceptions() {return(exceptions);}
     public int     getWrites    () {return(writes);}
     public String  getException () {return(lastException);}
     public OutputStream getOStream () {return(fos);}
+    public void    delete() {ffos.delete();}
 
 }

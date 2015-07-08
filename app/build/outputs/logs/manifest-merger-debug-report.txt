@@ -150,57 +150,53 @@ ADDED from AndroidManifest.xml:22:17
 	android:name
 		ADDED from AndroidManifest.xml:22:25
 category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:24:17
+ADDED from AndroidManifest.xml:23:17
 	android:name
-		ADDED from AndroidManifest.xml:24:27
+		ADDED from AndroidManifest.xml:23:27
 activity#com.example.boba.lookapplication.ShowSensors
-ADDED from AndroidManifest.xml:27:9
+ADDED from AndroidManifest.xml:26:9
 	android:label
-		ADDED from AndroidManifest.xml:29:13
-	android:parentActivityName
-		ADDED from AndroidManifest.xml:30:13
-	android:name
 		ADDED from AndroidManifest.xml:28:13
-meta-data#android.support.PARENT_ACTIVITY
-ADDED from AndroidManifest.xml:31:13
-	android:name
-		ADDED from AndroidManifest.xml:32:17
-	android:value
-		ADDED from AndroidManifest.xml:33:17
-activity#com.example.boba.lookapplication.ShowWiFi
-ADDED from AndroidManifest.xml:35:9
-	android:label
-		ADDED from AndroidManifest.xml:37:13
 	android:parentActivityName
-		ADDED from AndroidManifest.xml:38:13
+		ADDED from AndroidManifest.xml:29:13
 	android:name
+		ADDED from AndroidManifest.xml:27:13
+meta-data#android.support.PARENT_ACTIVITY
+ADDED from AndroidManifest.xml:30:13
+	android:name
+		ADDED from AndroidManifest.xml:31:17
+	android:value
+		ADDED from AndroidManifest.xml:32:17
+activity#com.example.boba.lookapplication.ShowWiFi
+ADDED from AndroidManifest.xml:34:9
+	android:label
 		ADDED from AndroidManifest.xml:36:13
+	android:parentActivityName
+		ADDED from AndroidManifest.xml:37:13
+	android:name
+		ADDED from AndroidManifest.xml:35:13
 service#com.example.boba.lookapplication.LookServiceBobaTest
-ADDED from AndroidManifest.xml:44:9
+ADDED from AndroidManifest.xml:43:9
 	android:name
-		ADDED from AndroidManifest.xml:44:18
-service#com.example.boba.lookapplication.GPSTracker
-ADDED from AndroidManifest.xml:45:9
-	android:name
-		ADDED from AndroidManifest.xml:45:18
+		ADDED from AndroidManifest.xml:43:18
 activity#com.example.boba.lookapplication.SettingsActivity
-ADDED from AndroidManifest.xml:47:9
+ADDED from AndroidManifest.xml:45:9
 	android:label
-		ADDED from AndroidManifest.xml:49:13
+		ADDED from AndroidManifest.xml:47:13
 	android:name
-		ADDED from AndroidManifest.xml:48:13
+		ADDED from AndroidManifest.xml:46:13
 intent-filter#com.example.boba.lookapplication.ACTION_USER_PREFERENCE
-ADDED from AndroidManifest.xml:50:13
+ADDED from AndroidManifest.xml:48:13
 action#com.example.boba.lookapplication.ACTION_USER_PREFERENCE
-ADDED from AndroidManifest.xml:51:17
+ADDED from AndroidManifest.xml:49:17
 	android:name
-		ADDED from AndroidManifest.xml:51:25
+		ADDED from AndroidManifest.xml:49:25
 activity#com.example.boba.lookapplication.ShowDB
-ADDED from AndroidManifest.xml:54:9
+ADDED from AndroidManifest.xml:52:9
 	android:label
-		ADDED from AndroidManifest.xml:56:13
+		ADDED from AndroidManifest.xml:54:13
 	android:name
-		ADDED from AndroidManifest.xml:55:13
+		ADDED from AndroidManifest.xml:53:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:22.2.0:20:5
