@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.Date;
 
 /**
@@ -22,19 +24,20 @@ import java.util.Date;
 public class TestSQLLiteDB extends AndroidTestCase {
     public static final String TEST_NAME_DB = "TestApplication.db";
     private DB1 mDB1;
+    Context ctx = null;
 
     public TestSQLLiteDB() { super(); }
 
     @Before
     public void createSQLDBObject() {
-        Context ctx = InstrumentationRegistry.getTargetContext();
+        ctx = InstrumentationRegistry.getTargetContext();
         mDB1        = new DB1(ctx,TEST_NAME_DB);
     }
 
     @After
     public void deleteSQLDBObject() {
         mDB1.close();
-        Context ctx = InstrumentationRegistry.getTargetContext();
+        // ctx = InstrumentationRegistry.getTargetContext();
         // ????? ctx.deleteFile(mDB1.getPath());
     }
 
@@ -540,9 +543,9 @@ public class TestSQLLiteDB extends AndroidTestCase {
     }
 
     //
-    // In time-date dependence, don't use this test in 23:30-24:00. Its may done wrong results.
-    // It's testing select data with re-step days and using simpling schema for generating test data.
-    // Firstly, load test data, then select today and yesterday's data.
+    // In time-date dependence, don't use this test in 23:30-24:00. Its may be done wrong results.
+    // It's testing select data with re-step days and using simpling schema for generating test data:
+    // firstly, load test data, then select and check today and yesterday's data.
     // Tests work in 47/48*100% cases correctly :).
     //
     @Test
@@ -551,15 +554,21 @@ public class TestSQLLiteDB extends AndroidTestCase {
         int records = 5;
         long count, required;
         String filename = "TestExport.csv";
+        File file = new File(ctx.getExternalFilesDir(null),filename);
+        int  avrRecord = 100;
 
         long dtBegin, dtEnd, wifiRecords;
         Date date;
+
+        if (file.exists()) file.delete();
 
         // check if DB is empty
 
         mDB1.clearDataBase();
         count = mDB1.exportWiFiData(filename);
         assertEquals("DB is empty only, but print header string", 0 + 1, count);
+        assertTrue("File consists only header", file.length() <= 78); //only header must be 78
+        //assertEquals("File consists only header",file.length(),0);
 
         // check if DB is not empty
 
@@ -569,6 +578,7 @@ public class TestSQLLiteDB extends AndroidTestCase {
 
         count = mDB1.exportWiFiData(filename);
         assertEquals("DB is not empty", records + records + 1, count);
+        assertTrue("File size not grow", file.length() <= (78+avrRecord*(records+records)));
 
         date = new Date();
 
@@ -577,10 +587,12 @@ public class TestSQLLiteDB extends AndroidTestCase {
 
         count = mDB1.exportWiFiDataDay(filename,new Date().getTime()-24*60*60*1000);
         assertEquals("DB is not empty, but only header must be exists in output", 1, count);
+        assertTrue("File consists only header", file.length() <= (78));
 
         // last from last good to now
         count = mDB1.exportWiFiDataLast(filename);
         assertEquals("DB is not empty", records + records + 1, count);
+        assertTrue("File size not grow", file.length() <= (78 + avrRecord * (records + records)));
 
         mDB1.clearDataBase();
         InsertWiFiTestAbend(records, true);
@@ -592,6 +604,7 @@ public class TestSQLLiteDB extends AndroidTestCase {
 
         count = mDB1.exportWiFiDataLast(filename);
         assertEquals("DB is not empty", records + 1, count);
+        assertTrue("File size not grow", file.length() <= (78 + avrRecord * (records)));
 
         InsertWiFiTestAbend(records, true);
 
@@ -599,11 +612,13 @@ public class TestSQLLiteDB extends AndroidTestCase {
 
         count = mDB1.exportWiFiDataLast(filename);
         assertEquals("DB is not empty", records + records + 1, count);
+        assertTrue("File size not grow", file.length() <= (78 + avrRecord * (records + records)));
 
         // last from last good to now
         required  = mDB1.countAllRecords();
         count     = mDB1.exportWiFiDataLastDay(filename);
         assertEquals("DB is not empty", required + 1, count);
+        assertTrue("File size not grow", file.length() <= (78+avrRecord*required));
 
     }
 

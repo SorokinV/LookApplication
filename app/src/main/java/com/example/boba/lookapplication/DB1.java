@@ -154,7 +154,7 @@ public class DB1{
         Cursor mCursor = database.query(WiFi_TABLE, cols, when, null, null, null, order, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
-            WriteFile ef = new WriteFile(mContext,filename);
+            WriteFile ef = new WriteFile(mContext,filename,false);
             String sep = ef.getSeparator();
             String text, temp;
             text = "nn"; for (int i=0; i<cols.length; i++) text += sep+cols[i]; ef.writeRecordWithoutPrefix(text);
