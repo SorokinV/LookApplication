@@ -38,20 +38,26 @@ public class TestSQLLiteDB extends AndroidTestCase {
         // ????? ctx.deleteFile(mDB1.getPath());
     }
 
-    void InsertWiFiTestAbend (int records) {
+    void InsertWiFiTestAbend (int records, boolean LaLo) {
         long result;
         for (int i=0; i<records; i++) {
             long dt = new Date().getTime();
-            result = mDB1.createRecords(dt, "BSSID"+i, "SSID"+i, (float) i+2400, (float) -90+i, "dContents"+i, i);
+            if (LaLo)
+                result = mDB1.createRecords(dt, "BSSID"+i, "SSID"+i, (float) i+2400, (float) -90+i, "dContents"+i, i, 40.0+i,131.0+i);
+            else
+                result = mDB1.createRecords(dt, "BSSID"+i, "SSID"+i, (float) i+2400, (float) -90+i, "dContents"+i, i);
         }
     }
 
-    void InsertWiFiTestGood (int records) {
+    void InsertWiFiTestGood (int records, boolean LaLo) {
         long result;
         long dtBegin = new Date().getTime();
         for (int i=0; i<records; i++) {
             long dt = new Date().getTime();
-            result = mDB1.createRecords(dt, "BSSID"+i, "SSID"+i, (float) i+2400, (float) -90+i, "dContents"+i, i);
+            if (LaLo)
+                result = mDB1.createRecords(dt, "BSSID"+i, "SSID"+i, (float) i+2400, (float) -90+i, "dContents"+i, i, 40.0+i,131.0+i);
+            else
+                result = mDB1.createRecords(dt, "BSSID"+i, "SSID"+i, (float) i+2400, (float) -90+i, "dContents"+i, i);
         }
         long dtEnd = new Date().getTime();
         result = mDB1.createRecords(dtBegin,dtEnd);
@@ -144,6 +150,9 @@ public class TestSQLLiteDB extends AndroidTestCase {
 
         long count = 0;
 
+        int records = 0;
+        int records_last = 0;
+
         // check counting on zero database
         count = mDB1.countAllRecords();    assertEquals("DB is not null (-)", 0, count);
         count = mDB1.countAllBSSID();      assertEquals("DB is not null (-)", 0, count);
@@ -153,14 +162,140 @@ public class TestSQLLiteDB extends AndroidTestCase {
         count = mDB1.countBSSIDLast();     assertEquals("DB is not null (-)", 0, count);
         count = mDB1.countBSSIDPreLast();  assertEquals("DB is not null (-)", 0, count);
 
-        count = mDB1.countWiFi("count(distinct "+ DB1.WiFi_dContents +") AS Context");
+        count = mDB1.countWiFi("count(distinct " + DB1.WiFi_dContents + ") AS Context");
         assertEquals("DB is not null (-)", 0, count);
 
-        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context");
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(distinct " + DB1.PRTC_DateTimeBegin + ") AS Context");
         assertEquals("DB is not null (-)", 0, count);
 
-        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context", DB1.PRTC_DateTimeEnd +" = 0");
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" = 0");
         assertEquals("DB is not null (-)", 0, count);
+
+        //
+        // LaLo = Latitude + Longitude
+        //
+        // 4 pass test where condition:
+        // records path1 (good) < records path2 (good with LaLo)
+        //                      < records path3 (abend without LaLo)
+        //                      < records path4 (good without LaLo)
+        //
+        //
+
+        // add normal data without LaLo and check
+        records = 10;
+        records_last = 0;
+
+        InsertWiFiTestGood(records,false);
+        count = mDB1.countAllRecords();    assertEquals(records, count);
+        count = mDB1.countAllBSSID();      assertEquals(records, count);
+        count = mDB1.countAllLooks();      assertEquals(records, count);
+        count = mDB1.countLati();          assertEquals(0, count);
+        count = mDB1.countLogi();          assertEquals(0, count);
+        count = mDB1.countBSSIDLast();     assertEquals(0, count);
+        count = mDB1.countBSSIDPreLast();  assertEquals(records, count);
+
+        count = mDB1.countWiFi("count(distinct " + DB1.WiFi_dContents + ") AS Context");
+        assertEquals("Context (-)", records, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(distinct " + DB1.PRTC_DateTimeBegin + ") AS Context");
+        assertEquals("Protocol checking (-)", 1, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" = 0");
+        assertEquals("Wrong when==0 (-)", 0, count);
+
+        // next add normal data with LaLo and check
+        records_last = records;
+        records = 20;
+
+        InsertWiFiTestGood(records,true);
+        count = mDB1.countAllRecords();    assertEquals(records + records_last, count);
+        count = mDB1.countAllBSSID();      assertEquals(Math.max(records,records_last), count);
+        count = mDB1.countAllLooks();      assertEquals(records+records_last, count);
+        count = mDB1.countLati();          assertEquals(records, count);
+        count = mDB1.countLogi();          assertEquals(records, count);
+        count = mDB1.countBSSIDLast();     assertEquals(0, count);
+        count = mDB1.countBSSIDPreLast();  assertEquals(records, count);
+
+        count = mDB1.countWiFi("count(distinct " + DB1.WiFi_dContents + ") AS Context");
+        assertEquals("Context (-)", Math.max(records, records_last), count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(distinct " + DB1.PRTC_DateTimeBegin + ") AS Context");
+        assertEquals("Protocol checking (-)", 2, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" = 0");
+        assertEquals("Wrong when==0 (-)", 0, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" >= 0");
+        assertEquals("Wrong when==0 (-)", 2, count);
+
+        // next add abend data without LaLo and check
+        int records_LaLo = records;
+        int records_last_normal = records;
+        records_last = records+records_last;
+        records = 30;
+
+        InsertWiFiTestAbend(records,false);
+        count = mDB1.countAllRecords();    assertEquals(records + records_last, count);
+        count = mDB1.countAllBSSID();      assertEquals(records, count);
+        count = mDB1.countAllLooks();      assertEquals(records+records_last, count);
+        count = mDB1.countLati();          assertEquals(records_LaLo, count);
+        count = mDB1.countLogi();          assertEquals(records_LaLo, count);
+        count = mDB1.countBSSIDLast();     assertEquals(records, count);
+        count = mDB1.countBSSIDPreLast();  assertEquals(Math.max(records_last_normal,records), count);
+
+        count = mDB1.countWiFi("count(distinct " + DB1.WiFi_dContents + ") AS Context");
+        assertEquals("Context (-)", records, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(distinct " + DB1.PRTC_DateTimeBegin + ") AS Context");
+        assertEquals("Protocol checking (-)", 2, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" = 0");
+        assertEquals(0, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" >= 0");
+        assertEquals(2, count);
+
+        count = mDB1.countTable(DB1.WiFi_TABLE,"count(*) AS count",
+                DB1.WiFi_Latitude +" is not null");
+        assertEquals(records_LaLo, count);
+
+        // next add good data without LaLo and check
+        records_last = records+records_last;
+        records = 40;
+        records_last_normal = records;
+
+        InsertWiFiTestGood(records,false);
+        count = mDB1.countAllRecords();    assertEquals(records + records_last, count);
+        count = mDB1.countAllBSSID();      assertEquals(records, count);
+        count = mDB1.countAllLooks();      assertEquals(records+records_last, count);
+        count = mDB1.countLati();          assertEquals(records_LaLo, count);
+        count = mDB1.countLogi();          assertEquals(records_LaLo, count);
+        count = mDB1.countBSSIDLast();     assertEquals(0, count);
+        count = mDB1.countBSSIDPreLast();  assertEquals(Math.max(records_last_normal,records), count);
+
+        count = mDB1.countWiFi("count(distinct " + DB1.WiFi_dContents + ") AS Context");
+        assertEquals("Context (-)", records, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(distinct " + DB1.PRTC_DateTimeBegin + ") AS Context");
+        assertEquals("Protocol checking (-)", 3, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" = 0");
+        assertEquals(0, count);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE,"count(distinct "+ DB1.PRTC_DateTimeBegin +") AS Context",
+                DB1.PRTC_DateTimeEnd +" >= 0");
+        assertEquals(3, count);
+
+        count = mDB1.countTable(DB1.WiFi_TABLE,"count(*) AS count",
+                DB1.WiFi_Latitude +" is not null");
+        assertEquals(records_LaLo, count);
 
     }
 
