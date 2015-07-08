@@ -603,7 +603,7 @@ public class TestSQLLiteDB extends AndroidTestCase {
         // last from last good to now
         required  = mDB1.countAllRecords();
         count     = mDB1.exportWiFiDataLastDay(filename);
-        assertEquals("DB is not empty", 5*records + 1, count);
+        assertEquals("DB is not empty", required + 1, count);
 
     }
 
