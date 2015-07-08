@@ -299,4 +299,269 @@ public class TestSQLLiteDB extends AndroidTestCase {
 
     }
 
-}
+    @Test
+    public void TestRepair() {
+
+        int records = 5;
+        long count;
+
+        long dtBegin, dtEnd, wifiRecords;
+
+        // check if DB is empty
+
+        mDB1.clearDataBase();
+        mDB1.repairDB();
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+        assertEquals("DB is empty only", 0, count);
+        count = mDB1.countTable(DB1.WiFi_TABLE, "count(*) AS Count");
+        assertEquals("DB is empty only", 0, count);
+
+        // check if DB consists only abend data
+
+        mDB1.clearDataBase();
+        InsertWiFiTestAbend(records, false);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+        assertEquals("DB is abend only", 0, count);
+
+        mDB1.repairDB();
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+        assertEquals("DB is repair, must be one protocol record", 1, count);
+
+        dtBegin = mDB1.countTable(DB1.PRTC_TABLE, "min(" + DB1.PRTC_DateTimeBegin + ") AS dt");
+        dtEnd = mDB1.countTable(DB1.PRTC_TABLE, "max(" + DB1.PRTC_DateTimeEnd + ") AS dt");
+
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                DB1.WiFi_DateTime + " between " + dtBegin + " and " + dtEnd);
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                DB1.WiFi_DateTime + " between (select min(dtBegin) from protocol) and (select min(dtEnd) from protocol)");
+        //assertEquals("All records must be in between",dtBegin,dtEnd);
+        assertEquals("All records must be in between", records, wifiRecords);
+
+        // check if DB consists abend, good  data
+
+        mDB1.clearDataBase();
+        InsertWiFiTestAbend(records, false);
+        InsertWiFiTestGood(records, false);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+        assertEquals("DB is abend+good only", 1, count);
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                DB1.WiFi_DateTime + " between (select min(dtBegin) from protocol) and (select min(dtEnd) from protocol)");
+        assertEquals("Good records equals records count", records, wifiRecords);
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                " not (" + DB1.WiFi_DateTime + " between (select min(dtBegin) from protocol) and (select min(dtEnd) from protocol))");
+        assertEquals("Abend records equals records count", records, wifiRecords);
+
+        mDB1.repairDB();
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+        assertEquals("DB is repair, must be one protocol record", 2, count);
+
+        dtBegin = mDB1.countTable(DB1.PRTC_TABLE, "min(" + DB1.PRTC_DateTimeBegin + ") AS dt");
+        dtEnd = mDB1.countTable(DB1.PRTC_TABLE, "max(" + DB1.PRTC_DateTimeEnd + ") AS dt");
+
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                DB1.WiFi_DateTime + " between " + dtBegin + " and " + dtEnd);
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+        //assertEquals("All records must be in between",dtBegin,dtEnd);
+        assertEquals("All records must be in between", records + records, wifiRecords);
+
+        // check if DB consists good,abend  data
+
+        mDB1.clearDataBase();
+        InsertWiFiTestGood(records, false);
+        InsertWiFiTestAbend(records, false);
+
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+        assertEquals("DB is abend+good only", 1, count);
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                DB1.WiFi_DateTime + " between (select min(dtBegin) from protocol) and (select min(dtEnd) from protocol)");
+        assertEquals("Good records equals records count", records, wifiRecords);
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                " not (" + DB1.WiFi_DateTime + " between (select min(dtBegin) from protocol) and (select min(dtEnd) from protocol))");
+        assertEquals("Abend records equals records count", records, wifiRecords);
+
+        mDB1.repairDB();
+        count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+        assertEquals("DB is repair, must be one protocol record", 2, count);
+
+        dtBegin = mDB1.countTable(DB1.PRTC_TABLE, "min(" + DB1.PRTC_DateTimeBegin + ") AS dt");
+        dtEnd = mDB1.countTable(DB1.PRTC_TABLE, "max(" + DB1.PRTC_DateTimeEnd + ") AS dt");
+
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                DB1.WiFi_DateTime + " between " + dtBegin + " and " + dtEnd);
+        wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+        //assertEquals("All records must be in between",dtBegin,dtEnd);
+        assertEquals("All records must be in between", records + records, wifiRecords);
+
+        // check if DB consists abend,good,good,abend  data
+
+        {
+            int records1 = 5, records2 = 10, records3 = 8, records4 = 19;
+
+
+            mDB1.clearDataBase();
+            InsertWiFiTestAbend(records1, false);
+            InsertWiFiTestGood(records2, false);
+            InsertWiFiTestGood(records3, false);
+            InsertWiFiTestAbend(records4, false);
+
+            count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+            assertEquals("DB is abend+good+good+abend only", 2, count);
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("Good records equals records(2+3) count", records2 + records3, wifiRecords);
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "not exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("Abend records equals records(1+4) count", records1 + records4, wifiRecords);
+
+            mDB1.repairDB();
+            count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+            assertEquals("DB is repair, must be 4 good protocol record", 4, count);
+
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("All records must be in between", records1 + records2 + records3 + records4, wifiRecords);
+
+            wifiRecords = mDB1.countTable(DB1.PRTC_TABLE, "count(" + DB1.PRTC_DateTimeBegin + ") AS dt",
+                    "not exists ( select A." + DB1.PRTC_DateTimeBegin + " from protocol A " +
+                            "where " + DB1.PRTC_DateTimeBegin + " between A.dtBegin and A.dtEnd and " + DB1.PRTC_DateTimeBegin + "!=A.dtBegin)");
+            assertEquals("All records must not be crossing", 4, wifiRecords);
+
+            wifiRecords = mDB1.countTable(DB1.PRTC_TABLE, "count(" + DB1.PRTC_DateTimeBegin + ") AS dt",
+                    "not exists ( select A." + DB1.PRTC_DateTimeBegin + " from protocol A " +
+                            "where " + DB1.PRTC_DateTimeBegin + " between A.dtBegin and A.dtEnd and " + DB1.PRTC_DateTimeEnd + "!=A.dtEnd)");
+            assertEquals("All records must not be crossing", 4, wifiRecords);
+        }
+
+        // check if DB consists abend,good,abend,good  data
+
+        {
+            int records1 = 5, records2 = 10, records3 = 8, records4 = 19;
+
+
+            mDB1.clearDataBase();
+            InsertWiFiTestAbend(records1, false);
+            InsertWiFiTestGood(records2, false);
+            InsertWiFiTestAbend(records3, false);
+            InsertWiFiTestGood(records4, false);
+
+            count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+            assertEquals("DB is abend+good+abend+good only", 2, count);
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("Good records equals records(2+4) count", records2 + records4, wifiRecords);
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "not exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("Abend records equals records(1+3) count", records1 + records3, wifiRecords);
+
+            mDB1.repairDB();
+            count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+            assertEquals("DB is repair, must be 4 good protocol record", 4, count);
+
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("All records must be in between", records1 + records2 + records3 + records4, wifiRecords);
+
+            wifiRecords = mDB1.countTable(DB1.PRTC_TABLE, "count(" + DB1.PRTC_DateTimeBegin + ") AS dt",
+                    "not exists ( select A." + DB1.PRTC_DateTimeBegin + " from protocol A " +
+                            "where " + DB1.PRTC_DateTimeBegin + " between A.dtBegin and A.dtEnd and " + DB1.PRTC_DateTimeBegin + "!=A.dtBegin)");
+            assertEquals("All records must not be crossing", 4, wifiRecords);
+
+            wifiRecords = mDB1.countTable(DB1.PRTC_TABLE, "count(" + DB1.PRTC_DateTimeBegin + ") AS dt",
+                    "not exists ( select A." + DB1.PRTC_DateTimeBegin + " from protocol A " +
+                            "where " + DB1.PRTC_DateTimeBegin + " between A.dtBegin and A.dtEnd and " + DB1.PRTC_DateTimeEnd + "!=A.dtEnd)");
+            assertEquals("All records must not be crossing", 4, wifiRecords);
+        }
+
+        //
+        // check :  DB consists abend,good,abend,good,good,good,abend,good,abend  protocol=5
+        //            repair to good  good good  good good good good  good good   protocol=9
+        //
+
+        {
+            int records1 = 5, records2 = 10, records3 = 8, records4 = 19, records5 = 3;
+            int records6 = 5, records7 = 10, records8 = 8, records9 = 19;
+
+            int recordsAbend = 0;
+            int recordsGood = 0;
+
+
+            mDB1.clearDataBase();
+            InsertWiFiTestAbend(records1, false);
+            recordsAbend += records1;
+            InsertWiFiTestGood(records2, false);
+            recordsGood += records2;
+            InsertWiFiTestAbend(records3, false);
+            recordsAbend += records3;
+            InsertWiFiTestGood(records4, false);
+            recordsGood += records4;
+            InsertWiFiTestGood(records5, false);
+            recordsGood += records5;
+            InsertWiFiTestGood(records6, false);
+            recordsGood += records6;
+            InsertWiFiTestAbend(records7, false);
+            recordsAbend += records7;
+            InsertWiFiTestGood(records8, false);
+            recordsGood += records8;
+            InsertWiFiTestAbend(records9, false);
+            recordsAbend += records9;
+
+            count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+            assertEquals("DB is goods only", 5, count);
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("Good records equals records count", recordsGood, wifiRecords);
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "not exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("Abend records equals records count", recordsAbend, wifiRecords);
+
+            mDB1.repairDB();
+            count = mDB1.countTable(DB1.PRTC_TABLE, "count(*) AS Count");
+            assertEquals("DB is repair, must be all good protocol record", 9, count);
+
+            wifiRecords = mDB1.countTable(DB1.WiFi_TABLE, "count(" + DB1.WiFi_DateTime + ") AS dt",
+                    "exists ( select dtBegin from protocol where " + DB1.WiFi_DateTime + " between dtBegin and dtEnd)");
+            assertEquals("All records must be in between", recordsAbend + recordsGood, wifiRecords);
+
+            wifiRecords = mDB1.countTable(DB1.PRTC_TABLE, "count(" + DB1.PRTC_DateTimeBegin + ") AS dt",
+                    "not exists ( select A." + DB1.PRTC_DateTimeBegin + " from protocol A " +
+                            "where " + DB1.PRTC_DateTimeBegin + " between A.dtBegin and A.dtEnd and " + DB1.PRTC_DateTimeBegin + "!=A.dtBegin)");
+            assertEquals("All records must not be crossing", 9, wifiRecords);
+
+            wifiRecords = mDB1.countTable(DB1.PRTC_TABLE, "count(" + DB1.PRTC_DateTimeBegin + ") AS dt",
+                    "not exists ( select A." + DB1.PRTC_DateTimeBegin + " from protocol A " +
+                            "where " + DB1.PRTC_DateTimeBegin + " between A.dtBegin and A.dtEnd and " + DB1.PRTC_DateTimeEnd + "!=A.dtEnd)");
+            assertEquals("All records must not be crossing", 9, wifiRecords);
+        }
+    }
+
+    @Test
+    public void TestExport() {
+
+        int records = 5;
+        long count;
+        String filename = "TestExport.csv";
+
+        long dtBegin, dtEnd, wifiRecords;
+
+        // check if DB is empty
+
+        mDB1.clearDataBase();
+        count = mDB1.exportWiFiData(filename);
+        assertEquals("DB is empty only", 0, count);
+
+        // check if DB is empty
+
+        mDB1.clearDataBase();
+        InsertWiFiTestGood(records, false);
+        InsertWiFiTestAbend(records,true);
+        count = mDB1.exportWiFiData(filename);
+        assertEquals("DB is empty only", records+records, count);
+
+    }
+
+    }

@@ -48,12 +48,14 @@ public class DB1{
         File   file = new File(context.getExternalFilesDir(null),NameDB);
         dbHelper = new DataBaseHelper1(context,file.getPath());
         database = dbHelper.getWritableDatabase();
+        mContext = context;
     }
 
     public DB1(Context context, String nameDB){
         File   file = new File(context.getExternalFilesDir(null),nameDB);
         dbHelper = new DataBaseHelper1(context,file.getPath());
         database = dbHelper.getWritableDatabase();
+        mContext = context;
     }
 
     public long createRecords(long dt, String BSSID, String SSID,
@@ -106,89 +108,117 @@ public class DB1{
         return mCursor; // iterate to get each value.
     }
 
-    public int countTable (String nameTable, String countSelection) {
+    public long countTable (String nameTable, String countSelection) {
         String[] cols = new String[] {countSelection};
         Cursor mCursor = database.query(true, nameTable,cols,null
                 , null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
-        int count = 0; try {count = mCursor.getInt(0);} finally {mCursor.close();}
+        long count = 0;
+        try {count = mCursor.getLong(0);} finally {mCursor.close();}
         return(count);
     }
 
-    public int countTable (String nameTable, String countSelection, String when) {
+    public long countTable (String nameTable, String countSelection, String when) {
         String[] cols = new String[] {countSelection};
         Cursor mCursor = database.query(true, nameTable,cols,when
                 , null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
-        int count = 0; try {count = mCursor.getInt(0);} finally {mCursor.close();}
+        long count = 0;
+        try {count = mCursor.getLong(0);} finally {mCursor.close();}
         return(count);
     }
 
-    public int countWiFi (String countSelection) {
+    public long countWiFi (String countSelection) {
         return(countTable(WiFi_TABLE, countSelection));
     }
 
-    public int countAllRecords()   { return(countWiFi(" count(*) AS count")); }
-    public int countAllBSSID()     { return(countWiFi("count( DISTINCT " + WiFi_BSSID + ") AS count")); }
-    public int countAllLooks()     { return(countWiFi("count( DISTINCT " + WiFi_DateTime + ") AS count")); }
-    public int countLati()         { return(countWiFi("count( DISTINCT " + WiFi_Latitude + ") AS count")); }
-    public int countLogi()         { return(countWiFi("count( DISTINCT " + WiFi_Longitude + ") AS count")); }
+    public long countAllRecords()   { return(countWiFi(" count(*) AS count")); }
+    public long countAllBSSID()     { return(countWiFi("count( DISTINCT " + WiFi_BSSID + ") AS count")); }
+    public long countAllLooks()     { return(countWiFi("count( DISTINCT " + WiFi_DateTime + ") AS count")); }
+    public long countLati()         { return(countWiFi("count( DISTINCT " + WiFi_Latitude + ") AS count")); }
+    public long countLogi()         { return(countWiFi("count( DISTINCT " + WiFi_Longitude + ") AS count")); }
 
-    public int countBSSIDLast()    { return(countTable(TABLE_BSSID_Last, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
-    public int countBSSIDPreLast() { return(countTable(TABLE_BSSID_PreLast, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
+    public long countBSSIDLast()    { return(countTable(TABLE_BSSID_Last, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
+    public long countBSSIDPreLast() { return(countTable(TABLE_BSSID_PreLast, "count( DISTINCT " + WiFi_BSSID + ") AS count"));}
 
-    public boolean exportWiFiData (String filename, long beginDate, long endDate) {
-        boolean   result = false;
+    public int exportWiFiData (String filename, long beginDate, long endDate) {
+        int result = 0;
         String[]  cols   = new String[] {WiFi_DateTime,WiFi_SSID,WiFi_BSSID,
                 WiFi_dB,WiFi_Frequency,WiFi_Latitude,WiFi_Longitude,WiFi_capabalities,WiFi_dContents};
         String    when   = "datetime between "+beginDate+" and "+endDate;
-        Cursor mCursor = database.query(true, WiFi_TABLE,cols,when,null, null, null, null, null);
+        Cursor mCursor = database.query(true, WiFi_TABLE, cols, when, null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
             WriteFile ef = new WriteFile(mContext,filename);
             String sep = ef.getSeparator();
             String text;
-            int count = 0;
-            do { count++;
-                text = ""; for (int i=0;i<mCursor.getColumnCount();i++) text += sep+mCursor.getString(i);
-                ef.writeRecordWithoutPrefix(text);
-            } while (mCursor.moveToNext());
-            mCursor.close();
+            if (!mCursor.isLast()) {
+                do {
+                    text = "";
+                    for (int i = 0; i < mCursor.getColumnCount(); i++)
+                        text += sep + mCursor.getString(i);
+                    ef.writeRecordWithoutPrefix(text);
+                } while (mCursor.moveToNext());
+                mCursor.close();
+            }
             ef.close();
-            result = true;
+            result = ef.getWrites();
         }
         return (result);
     }
 
-    public boolean exportWiFiData (String filename) {
+    public int exportWiFiData (String filename) {
         long timeBegin = countWiFi("min(" + WiFi_DateTime + ") AS minDateTime");
         long timeEnd   = countWiFi("max(" + WiFi_DateTime + ") AS maxDateTime");
         return (exportWiFiData(filename, timeBegin, timeEnd));
     }
 
-    public boolean exportWiFiDataDay (String filename, long timeDay) {
+    public int exportWiFiDataDay (String filename, long timeDay) {
         Date date = new Date(timeDay); date.setHours(0);date.setMinutes(0);date.setSeconds(0);
         long timeBegin = date.getTime();
         long timeEnd   = timeBegin+24*60*60*1000-999;
         return (exportWiFiData(filename, timeBegin, timeEnd));
     }
 
-    public boolean exportWiFiDataLast (String filename) {
+    public int exportWiFiDataLast (String filename) {
         long timeBegin = countTable(PRTC_TABLE, "max(" + PRTC_DateTimeBegin + ") AS maxTimeBegin");
         long timeEnd   = new Date().getTime();
         return (exportWiFiData(filename, timeBegin, timeEnd));
     }
 
-    public boolean exportWiFiDataLastDay (String filename) {
+    public int exportWiFiDataLastDay (String filename) {
         long timeBegin = new Date().getTime();
         return (exportWiFiDataDay(filename, timeBegin));
     }
 
+
+    //
+    // repair protocol records after abends and omitting protocol record
+    //
     public boolean repairDB (){
+
+        // verify not empty look and empty protocol --> repair
+        {
+            long count         = countTable(PRTC_TABLE, "count(*) AS count");
+            long records       = countTable(WiFi_TABLE, "count(*) AS count");
+            if ((count==0)&&(records==0)) return(true);
+        }
+
+        // verify not empty look and empty protocol --> repair
+        {
+            long count         = countTable(PRTC_TABLE, "count(*) AS count");
+            if (count==0) {
+                long timeBeginWiFi = countWiFi("min(" + WiFi_DateTime + ") AS minTime");
+                long timeEndWiFi   = countWiFi("max(" + WiFi_DateTime + ") AS maxTime");
+                long result = createRecords(timeBeginWiFi, timeEndWiFi);
+                return(true);
+            }
+
+        }
 
         // verify first look and repair from abend
         {
@@ -213,7 +243,8 @@ public class DB1{
         }
 
         // verify and repair abends between first and last looks
-        String when = " not exists ( select "+PRTC_DateTimeBegin+
+
+        String when = " not exists ( select "+PRTC_DateTimeBegin+" from "+PRTC_TABLE+" "+
                 " where " + WiFi_DateTime + " between " + PRTC_DateTimeBegin + " and " + PRTC_DateTimeEnd + ") ";
         long   count = countTable(WiFi_TABLE, "count(*) AS records", when);
 
