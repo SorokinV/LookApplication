@@ -149,18 +149,22 @@ public class DB1{
         int result = 0;
         String[]  cols   = new String[] {WiFi_DateTime,WiFi_SSID,WiFi_BSSID,
                 WiFi_dB,WiFi_Frequency,WiFi_Latitude,WiFi_Longitude,WiFi_capabalities,WiFi_dContents};
-        String    when   = "datetime between "+beginDate+" and "+endDate;
-        Cursor mCursor = database.query(true, WiFi_TABLE, cols, when, null, null, null, null, null);
+        String    when   = WiFi_DateTime+" between "+beginDate+" and "+endDate;
+        String    order  = WiFi_DateTime+" ASC";
+        Cursor mCursor = database.query(WiFi_TABLE, cols, when, null, null, null, order, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
             WriteFile ef = new WriteFile(mContext,filename);
             String sep = ef.getSeparator();
-            String text;
-            if (!mCursor.isLast()) {
+            String text, temp;
+            text = "nn"; for (int i=0; i<cols.length; i++) text += sep+cols[i]; ef.writeRecordWithoutPrefix(text);
+            if (mCursor.getCount()>0) {
                 do {
-                    text = "";
-                    for (int i = 0; i < mCursor.getColumnCount(); i++)
+                    text = ""+(ef.getWrites());
+                    for (int i = 0; i < mCursor.getColumnCount(); i++) {
+                        temp = mCursor.getString(i); if (temp == null) temp = "";
                         text += sep + mCursor.getString(i);
+                    }
                     ef.writeRecordWithoutPrefix(text);
                 } while (mCursor.moveToNext());
                 mCursor.close();

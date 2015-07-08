@@ -539,28 +539,71 @@ public class TestSQLLiteDB extends AndroidTestCase {
         }
     }
 
+    //
+    // In time-date dependence, don't use this test in 23:30-24:00. Its may done wrong results.
+    // It's testing select data with re-step days and using simpling schema for generating test data.
+    // Firstly, load test data, then select today and yesterday's data.
+    // Tests work in 47/48*100% cases correctly :).
+    //
     @Test
     public void TestExport() {
 
         int records = 5;
-        long count;
+        long count, required;
         String filename = "TestExport.csv";
 
         long dtBegin, dtEnd, wifiRecords;
+        Date date;
 
         // check if DB is empty
 
         mDB1.clearDataBase();
         count = mDB1.exportWiFiData(filename);
-        assertEquals("DB is empty only", 0, count);
+        assertEquals("DB is empty only, but print header string", 0 + 1, count);
 
-        // check if DB is empty
+        // check if DB is not empty
 
         mDB1.clearDataBase();
         InsertWiFiTestGood(records, false);
-        InsertWiFiTestAbend(records,true);
+        InsertWiFiTestAbend(records, true);
+
         count = mDB1.exportWiFiData(filename);
-        assertEquals("DB is empty only", records+records, count);
+        assertEquals("DB is not empty", records + records + 1, count);
+
+        date = new Date();
+
+        count = mDB1.exportWiFiDataDay(filename, new Date().getTime());
+        assertEquals("DB is not empty", records+records+1, count);
+
+        count = mDB1.exportWiFiDataDay(filename,new Date().getTime()-24*60*60*1000);
+        assertEquals("DB is not empty, but only header must be exists in output", 1, count);
+
+        // last from last good to now
+        count = mDB1.exportWiFiDataLast(filename);
+        assertEquals("DB is not empty", records + records + 1, count);
+
+        mDB1.clearDataBase();
+        InsertWiFiTestAbend(records, true);
+        InsertWiFiTestGood(records, false);
+        InsertWiFiTestAbend(records, true);
+        InsertWiFiTestGood(records, false);
+
+        // datas : abend-good-abend-good
+
+        count = mDB1.exportWiFiDataLast(filename);
+        assertEquals("DB is not empty", records + 1, count);
+
+        InsertWiFiTestAbend(records, true);
+
+        // datas : abend-good-abend-good-abend
+
+        count = mDB1.exportWiFiDataLast(filename);
+        assertEquals("DB is not empty", records + records + 1, count);
+
+        // last from last good to now
+        required  = mDB1.countAllRecords();
+        count     = mDB1.exportWiFiDataLastDay(filename);
+        assertEquals("DB is not empty", 5*records + 1, count);
 
     }
 
