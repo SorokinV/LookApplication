@@ -312,9 +312,9 @@
     <string name="common_signin_button_text_long">Sign in with Google</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
-    <string name="count_BSSID_Last">BSSID count (current) :</string>
-    <string name="count_BSSID_PreLast">BSSID count (prelast) :</string>
-    <string name="count_BSSID_records">BSSID count :</string>
+    <string name="count_BSSID_Last">SSID count (current) :</string>
+    <string name="count_BSSID_PreLast">SSID count (prelast) :</string>
+    <string name="count_BSSID_records">SSID count :</string>
     <string name="count_DB_records">Records count :</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.5.0/res/values/admob_strings.xml -->
     <eat-comment/>
@@ -360,6 +360,10 @@
     <string name="pref_location_use_title">Using location</string>
     <string name="pref_lookservice_key">Service key</string>
     <string name="pref_lookservice_title">Service options</string>
+    <string name="pref_nmea_protocol_append_summary">Enable protocol NMEA append</string>
+    <string name="pref_nmea_protocol_append_title">Enable protocol NMEA append</string>
+    <string name="pref_nmea_protocol_summary">Enable protocol NMEA</string>
+    <string name="pref_nmea_protocol_title">Enable protocol NMEA</string>
     <string name="pref_protocol_append_summary">Enable protocol append</string>
     <string name="pref_protocol_append_title">Enable protocol append</string>
     <string name="pref_protocol_summary">Enable protocol</string>

@@ -33,6 +33,9 @@ public class LookServiceBobaTest extends IntentService {
     boolean OKLocationUse    = true;
     boolean OKDBUse          = true;
 
+    boolean OKNMEAProtocol   = false;
+    boolean OKNMEAAppend     = false;
+
     boolean stopping         = false;
     boolean stopped          = false;
     boolean sendstatus       = false;
@@ -97,6 +100,8 @@ public class LookServiceBobaTest extends IntentService {
         OKProtocol       = intent.getBooleanExtra("protocol", OKProtocol);
         OKProtocolAppend = intent.getBooleanExtra("protocolappend", OKProtocolAppend);
         OKLocationUse    = intent.getBooleanExtra("location", OKLocationUse);
+        OKNMEAProtocol   = intent.getBooleanExtra("nmeaprotocol", OKNMEAProtocol);
+        OKNMEAAppend     = intent.getBooleanExtra("nmeaappend", OKNMEAAppend);
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
@@ -107,7 +112,7 @@ public class LookServiceBobaTest extends IntentService {
         if (OKProtocol) { wpn.writeRecord("service begin time(M)="+(workTimeMS/1000/60)+" delay(S)="+(delayWaitMS/1000)); }
         if (OKLocationUse) {
             // lookGeo = new LookGeo(this);
-            gpsTracker = new GPSTracker(this,delayWaitMS);
+            gpsTracker = new GPSTracker(this,delayWaitMS,OKNMEAProtocol,OKNMEAAppend);
         }
 
         //Log.d(LOG_TAG, "service starting beep=" + OKBeep + " size=" + wif.fSize() + " " + getExternalFilesDir(null));

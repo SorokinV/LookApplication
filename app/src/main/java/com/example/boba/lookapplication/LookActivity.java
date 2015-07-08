@@ -34,6 +34,8 @@ public class LookActivity extends ActionBarActivity {
     boolean OKProtocol       = false; // inner working protocol
     boolean OKProtocolAppend = false; // append or recreate inner working protocol
     boolean OKLocationUse    = false; // append or recreate inner working protocol
+    boolean OKNMEAProtocol   = false; // use inner NMEA protocol
+    boolean OKNMEAAppend     = false; // append or recreate inner NMEA protocol
 
     ProgressBar progressBar;
 
@@ -144,6 +146,8 @@ public class LookActivity extends ActionBarActivity {
         intentService.putExtra("protocol",OKProtocol);
         intentService.putExtra("protocolappend",OKProtocolAppend);
         intentService.putExtra("location",OKLocationUse);
+        intentService.putExtra("nmeaprotocol",OKNMEAProtocol);
+        intentService.putExtra("nmeaappend",OKNMEAAppend);
 
         startService(intentService);
 
@@ -248,6 +252,9 @@ public class LookActivity extends ActionBarActivity {
         OKProtocol         = sharedPref.getBoolean("pref_protocol", OKProtocol);
         OKProtocolAppend   = sharedPref.getBoolean("pref_protocol_append", OKProtocolAppend);
         OKLocationUse      = sharedPref.getBoolean("pref_location_use", OKLocationUse);
+
+        OKNMEAProtocol     = sharedPref.getBoolean("pref_nmeaprotocol", OKNMEAProtocol);
+        OKNMEAAppend       = sharedPref.getBoolean("pref_nmeaappend", OKNMEAAppend);
     }
 
     int SensorsCount () {

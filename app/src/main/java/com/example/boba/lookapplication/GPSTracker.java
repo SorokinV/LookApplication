@@ -25,7 +25,7 @@ import android.util.Log;
 
 public class GPSTracker extends Service implements LocationListener, GpsStatus.NmeaListener {
 
-    private final Context mContext;
+    private Context mContext;
 
     // object for unsleep power state
     private PowerManager.WakeLock wakeLock = null;
@@ -33,8 +33,8 @@ public class GPSTracker extends Service implements LocationListener, GpsStatus.N
     // nmea protocol
     WriteFile nmea = null;
     boolean OKNMEA         = true;
-    boolean OKNMEAprotocol = false;
-    boolean OKNMEAappend   = false;
+    boolean OKNMEAProtocol = false;
+    boolean OKNMEAAppend   = false;
 
 
     // flag for GPS status
@@ -61,20 +61,33 @@ public class GPSTracker extends Service implements LocationListener, GpsStatus.N
 
     public GPSTracker(Context context) {
         super();
-        this.mContext = context;
-        WakeLockOn();
-        getLocation();
-        setNmeaOn();
-
+        gpsTracker(context,MIN_TIME_BW_UPDATES,OKNMEAProtocol,OKNMEAAppend);
     }
 
     public GPSTracker(Context context, long min_time_bw_updates) {
         super();
+        gpsTracker(context, min_time_bw_updates, OKNMEAProtocol, OKNMEAAppend);
+    }
+
+    public GPSTracker(Context context, long min_time_bw_updates, boolean nmeaProtocol) {
+        super();
+        gpsTracker(context,min_time_bw_updates,nmeaProtocol,OKNMEAAppend);
+    }
+
+    public GPSTracker(Context context, long min_time_bw_updates, boolean nmeaProtocol, boolean nmeaAppend) {
+        super();
+        gpsTracker(context,min_time_bw_updates,nmeaProtocol,nmeaAppend);
+    }
+
+    public void gpsTracker (Context context, long min_time_bw_updates, boolean nmeaProtocol, boolean nmeaAppend) {
         this.mContext = context;
         MIN_TIME_BW_UPDATES = min_time_bw_updates;
+        OKNMEAProtocol = nmeaProtocol;
+        OKNMEAAppend = nmeaAppend;
         WakeLockOn();
         getLocation();
         setNmeaOn();
+
     }
 
     public boolean WakeLockOn () {
@@ -94,8 +107,8 @@ public class GPSTracker extends Service implements LocationListener, GpsStatus.N
     public void setNmeaOn () {
         if (isGPSEnabled) {
             OKNMEA = locationManager.addNmeaListener(this);
-            if ((OKNMEA)&&(OKNMEAprotocol)) {
-                nmea = new WriteFile(mContext, "nmea.csv",OKNMEAappend);
+            if ((OKNMEA)&&(OKNMEAProtocol)) {
+                nmea = new WriteFile(mContext, "nmea.csv",OKNMEAAppend);
             }
         }
     }
