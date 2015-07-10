@@ -121,7 +121,7 @@ public class GPSTracker extends Service implements LocationListener, GpsStatus.N
 
     @Override
     public void onNmeaReceived (long timestamp, String nmeaText) {
-        if (nmea!=null) nmea.writeRecord(""+timestamp+nmea.getSeparator()+nmeaText);
+        if (nmea!=null) nmea.writeRecord("" + timestamp + nmea.getSeparator() + nmeaText);
     }
 
     public Location getLocation() {
@@ -214,6 +214,20 @@ public class GPSTracker extends Service implements LocationListener, GpsStatus.N
 
         // return longitude
         return longitude;
+    }
+
+    /**
+     * Function to get old timestamp
+     * */
+    public long getLastTimeUTC(){
+        //refreshLocation();
+        long lastTime = 0;
+        if(location != null){
+            lastTime = location.getTime();
+        }
+
+        // return longitude
+        return (lastTime);
     }
 
     public void refreshLocation () {

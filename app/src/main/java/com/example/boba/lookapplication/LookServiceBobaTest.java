@@ -43,8 +43,9 @@ public class LookServiceBobaTest extends IntentService {
     long    dtBegin;
     long    dtEnd;
 
-    long delayWaitMS         = 5*1000;    // 05 sec
-    long workTimeMS          = 60*1000; // 60 sec
+    long delayWaitMS         = 5*1000;       // 05 sec
+    long workTimeMS          = 60*1000;      // 60 sec
+    long timeGPSGood         = 60*60*1000;   // 60 min
     final String LOG_TAG     = "LookServiceBoba";
 
     String sep = "\t";
@@ -102,6 +103,7 @@ public class LookServiceBobaTest extends IntentService {
         OKLocationUse    = intent.getBooleanExtra("location", OKLocationUse);
         OKNMEAProtocol   = intent.getBooleanExtra("nmeaprotocol", OKNMEAProtocol);
         OKNMEAAppend     = intent.getBooleanExtra("nmeaappend", OKNMEAAppend);
+        timeGPSGood      = intent.getLongExtra("timeoldlocationuses",timeGPSGood);
 
         if (OKBeep) beep.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 2000);
 
@@ -226,7 +228,8 @@ public class LookServiceBobaTest extends IntentService {
                 String[] listWiFi = bobaWiFiLook();
 
                 String location = "";
-                if (OKLocationUse) {
+
+                if (OKLocationUse&((System.currentTimeMillis()-timeGPSGood)<=gpsTracker.getLastTimeUTC())) {
                     // location = lookGeo.getLocationString();
                     location = gpsTracker.getLocationString();
                 }
@@ -292,9 +295,15 @@ public class LookServiceBobaTest extends IntentService {
                             iList.capabilities+sep+
                             iList.describeContents();
 
+                    boolean OKTimeAndLocation = false;
+                    double latitude =0.0, longitude =0.0;
+
                     if (OKLocationUse) {
-                        double latitude  = gpsTracker.getLatitude();
-                        double longitude = gpsTracker.getLongitude();
+                        OKTimeAndLocation = (System.currentTimeMillis()-timeGPSGood)<=gpsTracker.getLastTimeUTC();
+                        latitude    = gpsTracker.getLatitude();
+                        longitude   = gpsTracker.getLongitude();
+                    }
+                    if (OKLocationUse&&OKTimeAndLocation) {
                         database.createRecords(dt, iList.BSSID, iList.SSID,
                                 iList.frequency, iList.level, iList.capabilities, iList.describeContents(),
                                 latitude, longitude);

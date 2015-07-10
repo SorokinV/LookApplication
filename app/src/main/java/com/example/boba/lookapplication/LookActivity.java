@@ -27,15 +27,16 @@ public class LookActivity extends ActionBarActivity {
 
     String LOG_TAG = "Main--Main";
 
-    int     delayS = 6;  // seconds
-    int     timeM  = 180; // minute
-    boolean OKBeep           = true;
-    boolean OKForeground     = true;
-    boolean OKProtocol       = false; // inner working protocol
-    boolean OKProtocolAppend = false; // append or recreate inner working protocol
-    boolean OKLocationUse    = false; // append or recreate inner working protocol
-    boolean OKNMEAProtocol   = false; // use inner NMEA protocol
-    boolean OKNMEAAppend     = false; // append or recreate inner NMEA protocol
+    int     delayS = 6;                // seconds
+    int     timeM  = 180;              // minute
+    boolean OKBeep                 = true;
+    boolean OKForeground           = true;
+    boolean OKProtocol             = false; // inner working protocol
+    boolean OKProtocolAppend       = false; // append or recreate inner working protocol
+    boolean OKLocationUse          = false; // append or recreate inner working protocol
+    boolean OKNMEAProtocol         = false; // use inner NMEA protocol
+    boolean OKNMEAAppend           = false; // append or recreate inner NMEA protocol
+    int     minutesOldLocationUses = 60;    // GPS location is not good after this time delay (minute)
 
     ProgressBar progressBar;
 
@@ -148,6 +149,7 @@ public class LookActivity extends ActionBarActivity {
         intentService.putExtra("location",OKLocationUse);
         intentService.putExtra("nmeaprotocol",OKNMEAProtocol);
         intentService.putExtra("nmeaappend",OKNMEAAppend);
+        intentService.putExtra("timeoldlocationuses",minutesOldLocationUses*60*1000);
 
         startService(intentService);
 
@@ -223,12 +225,15 @@ public class LookActivity extends ActionBarActivity {
         TextView bTextMessage = (TextView) findViewById(R.id.simpletextmessage);
         String bText = getString(R.string.textserviceparameter,timeM,delayS);
 
+
+        /* ????????????????????????????????
         if (OKLocationUse) {
             LookGeo lookGeo = new LookGeo(this);
             String location = lookGeo.getLocationString();
             if (location != "")
                 bText += " " + getString(R.string.textGEOparameter, lookGeo.getLocationString());
         }
+        */
 
         bTextMessage.setText(bText);
 
@@ -237,8 +242,9 @@ public class LookActivity extends ActionBarActivity {
     void RefreshParameters () {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        delayS  = Integer.parseInt(sharedPref.getString("pref_delayS",""+delayS));
-        timeM   = Integer.parseInt(sharedPref.getString("pref_timeM",""+timeM));
+        delayS                 = Integer.parseInt(sharedPref.getString("pref_delayS",""+delayS));
+        timeM                  = Integer.parseInt(sharedPref.getString("pref_timeM",""+timeM));
+        minutesOldLocationUses = Integer.parseInt(sharedPref.getString("pref_old_location_use_time",""+minutesOldLocationUses));
 
         if (timeM< 2)           timeM  = 2;
         if (timeM> (60*10))     timeM  = 60*10;

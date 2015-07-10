@@ -65,6 +65,9 @@
     <string name="pref_location_summary">Location summary</string>
     <string name="pref_location_use_title">Using location</string>
     <string name="pref_location_use_summary">Using location (GPS, GLONASS ...)</string>
+    <string name="pref_old_location_use">60</string>
+    <string name="pref_old_location_use_time_title">After this time (minutes) old location don\'t use</string>
+    <string name="pref_old_location_use_time_summary">After this time (minutes) old location don\'t use</string>
 
     <string name="pref_storage_title">Storage</string>
     <string name="pref_storage_key">Storage key</string>
