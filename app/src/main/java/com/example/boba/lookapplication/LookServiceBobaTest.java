@@ -59,7 +59,7 @@ public class LookServiceBobaTest extends IntentService {
 
     ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_NOTIFICATION,ToneGenerator.MAX_VOLUME);
 
-    LookGeo    lookGeo    = null;
+    //LookGeo    lookGeo    = null;
     GPSTracker gpsTracker = null;
 
     public static final String ACTION_COMMAND    = "com.example.boba.lookapplication.COMMAND";
