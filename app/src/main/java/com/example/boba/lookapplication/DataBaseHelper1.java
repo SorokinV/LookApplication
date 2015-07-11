@@ -16,12 +16,12 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_Protocol_CREATE  = "create table Protocol ( " +
+    private static final String DATABASE_Protocol_CREATE  = "create table IF NOT EXISTS Protocol ( " +
                     "dtBegin      integer  not null,"+
                     "dtEnd        integer,"+
                     "PRIMARY KEY (dtBegin ASC));";
 
-    private static final String DATABASE_WiFi_CREATE      = "create table WiFi ( " +
+    private static final String DATABASE_WiFi_CREATE      = "create table IF NOT EXISTS WiFi ( " +
             "datetime     integer  not null,"+
             "SSID         text     not null,"+
             "BSSID        text     not null,"+
@@ -33,25 +33,24 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
             "dContents    integer," +
             "PRIMARY KEY (datetime ASC, BSSID ASC, SSID ASC));";
 
-    private static final String DATABASE_VIEW_BSSID_last      = "create view BSSID_Last AS " +
+    private static final String DATABASE_VIEW_BSSID_last      = "create view IF NOT EXISTS BSSID_Last AS " +
             "select DISTINCT BSSID from WiFi where datetime> (select max(dtEnd) from Protocol)";
 
-    private static final String DATABASE_VIEW_BSSID_PreLast   = "create view BSSID_PreLast AS " +
+    private static final String DATABASE_VIEW_BSSID_PreLast   = "create view IF NOT EXISTS BSSID_PreLast AS " +
             "select DISTINCT BSSID from WiFi where datetime>=(select max(dtBegin) from Protocol)";
 
-    private static final String DATABASE_WiFi_Points_CREATE      = "create table WiFiPoints ( " +
-            "dtBegin      integer  not null,"+
-            "dtEnd        integer  not null,"+
-            "looks        integer  not null,"+
-            "SSID         text     not null,"+
-            "BSSID        text     not null,"+
-            "dB           float    not null,"   +
-            "Latitude     float,"  +
-            "Longitude    float,"  +
-            "stdDB        float,"  +
-            "stdLatitude  float,"  +
-            "stdLongitude float,"  +
-            "capabalities text,"   +
+    private static final String DATABASE_WiFi_Points_CREATE      =
+        "create table IF NOT EXISTS WiFiPoints ( " +
+            "dtBegin         integer  not null,"+
+            "dtEnd           integer  not null,"+
+            "looks           integer  not null,"+
+            "SSID            text     not null,"+
+            "BSSID           text     not null,"+
+            "dB              float    not null,"   +
+            "Latitude        float,"  +
+            "Longitude       float,"  +
+            "minCapabalities text,"   +
+            "maxCapabalities text,"   +
             "PRIMARY KEY (dtBegin ASC, dtEnd ASC, BSSID ASC, SSID ASC));";
 
     public DataBaseHelper1(Context context) {
@@ -78,7 +77,11 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
         Log.w(DataBaseHelper1.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        database.execSQL("DROP TABLE IF EXISTS MyEmployees");
+        database.execSQL("DROP TABLE Protocol");
+        database.execSQL("DROP TABLE WiFi");
+        database.execSQL("DROP VIEW BSSID_Last");
+        database.execSQL("DROP VIEW BSSID_PreLast");
         onCreate(database);
     }
+
 }
