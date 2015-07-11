@@ -19,6 +19,8 @@ public class DB1{
 
     private Context mContext;
 
+    File   file = null;
+
     public final static String NameDB = "LookApplication.db";
 
     public final static String PRTC_TABLE ="Protocol";            // name of common table
@@ -45,14 +47,14 @@ public class DB1{
      *
      */
     public DB1(Context context){
-        File   file = new File(context.getExternalFilesDir(null),NameDB);
+        file = new File(context.getExternalFilesDir(null),NameDB);
         dbHelper = new DataBaseHelper1(context,file.getPath());
         database = dbHelper.getWritableDatabase();
         mContext = context;
     }
 
     public DB1(Context context, String nameDB){
-        File   file = new File(context.getExternalFilesDir(null),nameDB);
+        file = new File(context.getExternalFilesDir(null),nameDB);
         dbHelper = new DataBaseHelper1(context,file.getPath());
         database = dbHelper.getWritableDatabase();
         mContext = context;
@@ -271,11 +273,19 @@ public class DB1{
         return(true);
     }
 
+    public void aggregateAndClear (long dtBegin, long dtEnd) {
+
+    }
+
     public int deleteRecords()     { deleteWiFiRecords(); deleteProtocols(); return(0);}
     public int deleteWiFiRecords() { return(database.delete(WiFi_TABLE, null, null)); }
     public int deleteProtocols()   { return(database.delete(PRTC_TABLE, null, null)); }
     public void clearDataBase() {deleteRecords();}
     public void close() {database.close();}
 
-    public String getPath() {return(database.getPath());}
+    public String  getPath() {return(database.getPath());}
+    public boolean deleteDatabase() {
+        if (file!=null) return(SQLiteDatabase.deleteDatabase(file));
+        return(false);
+    }
 }

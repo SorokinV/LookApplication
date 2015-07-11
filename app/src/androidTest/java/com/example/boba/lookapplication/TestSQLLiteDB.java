@@ -37,8 +37,7 @@ public class TestSQLLiteDB extends AndroidTestCase {
     @After
     public void deleteSQLDBObject() {
         mDB1.close();
-        // ctx = InstrumentationRegistry.getTargetContext();
-        // ????? ctx.deleteFile(mDB1.getPath());
+        mDB1.deleteDatabase();
     }
 
     void InsertWiFiTestAbend (int records, boolean LaLo) {

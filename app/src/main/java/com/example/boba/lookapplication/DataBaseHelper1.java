@@ -39,6 +39,21 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
     private static final String DATABASE_VIEW_BSSID_PreLast   = "create view BSSID_PreLast AS " +
             "select DISTINCT BSSID from WiFi where datetime>=(select max(dtBegin) from Protocol)";
 
+    private static final String DATABASE_WiFi_Points_CREATE      = "create table WiFiPoints ( " +
+            "dtBegin      integer  not null,"+
+            "dtEnd        integer  not null,"+
+            "looks        integer  not null,"+
+            "SSID         text     not null,"+
+            "BSSID        text     not null,"+
+            "dB           float    not null,"   +
+            "Latitude     float,"  +
+            "Longitude    float,"  +
+            "stdDB        float,"  +
+            "stdLatitude  float,"  +
+            "stdLongitude float,"  +
+            "capabalities text,"   +
+            "PRIMARY KEY (dtBegin ASC, dtEnd ASC, BSSID ASC, SSID ASC));";
+
     public DataBaseHelper1(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -54,6 +69,7 @@ public class DataBaseHelper1 extends SQLiteOpenHelper {
         database.execSQL(DATABASE_WiFi_CREATE);
         database.execSQL(DATABASE_VIEW_BSSID_last);
         database.execSQL(DATABASE_VIEW_BSSID_PreLast);
+        database.execSQL(DATABASE_WiFi_Points_CREATE);
     }
 
     // Method is called during an upgrade of the database,
