@@ -625,17 +625,53 @@ public class TestSQLLiteDB extends AndroidTestCase {
     @Test
     public void TestAggregate() {
 
-        int records = 10;
+        int  records = 10;
+        long count;
 
         long dtBegin = new Date().getTime();
         long dtEnd   = dtBegin+24*60*60*1000;
 
+        // test for exit and empty latitude and longitude
         mDB1.clearDataBase();
         InsertWiFiTestGood(records, false);
         InsertWiFiTestAbend(records, true);
 
-        mDB1.aggregateAndClear(dtBegin,dtEnd);
-        assertEquals(1, 1);
+        mDB1.aggregateAndClear(dtBegin, dtEnd);
+        count = mDB1.countTable("WiFiPoints", "count(BSSID) AS Count");
+        assertEquals(records, count);
+
+        // test for empty latitude and longitude
+        mDB1.clearDataBase();
+        InsertWiFiTestGood(records, false);
+        InsertWiFiTestAbend(records, false);
+
+        mDB1.aggregateAndClear(dtBegin, dtEnd);
+        count = mDB1.countTable("WiFiPoints", "count(BSSID) AS Count");
+        assertEquals(records, count);
+
+        // test for exist latitude and longitude and clear WiFi and Protocol tables
+        dtBegin = new Date().getTime();
+        dtEnd   = dtBegin+24*60*60*1000;
+
+        mDB1.clearDataBase();
+        InsertWiFiTestGood(records, true);
+        InsertWiFiTestAbend(records, true);
+
+        mDB1.aggregateAndClear(dtBegin, dtEnd);
+        count = mDB1.countTable("WiFiPoints", "count(BSSID) AS Count");
+        assertEquals(records, count);
+        count = mDB1.countTable("WiFiPoints", "count(BSSID) AS Count","SSID like 'SSID%'");
+        assertEquals(records, count);
+        count = mDB1.countTable("WiFiPoints", "count(BSSID) AS Count","BSSID like 'BSSID%'");
+        assertEquals(records, count);
+        count = mDB1.countTable("WiFiPoints", "count(BSSID) AS Count","SSID not like 'SSID%'");
+        assertEquals(0, count);
+        count = mDB1.countTable("WiFiPoints", "count(BSSID) AS Count","BSSID not like 'BSSID%'");
+        assertEquals(0, count);
+        count = mDB1.countTable("WiFi", "count(*) AS Count");
+        assertEquals(0, count);
+        count = mDB1.countTable("Protocol", "count(*) AS Count");
+        assertEquals(0, count);
 
     }
 

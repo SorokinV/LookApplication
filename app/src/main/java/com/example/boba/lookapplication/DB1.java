@@ -282,7 +282,7 @@ public class DB1{
                 "select min(datetime) as dtBegin," +
                 "max(datetime) as dtEnd," +
                 "count(datetime) as looks," +
-                "BSSID,SSID," +
+                "SSID,BSSID," +
                 "avg(dB) as dB," +
                 "avg(Latitude) as Latitude," +
                 "avg(Longitude) as Longitude," +
@@ -293,20 +293,31 @@ public class DB1{
         String select4 = "create temp table stemp2 as " + select3;
         String select5 = "create temp table stemp11 as select * from stemp2 where not exists (select old.BSSID from WiFiPoints old where BSSID=old.BSSID)";
         String select6 = "create temp table stemp12 as select * from stemp2 where     exists (select old.BSSID from WiFiPoints old where BSSID=old.BSSID)";
-        String insert = "insert into WiFiPoints select * from stemp11";
+        String insert  = "insert into WiFiPoints(dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities)"
+                +" select dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities from stemp11";
+        String delete0 = "delete from WiFi     where datetime between "+dtBegin+" and "+dtEnd+" ";
+        String delete1 = "delete from protocol where dtBegin  between "+dtBegin+" and "+dtEnd+" ";
 
         database.execSQL(select0);
         database.execSQL(select4);
         database.execSQL(select5);
         database.execSQL(select6);
         database.execSQL(insert);
+        // ??? database.execSQL(update);
+        database.execSQL(delete0);
+        database.execSQL(delete1);
+        database.execSQL("DROP TABLE IF EXISTS stemp1");
+        database.execSQL("DROP TABLE IF EXISTS stemp2");
+        database.execSQL("DROP TABLE IF EXISTS stemp11");
+        database.execSQL("DROP TABLE IF EXISTS stemp12");
 
     }
 
     public int deleteRecords()     { deleteWiFiRecords(); deleteProtocols(); return(0);}
     public int deleteWiFiRecords() { return(database.delete(WiFi_TABLE, null, null)); }
     public int deleteProtocols()   { return(database.delete(PRTC_TABLE, null, null)); }
-    public void clearDataBase() {deleteRecords();}
+    public int deleteWiFiPoints()  { return(database.delete("WiFiPoints", null, null)); }
+    public void clearDataBase() {deleteRecords();deleteWiFiPoints();}
     public void close() {database.close();}
 
     public String  getPath() {return(database.getPath());}
