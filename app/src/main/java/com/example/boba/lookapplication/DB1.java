@@ -295,6 +295,9 @@ public class DB1{
         String select6 = "create temp table stemp12 as select * from stemp2 where     exists (select old.BSSID from WiFiPoints old where BSSID=old.BSSID)";
         String insert  = "insert into WiFiPoints(dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities)"
                 +" select dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities from stemp11";
+        String update  = "insert or replace into WiFiPoints(dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities)"
+                +" select dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities from stemp12 A "+
+                "where A.Latitude NOT NULL AND EXISTS (select B.BSSID from WiFiPoints B where A.BSSID=B.BSSID and A.dB>B.dB)";
         String delete0 = "delete from WiFi     where datetime between "+dtBegin+" and "+dtEnd+" ";
         String delete1 = "delete from protocol where dtBegin  between "+dtBegin+" and "+dtEnd+" ";
 
@@ -303,7 +306,7 @@ public class DB1{
         database.execSQL(select5);
         database.execSQL(select6);
         database.execSQL(insert);
-        // ??? database.execSQL(update);
+        database.execSQL(update);
         database.execSQL(delete0);
         database.execSQL(delete1);
         database.execSQL("DROP TABLE IF EXISTS stemp1");
