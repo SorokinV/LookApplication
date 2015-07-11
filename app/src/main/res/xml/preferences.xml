@@ -12,22 +12,22 @@
             android:summary="@string/pref_beep_summary"/>
 
         <EditTextPreference
-        android:defaultValue="@string/pref_delayS"
-        android:dialogTitle="@string/pref_delayS_dialogtitle"
-        android:key="pref_delayS"
-        android:inputType="number"
-        android:numeric="integer"
-        android:summary="@string/pref_delayS_summary"
-        android:title="@string/pref_delayS_title" />
+            android:defaultValue="@string/pref_delayS"
+            android:dialogTitle="@string/pref_delayS_dialogtitle"
+            android:key="pref_delayS"
+            android:inputType="number"
+            android:numeric="integer"
+            android:summary="@string/pref_delayS_summary"
+            android:title="@string/pref_delayS_title" />
 
-    <EditTextPreference
-        android:defaultValue="@string/pref_timeM"
-        android:dialogTitle="@string/pref_timeM_dialogtitle"
-        android:key="pref_timeM"
-        android:inputType="number"
-        android:numeric="integer"
-        android:summary="@string/pref_timeM_summary"
-        android:title="@string/pref_timeM_title" />
+        <EditTextPreference
+            android:defaultValue="@string/pref_timeM"
+            android:dialogTitle="@string/pref_timeM_dialogtitle"
+            android:key="pref_timeM"
+            android:inputType="number"
+            android:numeric="integer"
+            android:summary="@string/pref_timeM_summary"
+            android:title="@string/pref_timeM_title" />
 
     </PreferenceCategory>
 
