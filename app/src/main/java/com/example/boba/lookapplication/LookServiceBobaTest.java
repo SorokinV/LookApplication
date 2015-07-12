@@ -163,8 +163,10 @@ public class LookServiceBobaTest extends IntentService {
 
         Toast.makeText(this, "service destroy (file size)="+wif.fSize(), Toast.LENGTH_SHORT).show();
         if (OKDBUse) {
+            /*
             Toast.makeText(this, "DB (count,BSSID,looks)=" + database.countAllRecords() + " " + database.countAllBSSID() + " " + database.countAllLooks(),
                     Toast.LENGTH_LONG).show();
+            */
             database.createRecords(dtBegin,dtEnd);
             database.close();
         }
