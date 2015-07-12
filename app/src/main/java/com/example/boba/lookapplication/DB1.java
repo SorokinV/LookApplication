@@ -19,6 +19,8 @@ public class DB1{
 
     private Context mContext;
 
+    File   file = null;
+
     public final static String NameDB = "LookApplication.db";
 
     public final static String PRTC_TABLE ="Protocol";            // name of common table
@@ -45,14 +47,14 @@ public class DB1{
      *
      */
     public DB1(Context context){
-        File   file = new File(context.getExternalFilesDir(null),NameDB);
+        file = new File(context.getExternalFilesDir(null),NameDB);
         dbHelper = new DataBaseHelper1(context,file.getPath());
         database = dbHelper.getWritableDatabase();
         mContext = context;
     }
 
     public DB1(Context context, String nameDB){
-        File   file = new File(context.getExternalFilesDir(null),nameDB);
+        file = new File(context.getExternalFilesDir(null),nameDB);
         dbHelper = new DataBaseHelper1(context,file.getPath());
         database = dbHelper.getWritableDatabase();
         mContext = context;
@@ -271,11 +273,62 @@ public class DB1{
         return(true);
     }
 
+    public void aggregateAndClear (long dtBegin, long dtEnd) {
+
+        String select0 = "create temp table stemp1 as select DISTINCT BSSID,SSID from WiFi where datetime between "+dtBegin+" and "+dtEnd+" ";
+        String select1 = "select BSSID from stemp1";
+        String select2 = "select * from WiFiPoints where BSSID in ("+select1+") order by BSSID ASC, SSID ASC";
+        String select3 =
+                "select min(datetime) as dtBegin," +
+                "max(datetime) as dtEnd," +
+                "count(datetime) as looks," +
+                "SSID,BSSID," +
+                "avg(dB) as dB," +
+                "avg(Latitude) as Latitude," +
+                "avg(Longitude) as Longitude," +
+                "min(capabalities) as minCapabalities," +
+                "max(capabalities) as maxCapabalities " +
+                "from WiFi where BSSID in (" + select1 + ") group by BSSID,SSID"
+                ;
+        String select4 = "create temp table stemp2 as " + select3;
+        String select5 = "create temp table stemp11 as select * from stemp2 where not exists (select old.BSSID from WiFiPoints old where BSSID=old.BSSID)";
+        String select6 = "create temp table stemp12 as select * from stemp2 where     exists (select old.BSSID from WiFiPoints old where BSSID=old.BSSID)";
+        String insert  = "insert into WiFiPoints(dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities)"
+                +" select dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities from stemp11";
+        String update  = "insert or replace into WiFiPoints(dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities)"
+                +" select dtBegin,dtEnd,looks,SSID,BSSID,dB,Latitude,Longitude,minCapabalities,maxCapabalities from stemp12 A "+
+                "where A.Latitude NOT NULL AND EXISTS (select B.BSSID from WiFiPoints B where A.BSSID=B.BSSID and A.dB>B.dB)";
+        String delete0 = "delete from WiFi     where datetime between "+dtBegin+" and "+dtEnd+" ";
+        String delete1 = "delete from protocol where dtBegin  between "+dtBegin+" and "+dtEnd+" ";
+
+        database.execSQL(select0);
+        database.execSQL(select4);
+        database.execSQL(select5);
+        database.execSQL(select6);
+        database.execSQL(insert);
+        database.execSQL(update);
+        database.execSQL(delete0);
+        database.execSQL(delete1);
+        database.execSQL("DROP TABLE IF EXISTS stemp1");
+        database.execSQL("DROP TABLE IF EXISTS stemp2");
+        database.execSQL("DROP TABLE IF EXISTS stemp11");
+        database.execSQL("DROP TABLE IF EXISTS stemp12");
+
+    }
+
     public int deleteRecords()     { deleteWiFiRecords(); deleteProtocols(); return(0);}
     public int deleteWiFiRecords() { return(database.delete(WiFi_TABLE, null, null)); }
     public int deleteProtocols()   { return(database.delete(PRTC_TABLE, null, null)); }
-    public void clearDataBase() {deleteRecords();}
+    public int deleteWiFiPoints()  { return(database.delete("WiFiPoints", null, null)); }
+    public void clearDataBase() {deleteRecords();deleteWiFiPoints();}
     public void close() {database.close();}
 
-    public String getPath() {return(database.getPath());}
+    public String  getPath() {return(database.getPath());}
+    public void    upgradeDB() {dbHelper.onUpgrade(database,0,1);}
+    /*
+    public boolean deleteDatabase() {
+        if (file!=null) return(SQLiteDatabase.deleteDatabase(file));
+        return(false);
+    }
+    */
 }
