@@ -90,5 +90,6 @@
     <string name="pref_special_title">Special</string>
     <string name="pref_special_key">Special key</string>
     <string name="title_activity_show_db">ShowDB</string>
+    <string name="title_activity_show_sensors_values">ShowSensorsValues</string>
 
 </resources>

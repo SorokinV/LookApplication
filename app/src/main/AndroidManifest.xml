@@ -20,6 +20,7 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -52,6 +53,10 @@
         <activity
             android:name=".ShowDB"
             android:label="@string/title_activity_show_db" >
+        </activity>
+        <activity
+            android:name=".ShowSensorsValues"
+            android:label="@string/title_activity_show_sensors_values" >
         </activity>
     </application>
 

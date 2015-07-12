@@ -409,6 +409,7 @@
     <string name="title_activity_setting">Setting</string>
     <string name="title_activity_show_db">ShowDB</string>
     <string name="title_activity_show_sensors">Show Sensors</string>
+    <string name="title_activity_show_sensors_values">ShowSensorsValues</string>
     <string name="title_activity_show_wi_fi">Show WiFi</string>
     <!-- From: file:/C:/Boba/Android/AndroidStudioProjects/LookApplication/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/res/values/wallet_strings.xml -->
     <eat-comment/>

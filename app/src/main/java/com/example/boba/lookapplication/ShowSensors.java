@@ -1,12 +1,14 @@
 package com.example.boba.lookapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -84,6 +86,11 @@ public class ShowSensors extends ActionBarActivity {
         int Count = 0; if (deviceSensors!=null) Count = deviceSensors.size();
         return(Count);
 
+    }
+
+    public void ClickShowSensorsValue (View view) {
+        Intent intent = new Intent(this,ShowSensorsValues.class);
+        startActivity(intent);
     }
 
 }

@@ -76,6 +76,10 @@
             android:name="com.example.boba.lookapplication.ShowDB"
             android:label="@string/title_activity_show_db" >
         </activity>
+        <activity
+            android:name="com.example.boba.lookapplication.ShowSensorsValues"
+            android:label="@string/title_activity_show_sensors_values" >
+        </activity>
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
