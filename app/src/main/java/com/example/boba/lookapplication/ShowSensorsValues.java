@@ -13,6 +13,18 @@ import android.widget.TextView;
 
 import java.util.List;
 
+//
+//  2015-07-13 22:50 after 10 hours try and errors: Decision:
+//
+//    1. on input use LinearAccelerator with calibration
+//    2. Gravity and GeoMagnetic calibrate, but don't use calibration values
+//    3. acceleration must be zero if less 3*dispersionLengthVector
+//    4. speed must be zero if acceleration is zero.
+//    5. filter don't use
+//
+//  goal: get stability in rest and correct distance calculation in move
+//
+//
 
 public class ShowSensorsValues extends ActionBarActivity implements SensorEventListener {
 
@@ -60,6 +72,13 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     Calibration cAccelerometer    = new Calibration(SensorManager.GRAVITY_EARTH);
     Calibration cAccelerometerL   = new Calibration(0.0f);
 
+    // for testing, looking on raw data
+
+    boolean debugOk = true;
+    long      dtBegin    = System.currentTimeMillis();
+    long      dtDebug    = dtBegin+30*1000; // after N seconds
+    long      dtEnd      = dtDebug+30*1000; // after dtDebug end collect datas
+    WriteFile writeFile  = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,14 +137,14 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 v = cAccelerometer.getValue(v);
                 // v = accFilter.get(event.values);
                 tAccelerometer.setText(String.format("%8.4f %8.4f %8.4f", v[0], v[1], v[2]));
-                point = addMove(point, event.timestamp, v, gravity, geomagnetic);
-                tPoint.setText(String.format("%8.4f %8.4f %8.4f", point[0], point[1], point[2]));
+                //point = addMove(point, event.timestamp, v, gravity, geomagnetic);
+                //tPoint.setText(String.format("%8.4f %8.4f %8.4f", point[0], point[1], point[2]));
                 break;
             }
             case Sensor.TYPE_GRAVITY : {
                 float[] v = event.values;
                 if (!cGravity.isCalibrate()) {cGravity.add(v); break;}
-                v = cGravity.getValue(v);
+                // v = cGravity.getValue(v);
                 //v = graFilter.get(event.values);
                 tGravity.setText(String.format("%8.4f %8.4f %8.4f", v[0], v[1], v[2]));
                 gravity = v;
@@ -135,15 +154,21 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 tGyroscope.setText(String.format("%8.4f %8.4f %8.4f", event.values[0], event.values[1], event.values[2]));
                 break;
             case Sensor.TYPE_LINEAR_ACCELERATION : {
-                float[] v = aclFilter.get(event.values);
-                //tLinear_Acceleration.setText(String.format("%7.3f %7.3f %7.3f", event.values[0], event.values[1], event.values[2]));
+                float[] v = event.values;
+                if (!cAccelerometerL.isCalibrate()) {cAccelerometerL.add(v); break;}
+                if ((gravity==null)||(geomagnetic==null)) break;
+                // v = cAccelerometerL.getValue(v);
+                // float[] v = aclFilter.get(event.values);
+                // tLinear_Acceleration.setText(String.format("%7.3f %7.3f %7.3f", event.values[0], event.values[1], event.values[2]));
                 tLinear_Acceleration.setText(String.format("%8.4f %8.4f %8.4f", v[0], v[1], v[2]));
+                point = addMove(point, event.timestamp, v, gravity, geomagnetic);
+                tPoint.setText(String.format("%8.4f %8.4f %8.4f", point[0], point[1], point[2]));
                 break;
             }
             case Sensor.TYPE_MAGNETIC_FIELD : {
                 float[] v = event.values;
                 if (!cMagnetic_Field.isCalibrate()) {cMagnetic_Field.add(v); break;}
-                v = cMagnetic_Field.getValue(v);
+                //v = cMagnetic_Field.getValue(v);
                 //v = graFilter.get(event.values);
                 tMagnetic_Field.setText(String.format("%8.4f %8.4f %8.4f", v[0], v[1], v[2]));
                 geomagnetic = v;
@@ -212,24 +237,35 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         float[]  II     = new float[]{0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
         float[]  sAcc   = cAccelerometer.getSigma();
         float[]  sGra   = cGravity.getSigma();
-        float    dispAbs= cAccelerometer.getSigmaAbs()+cGravity.getSigmaAbs();
+        float    dispAbs= cAccelerometerL.getSigmaAbs();
+        float    error3sigma = 9*dispAbs*dispAbs;
 
         if ((gravity==null)||(geomagnetic==null)) return(point);
-        double a0x = a[0]-gravity[0], a0y = a[1]-gravity[1], a0z = a[2]-gravity[2];
-
-        if (Math.abs(a0x)<3*(sAcc[0]+sGra[0])) a0x =0.0;
-        if (Math.abs(a0y)<3*(sAcc[1]+sGra[1])) a0y =0.0;
-        if (Math.abs(a0z)<3*(sAcc[2]+sGra[2])) a0z =0.0;
-
-        if (Math.abs(a0x)<3*dispAbs) a0x =0.0;
-        if (Math.abs(a0y)<3*dispAbs) a0y =0.0;
-        if (Math.abs(a0z)<3*dispAbs) a0z =0.0;
-
         if (this.timestamp==0) {this.timestamp=timestamp; return(point);}
         double  dt = ((timestamp-this.timestamp)*1e-9); this.timestamp=timestamp;
 
-        if (Math.abs(a0x+a0y+a0z)<3*dispAbs) {speed[0]=0.0;speed[1]=0.0;speed[2]=0.0; return(point);}
+        double a0x = a[0]-gravity[0], a0y = a[1]-gravity[1], a0z = a[2]-gravity[2];
+        a0x = a[0]; a0y = a[1]; a0z = a[2];
 
+        printDebug(String.format( "add1: t=%15d " +
+                        "a=( %11.6f:%11.6f:%11.6f) " +
+                        "a0=( %11.6f:%11.6f:%11.6f) " +
+                        "sAcc=( %11.6f:%11.6f:%11.6f) " +
+                        "sGra=( %11.6f:%11.6f:%11.6f) " +
+                        "dispAbs=%11.6f " +
+                        "gr=( %11.6f:%11.6f:%11.6f) " +
+                        "geo=( %11.6f:%11.6f:%11.6f) ",
+                timestamp,
+                a[0],a[1],a[2],
+                a0x,a0y,a0z,
+                sAcc[0],sAcc[1],sAcc[2],
+                sGra[0],sGra[1],sGra[2],
+                dispAbs,
+                gravity[0],gravity[1],gravity[2],
+                geomagnetic[0],geomagnetic[1],geomagnetic[2]));
+
+
+        if ((a0x*a0x+a0y*a0y+a0z*a0z)<=error3sigma) {speed[0]=0.0;speed[1]=0.0;speed[2]=0.0; return(point);}
 
         SensorManager.getRotationMatrix(RR,II,gravity,geomagnetic);
 
@@ -240,12 +276,6 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         double ax = ax0*II[0]+ay0*II[1]+az0*II[2];
         double ay = ax0*II[3]+ay0*II[4]+az0*II[5];
         double az = ax0*II[6]+ay0*II[7]+az0*II[8];
-        /*
-        ax = ax0;
-        ay = ay0;
-        az = az0;
-        */
-
 
         newPoint[0] = (point[0]+ax*0.5*dt*dt)+speed[0]*dt;
         newPoint[1] = (point[1]+ay*0.5*dt*dt)+speed[1]*dt;
@@ -259,7 +289,33 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         speed[1]   = 0.0;
         speed[2]   = 0.0;
     */
+
+        printDebug(String.format( "add2: dt-->%12.6f" +
+                        "af=( %11.6f:%11.6f:%11.6f) " +
+                        "af=( %11.6f:%11.6f:%11.6f) ",
+                dt,
+                ax,ay,az,
+                speed[0],speed[1],speed[2]
+        ));
+
         return(newPoint);
+    }
+
+    void printDebug(String text) {
+        if (debugOk&&(dtDebug<=System.currentTimeMillis())&&(System.currentTimeMillis()<=dtEnd)) printDebug0(text);
+
+        if (debugOk&&(writeFile!=null)&&(dtEnd<System.currentTimeMillis())) {
+            debugOk = false;
+            if (writeFile!=null) writeFile.close();
+            writeFile = null;
+        }
+    }
+
+    void printDebug0(String text) {
+        if (debugOk) {
+            if (writeFile==null) writeFile = new WriteFile(this,"bobaSensors.log",false);
+            writeFile.writeRecord(text);
+        }
     }
 
     //
@@ -316,7 +372,6 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         float[][] calibration  = new float[max][3];
         float[]   mean         = new float[] {0.0f,0.0f,0.0f};
         float[]   disp         = new float[] {0.0f,0.0f,0.0f};
-        float[]   std          = new float[] {0.0f,0.0f,0.0f};
         boolean   calibrate    = false;
         float     meanExpected = 0.0f;
         float     dispAbs      = 0.0f;
@@ -350,11 +405,20 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
             dispAbs = (float)Math.sqrt(disp[0]*disp[0]+disp[1]*disp[1]+disp[2]*disp[2]);
 
+            float meanXYZ = (float)Math.sqrt(mean[0] * mean[0] + mean[1] * mean[1] + mean[2] * mean[2]);
             if (Math.abs(meanExpected)>0.001f) {
-                float meanXYZ = (float)Math.sqrt(mean[0] * mean[0] + mean[1] * mean[1] + mean[2] * mean[2]);
                 mean[0]*=((meanXYZ-meanExpected)/meanExpected);
                 mean[1]*=((meanXYZ-meanExpected)/meanExpected);
                 mean[2]*=((meanXYZ-meanExpected)/meanExpected);
+            }
+
+            if (debugOk) {
+                printDebug0("Calibrate");
+                for (int i = 0; i < max; i++)
+                    printDebug0(String.format("%4d %11.6f %11.6f %11.6f", i, calibration[i][0], calibration[i][1], calibration[i][2]));
+                printDebug0(String.format(" mean %11.6f %11.6f %11.6f", mean[0], mean[1], mean[2]));
+                printDebug0(String.format(" disp %11.6f %11.6f %11.6f", disp[0], disp[1], disp[2]));
+                printDebug0(String.format(" Abs %11.6f Expected %11.6f  meanABS %11.6f", dispAbs, meanExpected,meanXYZ));
             }
 
             calibrate = true;
