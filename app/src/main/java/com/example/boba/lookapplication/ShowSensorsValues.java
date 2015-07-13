@@ -58,6 +58,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     Calibration cGravity          = new Calibration(SensorManager.GRAVITY_EARTH);
     Calibration cMagnetic_Field   = new Calibration(SensorManager.MAGNETIC_FIELD_EARTH_MAX);
     Calibration cAccelerometer    = new Calibration(SensorManager.GRAVITY_EARTH);
+    Calibration cAccelerometerL   = new Calibration(0.0f);
 
 
     @Override
@@ -112,8 +113,8 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER : {
                 float[] v  = event.values;
-                if ((gravity==null)||(geomagnetic==null)) break;
                 if (!cAccelerometer.isCalibrate()) {cAccelerometer.add(v); break;}
+                if ((gravity==null)||(geomagnetic==null)) break;
                 v = cAccelerometer.getValue(v);
                 // v = accFilter.get(event.values);
                 tAccelerometer.setText(String.format("%8.4f %8.4f %8.4f", v[0], v[1], v[2]));
@@ -211,18 +212,26 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         float[]  II     = new float[]{0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
         float[]  sAcc   = cAccelerometer.getSigma();
         float[]  sGra   = cGravity.getSigma();
+        float    dispAbs= cAccelerometer.getSigmaAbs()+cGravity.getSigmaAbs();
 
+        if ((gravity==null)||(geomagnetic==null)) return(point);
         double a0x = a[0]-gravity[0], a0y = a[1]-gravity[1], a0z = a[2]-gravity[2];
 
         if (Math.abs(a0x)<3*(sAcc[0]+sGra[0])) a0x =0.0;
         if (Math.abs(a0y)<3*(sAcc[1]+sGra[1])) a0y =0.0;
         if (Math.abs(a0z)<3*(sAcc[2]+sGra[2])) a0z =0.0;
 
+        if (Math.abs(a0x)<3*dispAbs) a0x =0.0;
+        if (Math.abs(a0y)<3*dispAbs) a0y =0.0;
+        if (Math.abs(a0z)<3*dispAbs) a0z =0.0;
+
         if (this.timestamp==0) {this.timestamp=timestamp; return(point);}
-        if ((gravity==null)||(geomagnetic==null)) return(point);
+        double  dt = ((timestamp-this.timestamp)*1e-9); this.timestamp=timestamp;
+
+        if (Math.abs(a0x+a0y+a0z)<3*dispAbs) {speed[0]=0.0;speed[1]=0.0;speed[2]=0.0; return(point);}
+
 
         SensorManager.getRotationMatrix(RR,II,gravity,geomagnetic);
-        double  dt = ((timestamp-this.timestamp)*1e-9); this.timestamp=timestamp;
 
         double ax0 = a0x*RR[0]+a0y*RR[1]+a0z*RR[2];
         double ay0 = a0x*RR[3]+a0y*RR[4]+a0z*RR[5];
@@ -307,8 +316,10 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         float[][] calibration  = new float[max][3];
         float[]   mean         = new float[] {0.0f,0.0f,0.0f};
         float[]   disp         = new float[] {0.0f,0.0f,0.0f};
+        float[]   std          = new float[] {0.0f,0.0f,0.0f};
         boolean   calibrate    = false;
         float     meanExpected = 0.0f;
+        float     dispAbs      = 0.0f;
 
         public Calibration (float expected) {
             meanExpected = expected;
@@ -337,6 +348,8 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             disp[1] = (float)Math.sqrt(disp[1]);
             disp[2] = (float)Math.sqrt(disp[2]);
 
+            dispAbs = (float)Math.sqrt(disp[0]*disp[0]+disp[1]*disp[1]+disp[2]*disp[2]);
+
             if (Math.abs(meanExpected)>0.001f) {
                 float meanXYZ = (float)Math.sqrt(mean[0] * mean[0] + mean[1] * mean[1] + mean[2] * mean[2]);
                 mean[0]*=((meanXYZ-meanExpected)/meanExpected);
@@ -348,6 +361,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         }
 
         public float[] getValue (float[] v) {
+            if (!calibrate) return(v);
             float[] vv = new float[3];
             vv[0] = v[0]-mean[0]; vv[1] = v[1]-mean[1]; vv[2] = v[2]-mean[2];
             return (vv);
@@ -355,6 +369,10 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
         public float[] getSigma () {
             return (disp);
+        }
+
+        public float   getSigmaAbs () {
+            return (dispAbs);
         }
 
         public boolean isCalibrate () {return(calibrate);}
