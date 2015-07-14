@@ -11,8 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.util.List;
-
 //
 //  2015-07-13 22:50 after 10 hours try and errors: Decision:
 //
@@ -515,7 +513,14 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
     }
 
-     static public class BufferCircular {
+    //
+    // Circular buffer on max points:(time and values=float[3])
+    //
+    //
+    // TODO: 2015-07-14 Decision: What is result calculate when time<minTime or maxTime<time (now result is zero)
+    //
+
+    static public class BufferCircular {
         int max = 100;
         int first = -1;
         int last = -1;
@@ -526,6 +531,15 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         float[][] values = new float[max][];
         long[] times = new long[max];
 
+        public BufferCircular() {super();}
+
+        public BufferCircular(int max) {
+            super();
+            this.max = max;
+            values = new float[max][];
+            times =  new long[max];
+        }
+
         public void add(long time, float[] values) {
             if ((time == minTime) || (time == maxTime)) return;
             if (time > maxTime) {
@@ -533,7 +547,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 if (first == -1) first = last;
                 this.values[last] = values;
                 this.times[last] = time;
-                maxTime = time;
+                maxTime = time; if (first==last) minTime = time;
             } else addMiddle(time, values);
         }
 
@@ -547,29 +561,19 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 times[first] = time;
                 minTime = time;
             }
-            if (maxTime < time) {
-                add(time, values);
-                return;
-            }
+            if (maxTime < time) {add(time, values); return; }
             for (int i = first; 1 == 1; i++)
-                if (times[i % max] >= time) {
-                    i1 = i % max;
-                    break;
-                }
+                if (times[i % max] >= time) { i1 = i % max; break; }
             if (times[i1] == time) return;
             i0 = i1;
-            i1 = (last + 1) % max;
-            if (i0 > i1) i1 += max;
-            float[] tempV = this.values[i0];
-            long tempT = this.times[i0];
-            this.values[i0] = values;
-            this.times[i0] = time;
-            for (int i = i0; i < i1; i++) {
-                this.values[i % max] = tempV;
-                this.times[i % max] = tempT;
-                tempV = this.values[(i + 1) % max];
-                tempT = this.times[(i + 1) % max];
+            i1 = (last + 1) % max; if (i0 > i1) i1 += max;
+            for (int i = i1; i > i0; i--) {
+                this.values[i % max] = this.values[(i-1) % max];
+                this.times[i % max] = this.times[(i-1) % max];
             }
+            this.values[i0 % max] = values;
+            this.times [i0 % max] = time;
+
             last = (last + 1) % max;
             return;
         }
@@ -587,7 +591,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             i0 = i1 - 1;
             if (i0 < 0) i0 += max;
             for (int i = 0; i < 3; i++)
-                result[i] = (values[i1][i] - values[i0][i]) * (time - times[i0]) / (times[i1] - times[i0]);
+                result[i] = values[i0][i]+(values[i1][i] - values[i0][i]) * (time - times[i0]) / (times[i1] - times[i0]);
             return result;
         }
 
@@ -602,22 +606,18 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         public void setMinTime(long time) {
             int i0, i1;
             if (time < minTime) return;
-            if (maxTime < time) {
-                first = last;
-                return;
-            }
+            if (maxTime < time) { first = last; minTime = maxTime; return; }
             for (int i = first; 1 == 1; i++)
-                if (times[i % max] >= time) {
-                    i1 = i;
-                    break;
-                }
-            if (times[i1] == time) {
-                first = i1;
-                return;
-            }
-            i0 = i1 - 1;
-            if (i0 < 0) i0 += max;
-            first = i0;
+                if (times[i % max] >= time) { i1 = i%max; break; }
+            if (times[i1] == time) { first = i1; minTime=times[first]; return; }
+            i0 = i1 - 1; if (i0 < 0) i0 += max;
+            first = i0; minTime=times[i0];
+        }
+
+        public int length() {
+            if (first<0) return(0);
+            if (first<=last) return(last-first+1);
+            return(last+max-first+1);
         }
     }
 
