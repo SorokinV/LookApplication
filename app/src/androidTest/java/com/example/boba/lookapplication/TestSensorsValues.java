@@ -243,4 +243,55 @@ public class TestSensorsValues  {
 
     }
 
+    @Test
+    public void test_buffer_main() {
+
+        ShowSensorsValues.BufferMain bufferMain = new ShowSensorsValues.BufferMain();
+
+        //
+        // Empty buffer
+        //
+
+        Assert.assertEquals(0, bufferMain.getMinTime());
+        Assert.assertEquals(0, bufferMain.getMaxTime());
+
+        double[] ns;
+
+        //
+        // check newSpeed
+        //
+        // TODO: precisely check low noise border
+        //
+
+        ns = bufferMain.newSpeed(0.20,new double[]{0.0,0.0,0.0},new float[]{1.0f,1.0f,1.0f},0.004);
+        Assert.assertEquals(0.2,ns[0],0.0001);
+        Assert.assertEquals(0.2,ns[1],0.0001);
+        Assert.assertEquals(0.2,ns[2],0.0001);
+
+        ns = bufferMain.newSpeed(0.20,new double[]{0.0,0.0,0.0},new float[]{1.0f,1.0f,1.0f},3.0);
+        Assert.assertEquals(0.0,ns[0],0.0001);
+        Assert.assertEquals(0.0,ns[1],0.0001);
+        Assert.assertEquals(0.0,ns[2],0.0001);
+
+        ns = bufferMain.newSpeed(0.20,new double[]{0.0,0.0,0.0},new float[]{1.0f,1.0f,1.0f},Math.sqrt(3/9));
+        Assert.assertEquals(0.2,ns[0],0.0001);
+        Assert.assertEquals(0.2,ns[1],0.0001);
+        Assert.assertEquals(0.2,ns[2],0.0001);
+
+        //
+        // check newStep
+        //
+
+        ns = bufferMain.newStep(1.0,
+                new double[]{0.0,0.0,0.0}, // speed
+                new float[]{1.0f,1.0f,1.0f}, // acceleration
+                new float[]{0.0f,0.0f,1.0f}, // gravity (z-->down)
+                new float[]{0.0f,1.0f,0.0f}, // geo-magnetic (y-->nord)
+                0.001f);
+        Assert.assertEquals(1,ns[0],0.0001);
+        Assert.assertEquals(1,ns[1],0.0001);
+        Assert.assertEquals(1,ns[2],0.0001);
+
+
+    }
 }

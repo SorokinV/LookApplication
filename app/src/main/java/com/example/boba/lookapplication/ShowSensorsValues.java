@@ -274,7 +274,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     // TODO: Check: why not call setMinTime ?
     //
 
-    class Calibration {
+    static class Calibration {
         int max = 100;
         int iii = 0;
         float[][] calibration = new float[max][3];
@@ -324,20 +324,6 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 mean[2] *= ((meanXYZ - meanExpected) / meanExpected);
             }
 
-            if (debugOk) {
-                printDebug0("Calibrate");
-                float ccc = 0.0f;
-                for (int i = 0; i < max; i++) {
-                    ccc = (float) Math.sqrt(calibration[i][0] * calibration[i][0] + calibration[i][1] * calibration[i][1] + calibration[i][2] * calibration[i][2]);
-                    printDebug0(String.format("%4d %11.6f %11.6f %11.6f m=%11.6f d=%11.6f", i, calibration[i][0], calibration[i][1], calibration[i][2], ccc, ccc - meanExpected));
-                }
-                ccc = meanXYZ;
-                printDebug0(String.format(" mean %11.6f %11.6f %11.6f m=%11.6f d=%11.6f", mean[0], mean[1], mean[2], meanXYZ, meanXYZ - meanExpected));
-                ccc = (float) Math.sqrt(disp[0] * disp[0] + disp[1] * disp[1] + disp[2] * disp[2]);
-                printDebug0(String.format(" disp %11.6f %11.6f %11.6f m=%11.6f", disp[0], disp[1], disp[2], ccc));
-                printDebug0(String.format(" Abs %11.6f Expected %11.6f  meanABS %11.6f", dispAbs, meanExpected, meanXYZ));
-            }
-
             calibrate = true;
         }
 
@@ -369,7 +355,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     //
     //
     //
-    public class BufferMain extends BufferCircular {
+    static public class BufferMain extends BufferCircular {
 
         double[][] xyz = new double[max][3];
         double[][] speed = new double[max][3];
