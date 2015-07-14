@@ -14,8 +14,7 @@ import java.io.File;
  * Created by boba2 on 14.07.2015.
  */
 @RunWith(AndroidJUnit4.class)
-
-public class TestSensorsValues extends ShowSensorsValues {
+public class TestSensorsValues  {
 
     public static final String TAG = "TestSensorsValues";
 
@@ -30,15 +29,18 @@ public class TestSensorsValues extends ShowSensorsValues {
         // Empty buffer
         //
 
-        BufferCircular circular = new BufferCircular();
+        ShowSensorsValues.BufferCircular circular = new ShowSensorsValues.BufferCircular();
 
         Assert.assertEquals(0,circular.getMinTime());
         Assert.assertEquals(0, circular.getMaxTime());
 
         float[] point;
-        point = circular.calculate(-1); Assert.assertEquals(new float[]{0.0f,0.0f,0.0f}, point);
-        point = circular.calculate(1);  Assert.assertEquals(new float[]{0.0f,0.0f,0.0f}, point);
-        point = circular.calculate(0);  Assert.assertEquals(new float[]{0.0f,0.0f,0.0f}, point);
+        point = circular.calculate(-1);
+        Assert.assertTrue((point[0]==0.0f&&point[0]==0.0f&&point[0]==0.0f));
+        point = circular.calculate(1);
+        Assert.assertTrue((point[0] == 0.0f && point[0] == 0.0f && point[0] == 0.0f));
+        point = circular.calculate(0);
+        Assert.assertTrue((point[0] == 0.0f && point[0] == 0.0f && point[0] == 0.0f));
 
     }
 

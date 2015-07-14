@@ -272,6 +272,10 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
     }
 
+    //
+    // TODO: Check: why not call setMinTime ?
+    //
+
     class Calibration {
         int max = 100;
         int iii = 0;
@@ -511,7 +515,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
     }
 
-    public class BufferCircular {
+     static public class BufferCircular {
         int max = 100;
         int first = -1;
         int last = -1;
@@ -573,7 +577,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         public float[] calculate(long time) {
             float[] result = new float[]{0.0f, 0.0f, 0.0f};
             int i0, i1;
-            if ((time < minTime) || (maxTime < time)) return result;
+            if ((first<0)||(time < minTime) || (maxTime < time)) return result;
             for (int i = first; 1 == 1; i++)
                 if (times[i % max] >= time) {
                     i1 = i % max;
