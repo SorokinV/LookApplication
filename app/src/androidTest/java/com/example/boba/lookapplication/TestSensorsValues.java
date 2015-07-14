@@ -165,6 +165,81 @@ public class TestSensorsValues  {
         Assert.assertEquals(5, circular.length());
         Assert.assertEquals(402, circular.getMinTime());
         Assert.assertEquals(500, circular.getMaxTime());
+        circular.setMinTime(450);
+        Assert.assertEquals(2, circular.length());
+        Assert.assertEquals(405, circular.getMinTime());
+        Assert.assertEquals(500, circular.getMaxTime());
+        circular.setMinTime(500);
+        Assert.assertEquals(1, circular.length());
+        Assert.assertEquals(500, circular.getMinTime());
+        Assert.assertEquals(500, circular.getMaxTime());
+        circular.setMinTime(600);
+        Assert.assertEquals(1, circular.length());
+        Assert.assertEquals(500, circular.getMinTime());
+        Assert.assertEquals(500, circular.getMaxTime());
+
+        circular = new ShowSensorsValues.BufferCircular(10);
+        Assert.assertEquals(0, circular.length());
+
+        //   must be: 100,200,300,...,900,1000
+        for (int i=10; i>=1; i--) circular.add(i*100,new float[]{0.0f,0.0f,(i*100.0f)});
+        Assert.assertEquals(10,   circular.length());
+        Assert.assertEquals(100,  circular.getMinTime());
+        Assert.assertEquals(1000, circular.getMaxTime());
+        {
+            for (int i = 0; i < circular.length(); i++) {
+                Assert.assertEquals((i+1)*100, circular.times[(circular.first+i)%circular.max]);
+                Assert.assertEquals((i+1)*100, (long)circular.values[(circular.first+i)%circular.max][2]);
+            }
+        }
+
+        //   must be: 100,200,300,...,900,1000
+        circular.setMinTime(550);
+        //   must be: 500,600,700,800,900,1000
+        Assert.assertEquals(6,   circular.length());
+        Assert.assertEquals(500,  circular.getMinTime());
+        Assert.assertEquals(1000, circular.getMaxTime());
+
+        {
+            for (int i = 0; i < circular.length(); i++) {
+                Assert.assertEquals(i*100+500, circular.times[(circular.first+i)%circular.max]);
+                Assert.assertEquals(i*100+500, (long)circular.values[(circular.first+i)%circular.max][2]);
+            }
+        }
+
+        //   exists : 500,600,700,800,900,1000 plus 1100,1200,1300,1400
+        //   must be: 500,600,700,800,900,1000,1100,1200,1300,1400
+        for (int i=11; i<=14; i++) circular.add(i*100,new float[]{0.0f,0.0f,(i*100.0f)});
+        Assert.assertEquals(10,   circular.length());
+        Assert.assertEquals(500,  circular.getMinTime());
+        Assert.assertEquals(1400, circular.getMaxTime());
+        {
+            for (int i = 0; i < circular.length(); i++) {
+                Assert.assertEquals(i*100+500, circular.times[(circular.first+i)%circular.max]);
+                Assert.assertEquals(i*100+500, (long)circular.values[(circular.first+i)%circular.max][2]);
+            }
+        }
+
+        point = circular.calculate(550);
+        Assert.assertEquals(point[0],0.0f,0.0004f);
+        Assert.assertEquals(point[1],0.0f,0.0004f);
+        Assert.assertEquals(point[2],550.0f,0.0004f);
+        point = circular.calculate(825);
+        Assert.assertEquals(point[0],0.0f,0.0004f);
+        Assert.assertEquals(point[1],0.0f,0.0004f);
+        Assert.assertEquals(point[2],825.0f,0.0004f);
+        point = circular.calculate(1399);
+        Assert.assertEquals(point[0],0.0f,0.0004f);
+        Assert.assertEquals(point[1],0.0f,0.0004f);
+        Assert.assertEquals(point[2],1399.0f,0.0004f);
+        point = circular.calculate(1300);
+        Assert.assertEquals(point[0],0.0f,0.0004f);
+        Assert.assertEquals(point[1],0.0f,0.0004f);
+        Assert.assertEquals(point[2],1300.0f,0.0004f);
+        point = circular.calculate(1400);
+        Assert.assertEquals(point[0],0.0f,0.0004f);
+        Assert.assertEquals(point[1],0.0f,0.0004f);
+        Assert.assertEquals(point[2],1400.0f,0.0004f);
 
     }
 
