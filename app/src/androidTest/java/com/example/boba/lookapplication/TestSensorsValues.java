@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 
 /**
+ *
  * Created by boba2 on 14.07.2015.
  */
 @RunWith(AndroidJUnit4.class)
@@ -244,7 +245,7 @@ public class TestSensorsValues  {
     }
 
     @Test
-    public void test_buffer_main() {
+    public void test_calculate_distance_and_speed() {
 
         ShowSensorsValues.BufferMain bufferMain = new ShowSensorsValues.BufferMain();
 
@@ -282,15 +283,93 @@ public class TestSensorsValues  {
         // check newStep
         //
 
-        ns = bufferMain.newStep(1.0,
-                new double[]{0.0,0.0,0.0}, // speed
-                new float[]{1.0f,1.0f,1.0f}, // acceleration
-                new float[]{0.0f,0.0f,1.0f}, // gravity (z-->down)
-                new float[]{0.0f,1.0f,0.0f}, // geo-magnetic (y-->nord)
+        ns = bufferMain.newStep0(1.0,         // dt time (seconds)
+                new double[]{0.0, 0.0, 0.0},   // speed
+                new float[]{1.0f, 1.0f, 1.0f}, // acceleration
+                new float[]{0.0f, 0.0f, 1.0f}, // gravity (z-->down)
+                new float[]{0.0f, 1.0f, 0.0f}, // geo-magnetic (y-->nord)
                 0.001f);
-        Assert.assertEquals(1,ns[0],0.0001);
-        Assert.assertEquals(1,ns[1],0.0001);
-        Assert.assertEquals(1,ns[2],0.0001);
+        Assert.assertEquals(0.5,ns[0],0.0001);
+        Assert.assertEquals(0.5,ns[1],0.0001);
+        Assert.assertEquals(1.0/2.0,ns[2],0.0001);
+
+        ns = bufferMain.newStep0(1.5,         // dt time (seconds)
+                new double[]{0.0, 0.0, 0.0},   // speed
+                new float[]{1.5f, 1.0f, 0.0f}, // acceleration
+                new float[]{0.0f, 0.0f, 1.0f}, // gravity (z-->down)
+                new float[]{0.0f, 1.0f, 0.0f}, // geo-magnetic (y-->nord)
+                0.001f);
+        Assert.assertEquals(1.5*1.5*1.5*0.5,ns[0],0.0001);
+        Assert.assertEquals(1.0*1.5*1.5*0.5,ns[1],0.0001);
+        Assert.assertEquals(0.0,ns[2],0.0001);
+
+        ns = bufferMain.newStep0(1.5,         // dt time (seconds)
+                new double[]{0.0, 0.0, 0.0},   // speed
+                new float[]{-1.5f, 1.0f, 0.0f}, // acceleration
+                new float[]{0.0f, 0.0f, 1.0f}, // gravity (z-->down)
+                new float[]{0.0f, -1.0f, 0.0f}, // geo-magnetic (y-->nord)
+                0.001f);
+        Assert.assertEquals( 1.5*1.5*1.5*0.5,ns[0],0.0001);
+        Assert.assertEquals(-1.0*1.5*1.5*0.5,ns[1],0.0001);
+        Assert.assertEquals( 0.0,ns[2],0.0001);
+
+        //
+        // Rotation accelerator vector in xy (z-rotation), xz (y-rotation) planes in normal XYZ bazis
+        //
+
+        {
+            double   dt    = 0.15;
+            float[]  acc0  = new float[]{1.8f, 2.0f, -0.5f};
+            float    acc   = (float)Math.sqrt(acc0[0]*acc0[0]+acc0[1]*acc0[1]+acc0[2]*acc0[2]);
+            float[]  acc1  = new float[3];
+            double[] speed =  new double[]{1f, 1.5f, 2.0f};
+            double[] dist  = new double[3];
+            double   dd0   = 0.5*dt*dt*(acc0[0]*acc0[0]+acc0[1]*acc0[1]+acc0[2]*acc0[2])+
+                    dt*Math.sqrt(speed[0]*speed[0]+speed[1]*speed[1]+speed[2]*speed[2]);
+            double   dd;
+            double   ddCurrency = dd0*0.0925;
+            for (double i = 0.0; i <= 2.0 * Math.PI; i += Math.PI * 0.1) {
+                // Rotation on xy plane z-rotation
+                acc1[0] = acc*(float)Math.cos(i);
+                acc1[1] = acc*(float)Math.sin(i);
+                acc1[2] = acc0[2];
+                dist[0] = 0.5*dt*dt*acc1[0]+speed[0]*dt;
+                dist[1] = 0.5*dt*dt*acc1[1]+speed[1]*dt;
+                dist[2] = 0.5*dt*dt*acc1[2]+speed[2]*dt;
+                ns = bufferMain.newStep0(dt,         // dt time (seconds)
+                        speed,   // speed
+                        acc1, // acceleration
+                        new float[]{0.0f, 0.0f, 1.0f}, // gravity (z-->down)
+                        new float[]{0.0f, 1.0f, 0.0f}, // geo-magnetic (y-->nord)
+                        0.0001f);
+                Assert.assertEquals( dist[0],ns[0],0.0001);
+                Assert.assertEquals( dist[1],ns[1],0.0001);
+                Assert.assertEquals( dist[2],ns[2],0.0001);
+                dd   = 0.5*dt*dt*(acc1[0]*acc1[0]+acc1[1]*acc1[1]+acc1[2]*acc1[2])+
+                        dt*Math.sqrt(speed[0]*speed[0]+speed[1]*speed[1]+speed[2]*speed[2]);
+                Assert.assertEquals( dd0,dd,ddCurrency);
+
+                // Rotation on xz plane y-rotation
+                acc1[0] = acc*(float)Math.cos(i);
+                acc1[1] = acc0[1];
+                acc1[2] = acc*(float)Math.sin(i);
+                dist[0] = 0.5*dt*dt*acc1[0]+speed[0]*dt;
+                dist[1] = 0.5*dt*dt*acc1[1]+speed[1]*dt;
+                dist[2] = 0.5*dt*dt*acc1[2]+speed[2]*dt;
+                ns = bufferMain.newStep0(dt,         // dt time (seconds)
+                        speed,   // speed
+                        acc1, // acceleration
+                        new float[]{0.0f, 0.0f, 1.0f}, // gravity (z-->down)
+                        new float[]{0.0f, 1.0f, 0.0f}, // geo-magnetic (y-->nord)
+                        0.0001f);
+                Assert.assertEquals( dist[0],ns[0],0.0001);
+                Assert.assertEquals( dist[1],ns[1],0.0001);
+                Assert.assertEquals( dist[2],ns[2],0.0001);
+                dd   = 0.5*dt*dt*(acc1[0]*acc1[0]+acc1[1]*acc1[1]+acc1[2]*acc1[2])+
+                        dt*Math.sqrt(speed[0]*speed[0]+speed[1]*speed[1]+speed[2]*speed[2]);
+                Assert.assertEquals( dd0,dd,ddCurrency);
+            }
+        }
 
 
     }

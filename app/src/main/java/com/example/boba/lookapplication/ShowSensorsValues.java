@@ -357,6 +357,8 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     //
     static public class BufferMain extends BufferCircular {
 
+        static final double nano = 1e-9;
+
         double[][] xyz = new double[max][3];
         double[][] speed = new double[max][3];
 
@@ -413,18 +415,43 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             float[] graValues = gravity.calculate(time);
             float[] magValues = magnetic.calculate(time);
             int i1 = (i + 1) % max;
-            double dt = (times[i1] - time) * 1e-9;
+            double dt = (times[i1] - time) * nano;
 
-            xyz[i1] = add(xyz[i], newStep(dt, speed[i], accValues, graValues, magValues, accNoise));
+            xyz[i1] = add(xyz[i], newStep0(dt, speed[i], accValues, graValues, magValues, accNoise));
             speed[i1] = newSpeed(dt, speed[i], accValues, accNoise);
             return (true);
         }
 
-        public double[] newStep(double dt, double[] speed, float[] acc, float[] gra, float[] mag, float accNoise) {
-            double[] delta = new double[]{0.0, 0.0, 0.0};
+        //
+        // calculate accelerate in world axis
+        //      (input accelerate with gravity constant 9.81 m/sec^2) from local axis system
+        //
+        //      Acceleration, gravity and magnetic in local axis system.
+        //
+        // TODO: calculated acceleration is double or float?
+        //
+        public double[] worldAccelerateG(float[] acc, float[] gra, float[] mag, float accNoise) {
+            if ((gra == null) || (mag == null)) return (new double[]{0.0, 0.0, 0.0});
+            return (worldAccelerate0(new float[]{acc[0]-gra[0],acc[1]-gra[1],acc[2]-gra[2]},gra,mag,accNoise));
+        }
+
+        //
+        // calculate accelerate in world axis system with zero base input acceleration
+        //      (without gravity constant  9.81 m/sec^2) from local axis system
+        //
+        //      Acceleration, gravity and magnetic in local axis system.
+        //
+        // TODO: calculated acceleration is double or float?
+        //
+        public double[] worldAccelerate0(float[] acc, float[] gra, float[] mag, float accNoise) {
+            if ((gra == null) || (mag == null)) return (new double[]{0.0, 0.0, 0.0});
+
+            // iff length accelerate vector less 3*sigma then it's zero
+            if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= 9 * accNoise * accNoise)
+                return (new double[]{0.0, 0.0, 0.0});
+
             float[] RR = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
             float[] II = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-            if ((gra == null) || (mag == null)) return (delta);
 
             SensorManager.getRotationMatrix(RR, II, gra, mag);
 
@@ -438,12 +465,45 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             double ay = ax0 * II[3] + ay0 * II[4] + az0 * II[5];
             double az = ax0 * II[6] + ay0 * II[7] + az0 * II[8];
 
-            delta[0] = ax * 0.5 * dt * dt + speed[0] * dt;
-            delta[1] = ay * 0.5 * dt * dt + speed[1] * dt;
-            delta[2] = az * 0.5 * dt * dt + speed[2] * dt;
-
-            return (delta);
+            return (new double[]{ax,ay,az});
         }
+
+        //
+        // calculate distance step on accelerate with gravity constant 9.81 m/sec^2
+        //
+        public double[] newStepG(double dt, double[] speed, float[] accA, float[] gra, float[] mag, float accNoise) {
+            if ((gra == null) || (mag == null)) return (new double[]{0.0, 0.0, 0.0});
+            float[] acc = new float[] {accA[0] - gra[0], accA[1] - gra[1], accA[2]-gra[2]};
+            return(newStep0(dt,speed,acc,gra,mag,accNoise));
+        }
+
+        //
+        // Calculate distance step on input accelerate without gravity constant 9.81 m/sec^2
+        //
+        //      Speed in world axis system.
+        //      Acceleration, gravity and magnetic in local axis system.
+        //
+        public double[] newStep0(double dt, double[] speed, float[] acc, float[] gra, float[] mag, float accNoise) {
+            double[] delta = new double[]{0.0, 0.0, 0.0};
+            if ((gra == null) || (mag == null)) return (delta);
+
+            double[] a = worldAccelerate0(acc,gra,mag,accNoise);
+
+            double nsx = a[0] * 0.5 * dt * dt + speed[0] * dt;
+            double nsy = a[1] * 0.5 * dt * dt + speed[1] * dt;
+            double nsz = a[2] * 0.5 * dt * dt + speed[2] * dt;
+
+            return (new double[]{nsx,nsy,nsz});
+        }
+
+        //
+        // Calculate speed for acceleration and time period.
+        // Speed and acceleration on equal axis.
+        //
+        // if not exists acceleration (zero accelerate) then speed is set to zero value?
+        //
+        // TODO: check decision: zero acceleration --> zero speed
+        //
 
         public double[] newSpeed(double dt, double[] speed, float[] acc, double accNoise) {
             double[] newSpeed = new double[]{0.0, 0.0, 0.0};
