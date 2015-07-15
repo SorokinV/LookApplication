@@ -270,10 +270,6 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
     }
 
-    //
-    // TODO: Check: why not call setMinTime ?
-    //
-
     static class Calibration {
         int max = 100;
         int iii = 0;
@@ -355,6 +351,10 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     //
     //
     //
+    //
+    // TODO: Check: why not call setMinTime? Must be clear buffer periodically.
+    //
+
     static public class BufferMain extends BufferCircular {
 
         static final double nano = 1e-9;
@@ -515,7 +515,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             return (newSpeed);
         }
 
-        public double[] add(double[] a, double[] b) {
+        double[] add(double[] a, double[] b) {
             return (new double[]{a[0] + b[0], a[1] + b[1], a[2] + b[2]});
         }
 
@@ -571,8 +571,8 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         int first = -1;
         int last = -1;
 
-        long minTime = 0;
-        long maxTime = 0;
+        long minTime = -1;
+        long maxTime = -1;
 
         float[][] values = new float[max][];
         long[] times = new long[max];
@@ -626,6 +626,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
         public float[] calculate(long time) {
             float[] result = new float[]{0.0f, 0.0f, 0.0f};
+            if (length()==0) return result;
             int i0, i1;
             if ((first<0)||(time < minTime) || (maxTime < time)) return result;
             for (int i = first; 1 == 1; i++)
