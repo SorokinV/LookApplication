@@ -459,10 +459,11 @@ public class TestSensorsValues  {
     //
     //
     // TODO: Check getPoint
-    // TODO: --- Check addEvents
-    // TODO: Check checkEvents
-    // TODO: Check calculateEvents
-    // TODO: Check addAndCalculation
+    // (UnDone, unknown how generate hardware events) TODO: Check addEvents
+    // (UnDone, unknown how generate hardware events) TODO: Check addAndCalculation
+    // (Done) TODO: Check checkEvents
+    // (Done) TODO: Check calculateEvents
+    // (Done) TODO: Check cutBufferHead
     //
     //
 
@@ -541,8 +542,12 @@ public class TestSensorsValues  {
                 }
             }
 
+            Assert.assertEquals(0, mBuffer.first);
+            Assert.assertEquals(5,mBuffer.last);
             mBuffer.checkEvents();
-            Assert.assertEquals(5,mBuffer.iii);
+            Assert.assertEquals(5, mBuffer.iii);
+            Assert.assertEquals(1, mBuffer.first);
+            Assert.assertEquals(5,mBuffer.last);
 
             {
                 long[]   tt = new long[]{100000000,200000000,300000000,400000000,500000000};
@@ -560,6 +565,28 @@ public class TestSensorsValues  {
                 }
             }
 
+            // after cutting must be exists one point (last) with time=500 000 000
+            mBuffer.cutBufferHead();
+            Assert.assertEquals(5, mBuffer.iii);
+            Assert.assertEquals(mBuffer.iii,mBuffer.first);
+            Assert.assertEquals(mBuffer.iii,mBuffer.last);
+
+            {
+                double   dt = ShowSensorsValues.BufferMain.nano *(500000000-100000000);
+                double[] pp = new double[] {0.5 * dt * dt * 1.0,0.0,0.0};
+                double[] sp = new double[] {dt * 1.0,0.0,0.0};
+
+                Assert.assertEquals(500000000, mBuffer.times[mBuffer.iii]);
+
+                Assert.assertEquals(pp[0], mBuffer.xyz[mBuffer.iii][0], 0.001f);
+                Assert.assertEquals(pp[1], mBuffer.xyz[mBuffer.iii][1], 0.001f);
+                Assert.assertEquals(pp[2], mBuffer.xyz[mBuffer.iii][2], 0.001f);
+
+                Assert.assertEquals(sp[0], mBuffer.speed[mBuffer.iii][0], 0.001f);
+                Assert.assertEquals(sp[1], mBuffer.speed[mBuffer.iii][1], 0.001f);
+                Assert.assertEquals(sp[2], mBuffer.speed[mBuffer.iii][2], 0.001f);
+
+            }
 
 
         }

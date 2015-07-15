@@ -352,8 +352,8 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     //
     //
     //
-    // TODO: Check: why not call setMinTime? Must be clear buffer periodically.
-    // TODO: Check initial calculation state. When datas from accelerator getting first, then task don't start calculation. Not exists gravity and magnetic data.
+    // (Done) TODO: Check: why not call setMinTime? Must be clear buffer periodically.
+    // (Done) TODO: Check initial calculation state. When datas from accelerator getting first, then task don't start calculation. Not exists gravity and magnetic data.
     //
     //
 
@@ -383,15 +383,15 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         }
 
         public double[] getPoint() {
-            if ((iii < 0) || (iii == first)) return (xyz[0]);
-            int i = iii - 1;
-            if (i < 0) i += max;
+            if ((iii < 0)) return (xyz[0]);
+            int i = iii - 1; if (i < 0) i += max;
             return (xyz[i]);
         }
 
         public void addAndCalculate(SensorEvent event) {
             addEvent(event);
             checkEvents();
+            cutBufferHead();
         }
 
         public void checkEvents() {
@@ -423,6 +423,14 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             xyz[i1] = add(xyz[i], newStep0(dt, speed[i], accValues, graValues, magValues, accNoise));
             speed[i1] = newSpeed(dt, speed[i], accValues, accNoise);
             return (true);
+        }
+
+        public void cutBufferHead() {
+            if (iii>=0) {
+                this.setMinTime(times[iii]);
+                gravity.setMinTime(times[iii]);
+                magnetic.setMinTime(times[iii]);
+            }
         }
 
         //
