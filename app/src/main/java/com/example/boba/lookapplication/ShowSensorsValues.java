@@ -347,12 +347,14 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     }
 
     //
-    // Work on Linear Accelerator
+    // 2015-07-14: Work on Linear Accelerator (without gravity acceleration constats 9.81 m/sec^2)
     //
     //
     //
     //
     // TODO: Check: why not call setMinTime? Must be clear buffer periodically.
+    // TODO: Check initial calculation state. When datas from accelerator getting first, then task don't start calculation. Not exists gravity and magnetic data.
+    //
     //
 
     static public class BufferMain extends BufferCircular {
@@ -393,6 +395,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         }
 
         public void checkEvents() {
+            if (iii<0) CheckEventsFirstStart();
             int i0 = iii;
             if (i0 < 0) i0 = first;
             if (i0 < 0) return;
@@ -420,6 +423,28 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             xyz[i1] = add(xyz[i], newStep0(dt, speed[i], accValues, graValues, magValues, accNoise));
             speed[i1] = newSpeed(dt, speed[i], accValues, accNoise);
             return (true);
+        }
+
+        //
+        //
+        // Aligned state acceleration, gravity and magnetic data on time in first time.
+        // For example, exists data for acceleration in 1 seconds, magnetic in 2 seconds and gravity in 3 seconds.
+        // In this case task don't start calculation, then it's don't have gravity and magnetic data
+        // for time between 1 and 2 seconds.
+        //
+        // 2015-07-15 : find from testing
+        //
+        public void CheckEventsFirstStart () {
+            if (iii>=0) return;
+            if ((length()==0)||(magnetic.length()==0)||(gravity.length()==0)) return;
+            long maxmin = Math.max(minTime,Math.max(gravity.minTime,magnetic.minTime));
+            float[] vAcc = calculate(maxmin);
+            float[] vGra = gravity.calculate(maxmin);
+            float[] vMag = magnetic.calculate(maxmin);
+            add(maxmin, vAcc);
+            gravity.add(maxmin, vGra);
+            magnetic.add(maxmin, vMag);
+            setMinTime(maxmin);
         }
 
         //
@@ -586,6 +611,9 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             times =  new long[max];
         }
 
+        //
+        // time between 0 and infinity (only zero-positive)
+        //
         public void add(long time, float[] values) {
             if ((time == minTime) || (time == maxTime)) return;
             if (time > maxTime) {
@@ -608,7 +636,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 minTime = time;
             }
             if (maxTime < time) {add(time, values); return; }
-            for (int i = first; 1 == 1; i++)
+            for (int i = first; true; i++)
                 if (times[i % max] >= time) { i1 = i % max; break; }
             if (times[i1] == time) return;
             i0 = i1;

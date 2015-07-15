@@ -536,8 +536,31 @@ public class TestSensorsValues  {
                 for (int i = 0; i < mBuffer.length(); i++) {
                     Assert.assertEquals(tt[i], mBuffer.times[(mBuffer.first+i)%mBuffer.max]);
                     Assert.assertEquals(1.0f, mBuffer.values[(mBuffer.first+i)%mBuffer.max][0],0.001f);
+                    Assert.assertEquals(0.0f, mBuffer.values[(mBuffer.first+i)%mBuffer.max][1],0.001f);
+                    Assert.assertEquals(0.0f, mBuffer.values[(mBuffer.first+i)%mBuffer.max][2],0.001f);
                 }
             }
+
+            mBuffer.checkEvents();
+            Assert.assertEquals(5,mBuffer.iii);
+
+            {
+                long[]   tt = new long[]{100000000,200000000,300000000,400000000,500000000};
+                double   dt = 0.0;
+                double[] pp = new double[] {0.0,0.0,0.0};
+                for (int i = 0; i < mBuffer.length(); i++) {
+                    dt = ShowSensorsValues.BufferMain.nano *(tt[i]-tt[0]);
+                    pp[0] = 0.5*dt*dt*1.0;
+                    pp[1] = 0.5*dt*dt*0.0;
+                    pp[2] = 0.5*dt*dt*0.0;
+                    Assert.assertEquals(tt[i], mBuffer.times[(mBuffer.first+i)%mBuffer.max]);
+                    Assert.assertEquals(pp[0], mBuffer.xyz[(mBuffer.first+i)%mBuffer.max][0],0.001f);
+                    Assert.assertEquals(pp[1], mBuffer.xyz[(mBuffer.first+i)%mBuffer.max][1],0.001f);
+                    Assert.assertEquals(pp[2], mBuffer.xyz[(mBuffer.first+i)%mBuffer.max][2],0.001f);
+                }
+            }
+
+
 
         }
 
