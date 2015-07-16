@@ -121,6 +121,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             case Sensor.TYPE_GYROSCOPE:
                 tGyroscope.setText(String.format("%8.4f %8.4f %8.4f", event.values[0], event.values[1], event.values[2]));
                 break;
+
             case Sensor.TYPE_LINEAR_ACCELERATION: {
                 tLinear_Acceleration.setText(String.format("%8.4f %8.4f %8.4f", v[0], v[1], v[2]));
 
@@ -324,12 +325,25 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         }
 
         public float[] getValue(float[] v) {
+            return (getValueKv(v));
+        }
+
+        public float[] getValue0(float[] v) {
             if (!calibrate) return (v);
             float[] vv = new float[3];
             vv[0] = v[0] - mean[0];
             vv[1] = v[1] - mean[1];
             vv[2] = v[2] - mean[2];
             return (vv);
+        }
+
+        public float[] getValueKv(float[] v) {
+            if (!calibrate) return (v);
+            return (new float[]
+                    {(float)(((int)(v[0]/disp[0])+0.5)*disp[0]),
+                     (float)(((int)(v[1]/disp[1])+0.5)*disp[1]),
+                     (float)(((int)(v[2]/disp[2])+0.5)*disp[2])}
+            );
         }
 
         public float[] getSigmaXYZ() {
@@ -354,27 +368,32 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     //
     // (Done) TODO: Check: why not call setMinTime? Must be clear buffer periodically.
     // (Done) TODO: Check initial calculation state. When datas from accelerator getting first, then task don't start calculation. Not exists gravity and magnetic data.
-    //
+    // TODO: Add data in calibrate structures on gravity, acceleration, geomagnetic, linear acceleration
+    // TODO: Check kvanting calibration on dispersion values (axis or not)
     //
 
     static public class BufferMain extends BufferCircular {
 
-        static final double nano = 1e-9;
+        static final double nano  = 1e-9;
+        static final double coefficientNoise = 2.5;
 
         double[][] xyz = new double[max][3];
         double[][] speed = new double[max][3];
 
         int iii = -1;
 
-        BufferCircular gravity = new BufferCircular();
-        BufferCircular magnetic = new BufferCircular();
-        BufferCircular accelerator = new BufferCircular();
+        BufferCircular gravity      = new BufferCircular();
+        BufferCircular magnetic     = new BufferCircular();
+        BufferCircular accelerator  = new BufferCircular();
         BufferCircular acceleratorL = new BufferCircular();
-        BufferCircular gyroscope = new BufferCircular();
-        BufferCircular orientation = new BufferCircular();
-        BufferCircular rotation = new BufferCircular();
+        BufferCircular gyroscope    = new BufferCircular();
+        BufferCircular orientation  = new BufferCircular();
+        BufferCircular rotation     = new BufferCircular();
 
-        Calibration cAccelerometer = new Calibration(0.0f);
+        Calibration cAccelerometer  = new Calibration(0.0f);
+        Calibration cGravity        = new Calibration(0.0f);
+        Calibration cMagnetic       = new Calibration(0.0f);
+        Calibration cAccelerometerG = new Calibration(0.0f);
 
         public BufferMain() {
             super();
@@ -480,7 +499,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             if ((gra == null) || (mag == null)) return (new double[]{0.0, 0.0, 0.0});
 
             // iff length accelerate vector less 3*sigma then it's zero
-            if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= 9 * accNoise * accNoise)
+            if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= coefficientNoise*coefficientNoise*accNoise * accNoise)
                 return (new double[]{0.0, 0.0, 0.0});
 
             float[] RR = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -540,7 +559,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
         public double[] newSpeed(double dt, double[] speed, float[] acc, double accNoise) {
             double[] newSpeed = new double[]{0.0, 0.0, 0.0};
-            if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= 9 * accNoise * accNoise)
+            if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= coefficientNoise*coefficientNoise*accNoise * accNoise)
                 return (newSpeed);
             newSpeed[0] = speed[0] + acc[0] * dt;
             newSpeed[1] = speed[1] + acc[1] * dt;
@@ -555,10 +574,16 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         public void addEvent(SensorEvent event) {
             switch (event.sensor.getType()) {
                 case Sensor.TYPE_ACCELEROMETER: {
+                    if (!cAccelerometerG.isCalibrate()) {
+                        cAccelerometerG.add(event.values);
+                    }
                     accelerator.add(event.timestamp, event.values);
                     break;
                 }
                 case Sensor.TYPE_GRAVITY: {
+                    if (!cGravity.isCalibrate()) {
+                        cGravity.add(event.values);
+                    }
                     gravity.add(event.timestamp, event.values);
                     break;
                 }
@@ -567,8 +592,9 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                         cAccelerometer.add(event.values);
                         break;
                     }
-                    add(event.timestamp, event.values);
-                    acceleratorL.add(event.timestamp, event.values);
+                    float[] v = cAccelerometer.getValue(event.values);
+                    add(event.timestamp, v);
+                    acceleratorL.add(event.timestamp, v);
                     break;
                 }
                 case Sensor.TYPE_GYROSCOPE: {
@@ -576,6 +602,9 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                     break;
                 }
                 case Sensor.TYPE_MAGNETIC_FIELD: {
+                    if (!cMagnetic.isCalibrate()) {
+                        cMagnetic.add(event.values);
+                    }
                     magnetic.add(event.timestamp, event.values);
                     break;
                 }
