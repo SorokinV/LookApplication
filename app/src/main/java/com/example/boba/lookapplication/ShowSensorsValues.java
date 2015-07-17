@@ -204,17 +204,21 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
         if (debugOk && (writeFile != null) && (dtEnd < System.currentTimeMillis())) {
             debugOk = false;
-            if (writeFile != null) writeFile.close();
+            debugClose(writeFile);
             writeFile = null;
         }
     }
 
     void printDebug0(String text) {
         if (debugOk) {
-            if (writeFile == null) writeFile = new WriteFile(this, "bobaSensors.log", false);
-            writeFile.writeRecord(text);
+            if (writeFile == null) writeFile = debugOpen("debug.log");
+            debugWrite(writeFile,text);
         }
     }
+
+    WriteFile debugOpen  (String filename) { return (new WriteFile(this, filename, false)); }
+    void      debugWrite (WriteFile writeFile, String text) { if (writeFile!=null) writeFile.writeRecord(text);}
+    void      debugClose (WriteFile writeFile) { if (writeFile!=null) writeFile.close();}
 
     //
     // Common average filter on first N last points
@@ -271,39 +275,103 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
     }
 
-    static class Calibration {
+    // TODO: Restore static modifier after debug print
+
+    class Calibration {
+
+        int skipFirstValues = 30; // skip first values
+
         int max = 100;
         int iii = 0;
         float[][] calibration = new float[max][3];
-        float[] mean = new float[]{0.0f, 0.0f, 0.0f};
-        float[] disp = new float[]{0.0f, 0.0f, 0.0f};
+        float[] means   = new float[]{0.0f, 0.0f, 0.0f};
+        float[] disp    = new float[]{0.0f, 0.0f, 0.0f};
+        float[] offset  = new float[]{0.0f, 0.0f, 0.0f};
+        float[] maximum = new float[]{0.0f, 0.0f, 0.0f};
+        float[] minimum = new float[]{0.0f, 0.0f, 0.0f};
         boolean calibrate = false;
         float meanExpected = 0.0f;
         float dispAbs = 0.0f;
+
+        boolean   debug = false;
+        WriteFile debugFile=null;
+        String    debugName="bobaSensors.log";
+
+        public Calibration() {}
 
         public Calibration(float expected) {
             meanExpected = expected;
         }
 
+        public Calibration(float expected,String filename) {
+            meanExpected = expected;
+            debugName = filename;
+            debug = true;
+        }
+
+        public Calibration(String filename) {
+            debugName = filename;
+            debug = true;
+        }
+
+        protected void finalize() {
+            if (debug&&(debugFile!=null)) {
+                debugClose(debugFile);
+                debugFile = null;
+            }
+        }
+
         public void add(float[] v) {
+            if (debug) {
+                if (debugFile==null) debugFile=debugOpen(debugName);
+                debugWrite(debugFile, String.format("%13.9f %13.9f %13.9f", v[0], v[1], v[2]));
+            }
             if (calibrate) return;
-            calibration[iii++] = v;
+            if (skipFirstValues>0) {skipFirstValues--; return;}
+            calibration[iii++] = new float[]{v[0],v[1],v[2]};
             if (iii >= max) calibrate();
         }
 
-        void calibrate() {
-            for (int i = 0; i < max; i++) {
-                mean[0] += calibration[i][0];
-                mean[1] += calibration[i][1];
-                mean[2] += calibration[i][2];
+        public void add(long time, float[] v) {
+            if (debug) {
+                if (debugFile==null) debugFile=debugOpen(debugName);
+                debugWrite(debugFile, String.format("%13d %13.9f %13.9f %13.9f", time,   v[0], v[1], v[2]));
             }
-            mean[0] /= max;
-            mean[1] /= max;
-            mean[2] /= max;
+            if (calibrate) return;
+            if (skipFirstValues>0) {skipFirstValues--; return;}
+            calibration[iii++] = new float[]{v[0],v[1],v[2]};
+            if (iii >= max) calibrate();
+        }
+
+        // (Done) TODO: Correct. First values on maximum and minimum is not correct
+        void calibrate() {
+
             for (int i = 0; i < max; i++) {
-                disp[0] += (mean[0] - calibration[i][0]) * (mean[0] - calibration[i][0]);
-                disp[1] += (mean[1] - calibration[i][1]) * (mean[1] - calibration[i][1]);
-                disp[2] += (mean[2] - calibration[i][2]) * (mean[2] - calibration[i][2]);
+                means[0] += calibration[i][0];
+                means[1] += calibration[i][1];
+                means[2] += calibration[i][2];
+                if (i==0) {
+                    minimum[0]=calibration[i][0];
+                    minimum[1]=calibration[i][1];
+                    minimum[2]=calibration[i][2];
+                    maximum[0]=calibration[i][0];
+                    maximum[1]=calibration[i][1];
+                    maximum[2]=calibration[i][2];
+                }
+                if (minimum[0]>calibration[i][0]) minimum[0]=calibration[i][0];
+                if (minimum[1]>calibration[i][1]) minimum[1]=calibration[i][1];
+                if (minimum[2]>calibration[i][2]) minimum[2]=calibration[i][2];
+                if (maximum[0]<calibration[i][0]) maximum[0]=calibration[i][0];
+                if (maximum[1]<calibration[i][1]) maximum[1]=calibration[i][1];
+                if (maximum[2]<calibration[i][2]) maximum[2]=calibration[i][2];
+            }
+            means[0] /= max;
+            means[1] /= max;
+            means[2] /= max;
+            for (int i = 0; i < max; i++) {
+                disp[0] += (means[0] - calibration[i][0]) * (means[0] - calibration[i][0]);
+                disp[1] += (means[1] - calibration[i][1]) * (means[1] - calibration[i][1]);
+                disp[2] += (means[2] - calibration[i][2]) * (means[2] - calibration[i][2]);
             }
             disp[0] /= max;
             disp[1] /= max;
@@ -314,35 +382,65 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
             dispAbs = (float) Math.sqrt(disp[0] * disp[0] + disp[1] * disp[1] + disp[2] * disp[2]);
 
-            float meanXYZ = (float) Math.sqrt(mean[0] * mean[0] + mean[1] * mean[1] + mean[2] * mean[2]);
+            float meanXYZ = (float) Math.sqrt(means[0] * means[0] + means[1] * means[1] + means[2] * means[2]);
             if (Math.abs(meanExpected) > 0.001f) {
-                mean[0] *= ((meanXYZ - meanExpected) / meanExpected);
-                mean[1] *= ((meanXYZ - meanExpected) / meanExpected);
-                mean[2] *= ((meanXYZ - meanExpected) / meanExpected);
+                offset[0] *= ((meanXYZ - meanExpected) / meanExpected);
+                offset[1] *= ((meanXYZ - meanExpected) / meanExpected);
+                offset[2] *= ((meanXYZ - meanExpected) / meanExpected);
+            }
+
+            if (debug) {
+                if (debugFile==null) debugFile=debugOpen(debugName);
+                for (int i=0; i<max; i++) {
+                    debugWrite(debugFile, String.format("%5d. %13.9f %13.9f %13.9f",
+                            i, calibration[i][0], calibration[i][1], calibration[i][2]));
+                }
+                debugWrite(debugFile,String.format("means   = %13.9f %13.9f %13.9f",means[0],means[1],means[2]));
+                debugWrite(debugFile,String.format("disp    = %13.9f %13.9f %13.9f",disp[0],disp[1],disp[2]));
+                debugWrite(debugFile,String.format("offset  = %13.9f %13.9f %13.9f",offset[0],offset[1],offset[2]));
+                debugWrite(debugFile,String.format("minimum = %13.9f %13.9f %13.9f",minimum[0],minimum[1],minimum[2]));
+                debugWrite(debugFile,String.format("maximum = %13.9f %13.9f %13.9f",maximum[0],maximum[1],maximum[2]));
             }
 
             calibrate = true;
         }
 
         public float[] getValue(float[] v) {
-            return (getValueKv(v));
+            float[] vv = getValueKv(v);
+            if (debug)
+                if (debugFile==null) debugFile=debugOpen(debugName);
+                debugWrite(debugFile,
+                        String.format("d= %13.9f %13.9f %13.9f - %13.9f %13.9f %13.9f",
+                        v[0],v[1],v[2],vv[0],vv[1],vv[2]));
+            return (vv);
+        }
+
+        public float[] getValue(long time, float[] v) {
+            float[] vv = getValueKv(v);
+            if (debug)
+                if (debugFile==null) debugFile=debugOpen(debugName);
+                debugWrite(debugFile,
+                        String.format("vvvv= %13d %13.9f %13.9f %13.9f - %13.9f %13.9f %13.9f",
+                                time,v[0],v[1],v[2],vv[0],vv[1],vv[2]));
+            return (vv);
         }
 
         public float[] getValue0(float[] v) {
             if (!calibrate) return (v);
             float[] vv = new float[3];
-            vv[0] = v[0] - mean[0];
-            vv[1] = v[1] - mean[1];
-            vv[2] = v[2] - mean[2];
+            vv[0] = v[0] - means[0];
+            vv[1] = v[1] - means[1];
+            vv[2] = v[2] - means[2];
             return (vv);
         }
 
         public float[] getValueKv(float[] v) {
             if (!calibrate) return (v);
+            double coeff = 2.5;
             return (new float[]
-                    {(float)(((int)(v[0]/disp[0])+0.5)*disp[0]),
-                     (float)(((int)(v[1]/disp[1])+0.5)*disp[1]),
-                     (float)(((int)(v[2]/disp[2])+0.5)*disp[2])}
+                    {(float)(((int)(v[0]/(disp[0]*coeff)))*disp[0]*coeff),
+                     (float)(((int)(v[1]/(disp[1]*coeff)))*disp[1]*coeff),
+                     (float)(((int)(v[2]/(disp[2]*coeff)))*disp[2]*coeff)}
             );
         }
 
@@ -372,7 +470,9 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     // TODO: Check kvanting calibration on dispersion values (axis or not)
     //
 
-    static public class BufferMain extends BufferCircular {
+    // TODO: Restore static after debug printing
+
+    public class BufferMain extends BufferCircular {
 
         static final double nano  = 1e-9;
         static final double coefficientNoise = 2.5;
@@ -391,14 +491,24 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         BufferCircular rotation     = new BufferCircular();
 
         Calibration cAccelerometer  = new Calibration(0.0f);
-        Calibration cGravity        = new Calibration(0.0f);
-        Calibration cMagnetic       = new Calibration(0.0f);
-        Calibration cAccelerometerG = new Calibration(0.0f);
+        Calibration cGravity        = new Calibration(SensorManager.GRAVITY_EARTH);
+        Calibration cMagnetic       = new Calibration(SensorManager.MAGNETIC_FIELD_EARTH_MAX);
+        Calibration cAccelerometerG = new Calibration(SensorManager.GRAVITY_EARTH);
+
+        boolean debug = true;
 
         public BufferMain() {
             super();
             xyz[0] = new double[]{0.0, 0.0, 0.0};
             speed[0] = new double[]{0.0, 0.0, 0.0};
+
+            if (debug) {
+                cAccelerometer  = new Calibration(0.0f,"sAccelerationL.log");
+                cGravity        = new Calibration(SensorManager.GRAVITY_EARTH,"sGravity.log");
+                cMagnetic       = new Calibration(SensorManager.MAGNETIC_FIELD_EARTH_MAX,"sMagnetic.log");
+                cAccelerometerG = new Calibration(SensorManager.GRAVITY_EARTH,"sAccelerationG.log");
+            }
+
         }
 
         public double[] getPoint() {
@@ -498,9 +608,12 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
         public double[] worldAccelerate0(float[] acc, float[] gra, float[] mag, float accNoise) {
             if ((gra == null) || (mag == null)) return (new double[]{0.0, 0.0, 0.0});
 
+            /*
+            // TODO: Restore if kvanting is not success 2015-07-16
             // iff length accelerate vector less 3*sigma then it's zero
             if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= coefficientNoise*coefficientNoise*accNoise * accNoise)
                 return (new double[]{0.0, 0.0, 0.0});
+            */
 
             float[] RR = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
             float[] II = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -559,8 +672,13 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
 
         public double[] newSpeed(double dt, double[] speed, float[] acc, double accNoise) {
             double[] newSpeed = new double[]{0.0, 0.0, 0.0};
+            // TODO: Restore if kvanting is not success 2015-07-16
+            /*
             if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= coefficientNoise*coefficientNoise*accNoise * accNoise)
                 return (newSpeed);
+            */
+            // TODO: Restore if kvanting is not success 2015-07-16
+            if ((acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]) <= 0.01) return (newSpeed);
             newSpeed[0] = speed[0] + acc[0] * dt;
             newSpeed[1] = speed[1] + acc[1] * dt;
             newSpeed[2] = speed[2] + acc[2] * dt;
@@ -575,24 +693,28 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             switch (event.sensor.getType()) {
                 case Sensor.TYPE_ACCELEROMETER: {
                     if (!cAccelerometerG.isCalibrate()) {
-                        cAccelerometerG.add(event.values);
+                        cAccelerometerG.add(event.timestamp,event.values);
+                        break;
                     }
-                    accelerator.add(event.timestamp, event.values);
+                    float[] v = cAccelerometerG.getValue(event.timestamp,event.values);
+                    accelerator.add(event.timestamp, v);
                     break;
                 }
                 case Sensor.TYPE_GRAVITY: {
                     if (!cGravity.isCalibrate()) {
-                        cGravity.add(event.values);
+                        cGravity.add(event.timestamp,event.values);
+                        break;
                     }
-                    gravity.add(event.timestamp, event.values);
+                    float[] v = cGravity.getValue(event.timestamp,event.values);
+                    gravity.add(event.timestamp, v);
                     break;
                 }
                 case Sensor.TYPE_LINEAR_ACCELERATION: {
                     if (!cAccelerometer.isCalibrate()) {
-                        cAccelerometer.add(event.values);
+                        cAccelerometer.add(event.timestamp,event.values);
                         break;
                     }
-                    float[] v = cAccelerometer.getValue(event.values);
+                    float[] v = cAccelerometer.getValue(event.timestamp,event.values);
                     add(event.timestamp, v);
                     acceleratorL.add(event.timestamp, v);
                     break;
@@ -603,9 +725,11 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 }
                 case Sensor.TYPE_MAGNETIC_FIELD: {
                     if (!cMagnetic.isCalibrate()) {
-                        cMagnetic.add(event.values);
+                        cMagnetic.add(event.timestamp,event.values);
+                        break;
                     }
-                    magnetic.add(event.timestamp, event.values);
+                    float[] v = cMagnetic.getValue(event.timestamp,event.values);
+                    magnetic.add(event.timestamp, v);
                     break;
                 }
                 case Sensor.TYPE_ORIENTATION: {
@@ -628,7 +752,9 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
     // TODO: 2015-07-14 Decision: What is result calculate when time<minTime or maxTime<time (now result is zero)
     //
 
-    static public class BufferCircular {
+    // TODO: Restore static after debug print
+
+    public class BufferCircular {
         int max = 100;
         int first = -1;
         int last = -1;
@@ -656,7 +782,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             if (time > maxTime) {
                 last = ((last + 1) % max);
                 if (first == -1) first = last;
-                this.values[last] = values;
+                this.values[last] = new float[] {values[0],values[1],values[2]};
                 this.times[last] = time;
                 maxTime = time; if (first==last) minTime = time;
             } else addMiddle(time, values);
@@ -668,7 +794,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
             if (time < minTime) {
                 first--;
                 if (first < 0) first += max;
-                this.values[first] = values;
+                this.values[first] = new float[] {values[0],values[1],values[2]};
                 times[first] = time;
                 minTime = time;
             }
@@ -682,7 +808,7 @@ public class ShowSensorsValues extends ActionBarActivity implements SensorEventL
                 this.values[i % max] = this.values[(i-1) % max];
                 this.times[i % max] = this.times[(i-1) % max];
             }
-            this.values[i0 % max] = values;
+            this.values[i0 % max] = new float[] {values[0],values[1],values[2]};
             this.times [i0 % max] = time;
 
             last = (last + 1) % max;
